@@ -58,3 +58,6 @@ export const checkPermission = createAction(
   '[Auth] Check Permission',
   props<{ permission: string }>()
 );
+
+// Check stored auth on app init
+export const checkStoredAuth = createAction('[Auth] Check Stored Auth');
