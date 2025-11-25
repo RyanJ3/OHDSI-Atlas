@@ -25,32 +25,33 @@
     </button>
 
     <!-- User menu -->
-    @if (isAuthenticated$ | async) {
-      <button mat-button [matMenuTriggerFor]="userMenu" class="header__user-button">
-        <i class="fas fa-user-circle header__user-icon"></i>
-        <span class="header__user-name">{{ (user$ | async)?.name || (user$ | async)?.login }}</span>
-        <i class="fas fa-caret-down header__caret"></i>
+    <button mat-button [matMenuTriggerFor]="userMenu" class="header__user-button">
+      <span class="header__user-avatar">{{ getUserInitials() }}</span>
+      <span class="header__user-name">{{ getDisplayName() }}</span>
+      <i class="fas fa-caret-down header__caret"></i>
+    </button>
+    <mat-menu #userMenu="matMenu" class="header__user-menu">
+      <div class="user-menu-header">
+        <span class="user-menu-avatar">{{ getUserInitials() }}</span>
+        <div class="user-menu-info">
+          <span class="user-menu-name">{{ getDisplayName() }}</span>
+          <span class="user-menu-login">{{ user()?.login }}</span>
+        </div>
+      </div>
+      <mat-divider></mat-divider>
+      <button mat-menu-item>
+        <i class="fas fa-user fa-fw"></i>
+        <span>Profile</span>
       </button>
-      <mat-menu #userMenu="matMenu" class="header__user-menu">
-        <button mat-menu-item>
-          <i class="fas fa-user fa-fw"></i>
-          <span>Profile</span>
-        </button>
-        <button mat-menu-item>
-          <i class="fas fa-cog fa-fw"></i>
-          <span>Settings</span>
-        </button>
-        <mat-divider></mat-divider>
-        <button mat-menu-item (click)="logout()">
-          <i class="fas fa-sign-out-alt fa-fw"></i>
-          <span>Sign Out</span>
-        </button>
-      </mat-menu>
-    } @else {
-      <button mat-stroked-button color="primary" class="header__sign-in">
-        <i class="fas fa-sign-in-alt"></i>
-        Sign In
+      <button mat-menu-item>
+        <i class="fas fa-cog fa-fw"></i>
+        <span>Settings</span>
       </button>
-    }
+      <mat-divider></mat-divider>
+      <button mat-menu-item (click)="logout()">
+        <i class="fas fa-sign-out-alt fa-fw"></i>
+        <span>Sign Out</span>
+      </button>
+    </mat-menu>
   </div>
 </mat-toolbar>
