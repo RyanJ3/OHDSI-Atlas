@@ -27,18 +27,16 @@ export const routes: Routes = [
       {
         path: 'data-sources',
         loadComponent: () =>
-          import('./shared/components/placeholder-page/placeholder-page.component').then(
-            (m) => m.PlaceholderPageComponent
+          import('./features/data-sources/data-sources.component').then(
+            (m) => m.DataSourcesComponent
           ),
-        data: { title: 'Data Sources', icon: 'fa-database' },
       },
       {
         path: 'search',
         loadComponent: () =>
-          import('./shared/components/placeholder-page/placeholder-page.component').then(
-            (m) => m.PlaceholderPageComponent
+          import('./features/search/search.component').then(
+            (m) => m.SearchComponent
           ),
-        data: { title: 'Search Vocabulary', icon: 'fa-search' },
       },
       {
         path: 'conceptsets',
@@ -51,10 +49,9 @@ export const routes: Routes = [
       {
         path: 'cohortdefinitions',
         loadComponent: () =>
-          import('./shared/components/placeholder-page/placeholder-page.component').then(
-            (m) => m.PlaceholderPageComponent
+          import('./features/cohort-definitions/cohort-definitions.component').then(
+            (m) => m.CohortDefinitionsComponent
           ),
-        data: { title: 'Cohort Definitions', icon: 'fa-users' },
       },
       {
         path: 'characterizations',

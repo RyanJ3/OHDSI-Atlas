@@ -1,0 +1,196 @@
+.cohort-definitions-container {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+
+  &__title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    i {
+      font-size: 28px;
+      color: #1976d2;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 500;
+      color: #333;
+    }
+  }
+
+  &__actions {
+    button i {
+      margin-right: 8px;
+    }
+  }
+}
+
+.filter-card {
+  margin-bottom: 24px;
+}
+
+.search-field {
+  width: 100%;
+  max-width: 500px;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  color: #666;
+
+  p {
+    margin-top: 16px;
+  }
+}
+
+.results-card {
+  mat-card-content {
+    padding: 0;
+  }
+}
+
+.cohorts-table {
+  width: 100%;
+
+  th {
+    font-weight: 600;
+    color: #333;
+    background: #fafafa;
+  }
+
+  td {
+    vertical-align: middle;
+  }
+}
+
+.cohort-id {
+  font-family: monospace;
+  font-size: 13px;
+  color: #666;
+  background: #f5f5f5;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.cohort-name-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cohort-name {
+  font-weight: 500;
+  color: #333;
+}
+
+.cohort-description {
+  font-size: 12px;
+  color: #666;
+  max-width: 400px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tags-cell {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.tag-chip {
+  font-size: 11px;
+  min-height: 22px;
+  padding: 2px 8px;
+  background: #e3f2fd !important;
+  color: #1565c0 !important;
+}
+
+.actions-cell {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  button {
+    color: #666;
+
+    &:hover {
+      color: #1976d2;
+    }
+
+    &.has-generation {
+      color: #4caf50;
+    }
+
+    i {
+      font-size: 14px;
+    }
+  }
+}
+
+.delete-action {
+  color: #f44336 !important;
+
+  i {
+    color: #f44336;
+  }
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  text-align: center;
+
+  i {
+    font-size: 64px;
+    color: #ccc;
+    margin-bottom: 24px;
+  }
+
+  h3 {
+    margin: 0 0 8px 0;
+    font-size: 20px;
+    font-weight: 500;
+    color: #333;
+  }
+
+  p {
+    margin: 0 0 24px 0;
+    color: #666;
+  }
+
+  button i {
+    margin-right: 8px;
+  }
+}
+
+::ng-deep {
+  .mat-mdc-paginator {
+    border-top: 1px solid #eee;
+  }
+
+  .mat-mdc-row:hover {
+    background: #fafafa;
+  }
+
+  .mat-sort-header-arrow {
+    color: #666;
+  }
+}

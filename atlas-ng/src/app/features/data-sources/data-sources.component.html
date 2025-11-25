@@ -1,0 +1,119 @@
+<div class="data-sources-container">
+  <div class="page-header">
+    <div class="page-header__title">
+      <i class="fas fa-database"></i>
+      <h1>Data Sources</h1>
+    </div>
+    <div class="page-header__actions">
+      <button mat-raised-button color="primary" (click)="refreshAll()">
+        <i class="fas fa-sync-alt"></i>
+        Refresh All
+      </button>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-container">
+      <mat-spinner diameter="48"></mat-spinner>
+      <p>Loading data sources...</p>
+    </div>
+  } @else {
+    <div class="sources-grid">
+      @for (source of sources(); track source.sourceId) {
+        <mat-card class="source-card" [class.connected]="source.connectionStatus === 'connected'">
+          <mat-card-header>
+            <div class="source-header">
+              <div class="source-info">
+                <h3 class="source-name">{{ source.sourceName }}</h3>
+                <span class="source-key">{{ source.sourceKey }}</span>
+              </div>
+              <div class="source-status">
+                @switch (source.connectionStatus) {
+                  @case ('connected') {
+                    <mat-chip class="status-chip connected">
+                      <i class="fas fa-check-circle"></i>
+                      Connected
+                    </mat-chip>
+                  }
+                  @case ('disconnected') {
+                    <mat-chip class="status-chip disconnected">
+                      <i class="fas fa-times-circle"></i>
+                      Disconnected
+                    </mat-chip>
+                  }
+                  @case ('checking') {
+                    <mat-chip class="status-chip checking">
+                      <mat-spinner diameter="14"></mat-spinner>
+                      Checking...
+                    </mat-chip>
+                  }
+                }
+              </div>
+            </div>
+          </mat-card-header>
+
+          <mat-card-content>
+            <div class="source-details">
+              <div class="detail-row">
+                <span class="detail-label">Dialect</span>
+                <span class="detail-value dialect-badge">{{ source.sourceDialect }}</span>
+              </div>
+            </div>
+
+            <div class="daimons-section">
+              <h4>CDM Daimons</h4>
+              <div class="daimons-list">
+                @for (daimon of source.daimons; track daimon.daimonType) {
+                  <div class="daimon-item" [matTooltip]="daimon.tableQualifier">
+                    <i [class]="getDaimonIcon(daimon.daimonType)"></i>
+                    <span>{{ formatDaimonType(daimon.daimonType) }}</span>
+                    @if (daimon.priority === 1) {
+                      <span class="priority-badge">Primary</span>
+                    }
+                  </div>
+                }
+              </div>
+            </div>
+          </mat-card-content>
+
+          <mat-card-actions>
+            <button mat-button (click)="checkConnection(source)">
+              <i class="fas fa-plug"></i>
+              Test Connection
+            </button>
+            <button mat-button [matMenuTriggerFor]="sourceMenu">
+              <i class="fas fa-ellipsis-v"></i>
+            </button>
+            <mat-menu #sourceMenu="matMenu">
+              <button mat-menu-item>
+                <i class="fas fa-info-circle fa-fw"></i>
+                <span>View Details</span>
+              </button>
+              <button mat-menu-item>
+                <i class="fas fa-chart-bar fa-fw"></i>
+                <span>View Reports</span>
+              </button>
+              <mat-divider></mat-divider>
+              <button mat-menu-item>
+                <i class="fas fa-cog fa-fw"></i>
+                <span>Configure</span>
+              </button>
+            </mat-menu>
+          </mat-card-actions>
+        </mat-card>
+      }
+    </div>
+
+    @if (sources().length === 0) {
+      <div class="empty-state">
+        <i class="fas fa-database"></i>
+        <h3>No Data Sources Configured</h3>
+        <p>Connect to an OMOP CDM database to get started.</p>
+        <button mat-raised-button color="primary">
+          <i class="fas fa-plus"></i>
+          Add Data Source
+        </button>
+      </div>
+    }
+  }
+</div>
