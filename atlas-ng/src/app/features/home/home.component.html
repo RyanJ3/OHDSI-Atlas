@@ -1,0 +1,58 @@
+<div class="home">
+  <!-- Welcome Section -->
+  <div class="home__welcome">
+    <h1 class="home__title">Welcome to ATLAS</h1>
+    <p class="home__subtitle">
+      An open source software tool for researchers to conduct scientific analyses on standardized observational data
+    </p>
+  </div>
+
+  <!-- Quick Actions Grid -->
+  <div class="home__section">
+    <h2 class="home__section-title">Quick Actions</h2>
+    <div class="home__actions-grid">
+      @for (action of quickActions; track action.route) {
+        <mat-card class="home__action-card" [routerLink]="action.route">
+          <mat-card-content>
+            <div class="home__action-icon" [style.background-color]="action.color">
+              <i class="fas {{ action.icon }}"></i>
+            </div>
+            <h3 class="home__action-title">{{ action.title }}</h3>
+            <p class="home__action-description">{{ action.description }}</p>
+          </mat-card-content>
+        </mat-card>
+      }
+    </div>
+  </div>
+
+  <!-- Recent Activity Section (Placeholder) -->
+  <div class="home__section">
+    <h2 class="home__section-title">Recent Activity</h2>
+    <mat-card class="home__recent-card">
+      <mat-card-content>
+        <div class="home__empty-state">
+          <i class="fas fa-history home__empty-icon"></i>
+          <p>No recent activity to display</p>
+          <p class="home__empty-hint">Your recent cohorts, concept sets, and analyses will appear here</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Data Sources Overview (Placeholder) -->
+  <div class="home__section">
+    <h2 class="home__section-title">Data Sources</h2>
+    <mat-card class="home__sources-card">
+      <mat-card-content>
+        <div class="home__empty-state">
+          <i class="fas fa-database home__empty-icon"></i>
+          <p>Connect to view available data sources</p>
+          <button mat-raised-button color="primary" routerLink="/data-sources">
+            <i class="fas fa-plug"></i>
+            View Data Sources
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

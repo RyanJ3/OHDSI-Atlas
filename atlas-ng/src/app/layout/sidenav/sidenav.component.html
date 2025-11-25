@@ -1,0 +1,42 @@
+<nav class="sidenav" [class.sidenav--collapsed]="!expanded">
+  <div class="sidenav__nav-items">
+    @for (item of navItems; track item.route) {
+      <a
+        class="sidenav__nav-item"
+        [routerLink]="item.route"
+        routerLinkActive="sidenav__nav-item--active"
+        [matTooltip]="!expanded ? item.title : ''"
+        matTooltipPosition="right"
+        matRipple
+      >
+        <i class="sidenav__nav-icon fas {{ item.icon }}"></i>
+        @if (expanded) {
+          <span class="sidenav__nav-title">{{ item.title }}</span>
+        }
+        @if (item.badge && expanded) {
+          <span class="sidenav__nav-badge">{{ item.badge }}</span>
+        }
+      </a>
+    }
+  </div>
+
+  <!-- Footer -->
+  @if (expanded) {
+    <div class="sidenav__footer">
+      <div class="sidenav__footer-divider"></div>
+      <div class="sidenav__footer-content">
+        <a href="https://www.apache.org/licenses/LICENSE-2.0" target="_blank" class="sidenav__footer-link">
+          Apache 2.0
+        </a>
+        <span class="sidenav__footer-text">open source software</span>
+        <span class="sidenav__footer-text">provided by</span>
+        <a href="https://www.ohdsi.org" target="_blank" class="sidenav__footer-logo">
+          <img src="assets/images/ohdsi_color.png" alt="OHDSI" />
+        </a>
+        <a href="https://www.ohdsi.org" target="_blank" class="sidenav__footer-link">
+          join the journey
+        </a>
+      </div>
+    </div>
+  }
+</nav>

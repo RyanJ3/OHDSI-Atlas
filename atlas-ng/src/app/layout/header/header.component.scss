@@ -1,0 +1,127 @@
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  height: var(--atlas-header-height);
+  background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+
+  &__left,
+  &__center,
+  &__right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  &__left {
+    flex: 0 0 auto;
+  }
+
+  &__center {
+    flex: 1;
+    justify-content: center;
+  }
+
+  &__right {
+    flex: 0 0 auto;
+  }
+
+  &__menu-button {
+    color: white;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+  }
+
+  &__logo {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: white;
+    margin-left: 8px;
+
+    &:hover {
+      text-decoration: none;
+    }
+  }
+
+  &__logo-text {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+  }
+
+  &__icon-button {
+    color: white;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    i {
+      font-size: 18px;
+    }
+  }
+
+  &__user-button {
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: 4px;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+  }
+
+  &__user-icon {
+    font-size: 24px;
+  }
+
+  &__user-name {
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__caret {
+    font-size: 12px;
+    opacity: 0.8;
+  }
+
+  &__sign-in {
+    border-color: rgba(255, 255, 255, 0.5);
+    color: white;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+      border-color: white;
+    }
+
+    i {
+      margin-right: 6px;
+    }
+  }
+}
+
+::ng-deep .header__user-menu {
+  margin-top: 4px;
+
+  .mat-mdc-menu-item {
+    i {
+      margin-right: 12px;
+      color: #666;
+    }
+  }
+}

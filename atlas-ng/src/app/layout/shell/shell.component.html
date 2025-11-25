@@ -1,0 +1,22 @@
+<div class="shell">
+  <!-- Loading bar -->
+  @if (loading$ | async) {
+    <mat-progress-bar mode="indeterminate" class="shell__loading-bar"></mat-progress-bar>
+  }
+
+  <!-- Header -->
+  <app-header></app-header>
+
+  <!-- Main content area -->
+  <div class="shell__body">
+    <!-- Sidenav -->
+    <app-sidenav [expanded]="(sidenavExpanded$ | async) ?? true"></app-sidenav>
+
+    <!-- Content -->
+    <main class="shell__content" [class.shell__content--collapsed]="!(sidenavExpanded$ | async)">
+      <div class="shell__content-inner">
+        <router-outlet></router-outlet>
+      </div>
+    </main>
+  </div>
+</div>

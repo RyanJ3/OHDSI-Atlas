@@ -1,0 +1,38 @@
+.shell {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+
+  &__loading-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1100;
+  }
+
+  &__body {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+    margin-top: var(--atlas-header-height);
+  }
+
+  &__content {
+    flex: 1;
+    overflow: auto;
+    margin-left: var(--atlas-sidebar-width);
+    transition: margin-left 0.3s ease;
+    background-color: var(--atlas-background);
+
+    &--collapsed {
+      margin-left: var(--atlas-sidebar-collapsed-width);
+    }
+  }
+
+  &__content-inner {
+    padding: 24px;
+    min-height: calc(100vh - var(--atlas-header-height) - 48px);
+  }
+}
