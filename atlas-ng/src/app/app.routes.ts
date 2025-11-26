@@ -104,18 +104,16 @@ export const routes: Routes = [
       {
         path: 'reusables',
         loadComponent: () =>
-          import('./shared/components/placeholder-page/placeholder-page.component').then(
-            (m) => m.PlaceholderPageComponent
+          import('./features/reusables/reusables.component').then(
+            (m) => m.ReusablesComponent
           ),
-        data: { title: 'Reusables', icon: 'fa-recycle' },
       },
       {
         path: 'tagging',
         loadComponent: () =>
-          import('./shared/components/placeholder-page/placeholder-page.component').then(
-            (m) => m.PlaceholderPageComponent
+          import('./features/tagging/tagging.component').then(
+            (m) => m.TaggingComponent
           ),
-        data: { title: 'Tagging', icon: 'fa-tags' },
       },
       {
         path: 'jobs',
@@ -132,10 +130,9 @@ export const routes: Routes = [
       {
         path: 'feedback',
         loadComponent: () =>
-          import('./shared/components/placeholder-page/placeholder-page.component').then(
-            (m) => m.PlaceholderPageComponent
+          import('./features/feedback/feedback.component').then(
+            (m) => m.FeedbackComponent
           ),
-        data: { title: 'Feedback', icon: 'fa-comment' },
       },
       {
         path: '**',

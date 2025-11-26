@@ -1,0 +1,177 @@
+.feedback-container {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.page-header {
+  margin-bottom: 24px;
+
+  &__title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    i {
+      font-size: 28px;
+      color: #00897b;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 28px;
+      font-weight: 400;
+      color: #333;
+    }
+  }
+
+  &__subtitle {
+    margin-top: 8px;
+    color: #666;
+    font-size: 14px;
+    margin-left: 40px;
+  }
+}
+
+.feedback-layout {
+  display: grid;
+  grid-template-columns: 1fr 350px;
+  gap: 24px;
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.feedback-form-card {
+  mat-card-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 18px;
+
+    i {
+      color: #00897b;
+    }
+  }
+}
+
+.feedback-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 16px;
+
+  .full-width {
+    width: 100%;
+  }
+
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 16px;
+
+    button i {
+      margin-right: 8px;
+    }
+  }
+}
+
+.resources-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.resources-card,
+.tips-card {
+  mat-card-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 16px;
+
+    i {
+      color: #00897b;
+    }
+  }
+}
+
+.resources-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.resource-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+
+  &:hover {
+    background: #f5f5f5;
+  }
+
+  .resource-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: #e0f2f1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    i {
+      font-size: 18px;
+      color: #00897b;
+    }
+  }
+
+  .resource-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+
+    .resource-title {
+      font-weight: 500;
+      color: #333;
+      font-size: 14px;
+    }
+
+    .resource-description {
+      font-size: 12px;
+      color: #666;
+    }
+  }
+
+  > i.fa-external-link-alt {
+    font-size: 12px;
+    color: #999;
+  }
+}
+
+.tips-list {
+  margin: 0;
+  padding-left: 20px;
+
+  li {
+    padding: 6px 0;
+    color: #555;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+}
+
+::ng-deep {
+  .mat-mdc-option i {
+    margin-right: 8px;
+    width: 16px;
+    color: #666;
+  }
+}

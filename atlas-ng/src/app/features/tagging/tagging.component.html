@@ -1,0 +1,121 @@
+<div class="tagging-container">
+  <div class="page-header">
+    <div class="page-header__title">
+      <i class="fas fa-tags"></i>
+      <h1>Tagging</h1>
+    </div>
+    <div class="page-header__subtitle">
+      Manage tags to organize and categorize your analyses
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-container">
+      <mat-spinner diameter="48"></mat-spinner>
+      <p>Loading tags...</p>
+    </div>
+  } @else {
+    <div class="tagging-layout">
+      <!-- Tags Management -->
+      <mat-card class="tags-card">
+        <mat-card-header>
+          <mat-card-title>
+            <i class="fas fa-tag"></i>
+            Available Tags ({{ tags().length }})
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <!-- Add New Tag -->
+          <div class="add-tag-form">
+            <mat-form-field appearance="outline" class="tag-input">
+              <mat-label>New tag name</mat-label>
+              <input
+                matInput
+                [(ngModel)]="newTagName"
+                placeholder="Enter tag name..."
+                (keyup.enter)="addTag()"
+              />
+            </mat-form-field>
+            <button mat-raised-button color="primary" (click)="addTag()" [disabled]="!newTagName.trim()">
+              <i class="fas fa-plus"></i>
+              Add Tag
+            </button>
+          </div>
+
+          <mat-divider></mat-divider>
+
+          <!-- Search -->
+          <mat-form-field appearance="outline" class="search-field">
+            <mat-label>Search tags</mat-label>
+            <input matInput [(ngModel)]="searchFilter" placeholder="Filter tags..." />
+            <mat-icon matPrefix>search</mat-icon>
+          </mat-form-field>
+
+          <!-- Tags List -->
+          <div class="tags-list">
+            @for (tag of filteredTags; track tag.id) {
+              <div class="tag-item">
+                <div class="tag-preview" [style.background-color]="tag.color">
+                  {{ tag.name }}
+                </div>
+                <div class="tag-info">
+                  <span class="tag-usage">{{ tag.usageCount }} items</span>
+                  <span class="tag-author">by {{ tag.createdBy }}</span>
+                </div>
+                <div class="tag-actions">
+                  <button mat-icon-button matTooltip="Edit" (click)="editTag(tag)">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button mat-icon-button matTooltip="Delete" (click)="deleteTag(tag)">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Stats -->
+      <div class="stats-panel">
+        <mat-card class="stat-card">
+          <div class="stat-icon">
+            <i class="fas fa-tags"></i>
+          </div>
+          <div class="stat-content">
+            <span class="stat-value">{{ tags().length }}</span>
+            <span class="stat-label">Total Tags</span>
+          </div>
+        </mat-card>
+
+        <mat-card class="stat-card">
+          <div class="stat-icon usage">
+            <i class="fas fa-link"></i>
+          </div>
+          <div class="stat-content">
+            <span class="stat-value">{{ getTotalUsage() }}</span>
+            <span class="stat-label">Total Usage</span>
+          </div>
+        </mat-card>
+
+        <mat-card class="info-card">
+          <mat-card-header>
+            <mat-card-title>
+              <i class="fas fa-info-circle"></i>
+              About Tags
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <p>Tags help you organize and find your work across ATLAS:</p>
+            <ul>
+              <li>Apply tags to cohorts, concept sets, and analyses</li>
+              <li>Filter views by tags</li>
+              <li>Share tag conventions with your team</li>
+              <li>Export tagged items together</li>
+            </ul>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+  }
+</div>
