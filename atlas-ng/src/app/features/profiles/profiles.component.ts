@@ -15,9 +15,11 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSortModule, Sort } from '@angular/material/sort';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 
 // Import mock data
 import profilesData from '../../core/mock-data/profiles.json';
+import { ProfileDetailDialogComponent } from './profile-detail-dialog/profile-detail-dialog.component';
 
 interface RecordCounts {
   conditions: number;
@@ -64,12 +66,14 @@ interface Profile {
     MatSelectModule,
     MatSortModule,
     MatSnackBarModule,
+    MatDialogModule,
   ],
   templateUrl: './profiles.component.html',
   styleUrl: './profiles.component.scss',
 })
 export class ProfilesComponent implements OnInit {
   private snackBar = inject(MatSnackBar);
+  private dialog = inject(MatDialog);
 
   loading = signal(true);
   profiles = signal<Profile[]>([]);
@@ -216,8 +220,10 @@ export class ProfilesComponent implements OnInit {
   }
 
   viewProfile(profile: Profile): void {
-    this.snackBar.open(`Viewing profile for Person ${profile.personId}...`, '', {
-      duration: 2000,
+    this.dialog.open(ProfileDetailDialogComponent, {
+      data: { profile },
+      width: '850px',
+      maxHeight: '90vh',
     });
   }
 
