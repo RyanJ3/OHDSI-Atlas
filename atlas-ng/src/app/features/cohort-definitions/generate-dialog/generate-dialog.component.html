@@ -1,0 +1,109 @@
+<h2 mat-dialog-title>
+  <i class="fas fa-play-circle"></i>
+  Generate Cohort
+</h2>
+
+<mat-dialog-content>
+  <div class="cohort-info">
+    <span class="cohort-label">Cohort:</span>
+    <span class="cohort-name">{{ cohortName }}</span>
+    <span class="cohort-id">#{{ cohortId }}</span>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-sources">
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+      <p>Loading available data sources...</p>
+    </div>
+  } @else {
+    <div class="sources-section">
+      <div class="sources-header">
+        <h3>Select Data Sources</h3>
+        <mat-checkbox
+          [checked]="selectedCount === sources().length"
+          [indeterminate]="selectedCount > 0 && selectedCount < sources().length"
+          (change)="toggleAll($event.checked)"
+          [disabled]="generating()"
+        >
+          Select All
+        </mat-checkbox>
+      </div>
+
+      <div class="sources-list">
+        @for (sourceGen of sources(); track sourceGen.source.sourceKey) {
+          <div class="source-item" [class.selected]="sourceGen.selected">
+            <mat-checkbox
+              [(ngModel)]="sourceGen.selected"
+              [disabled]="generating()"
+            >
+              <div class="source-info">
+                <span class="source-name">{{ sourceGen.source.sourceName }}</span>
+                <span class="source-key">{{ sourceGen.source.sourceKey }}</span>
+              </div>
+            </mat-checkbox>
+
+            @if (sourceGen.selected && generating()) {
+              <div class="generation-status">
+                <div class="status-indicator" [class]="getStatusClass(sourceGen.status)">
+                  <i [class]="getStatusIcon(sourceGen.status)"></i>
+                  <span>{{ sourceGen.status | titlecase }}</span>
+                </div>
+
+                @if (sourceGen.status === 'generating') {
+                  <mat-progress-bar
+                    mode="determinate"
+                    [value]="sourceGen.progress"
+                  ></mat-progress-bar>
+                }
+
+                @if (sourceGen.status === 'complete') {
+                  <div class="generation-results">
+                    <mat-chip class="result-chip">
+                      <i class="fas fa-users"></i>
+                      {{ sourceGen.personCount | number }} persons
+                    </mat-chip>
+                    <mat-chip class="result-chip">
+                      <i class="fas fa-database"></i>
+                      {{ sourceGen.recordCount | number }} records
+                    </mat-chip>
+                  </div>
+                }
+
+                @if (sourceGen.status === 'error') {
+                  <div class="error-message">
+                    {{ sourceGen.errorMessage }}
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  @if (!generating()) {
+    <button mat-button (click)="cancel()">Cancel</button>
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="generate()"
+      [disabled]="selectedCount === 0"
+    >
+      <i class="fas fa-play"></i>
+      Generate ({{ selectedCount }})
+    </button>
+  } @else if (allComplete()) {
+    <button mat-raised-button color="primary" (click)="done()">
+      <i class="fas fa-check"></i>
+      Done
+    </button>
+  } @else {
+    <button mat-button disabled>
+      <i class="fas fa-spinner fa-spin"></i>
+      Generating...
+    </button>
+  }
+</mat-dialog-actions>

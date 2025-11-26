@@ -53,6 +53,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'cohortdefinitions/:id/results',
+        loadComponent: () =>
+          import('./features/cohort-definitions/cohort-results/cohort-results.component').then(
+            (m) => m.CohortResultsComponent
+          ),
+      },
+      {
         path: 'characterizations',
         loadComponent: () =>
           import('./shared/components/placeholder-page/placeholder-page.component').then(

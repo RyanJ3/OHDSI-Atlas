@@ -118,16 +118,22 @@
                   <i class="fas fa-ellipsis-v"></i>
                 </button>
                 <mat-menu #actionMenu="matMenu">
+                  @if (cohort.hasGeneration) {
+                    <button mat-menu-item (click)="viewResults(cohort)">
+                      <i class="fas fa-chart-bar fa-fw"></i>
+                      <span>View Results</span>
+                    </button>
+                  }
                   <button mat-menu-item (click)="copyCohort(cohort)">
                     <i class="fas fa-copy fa-fw"></i>
                     <span>Copy</span>
                   </button>
-                  <button mat-menu-item>
+                  <button mat-menu-item (click)="exportCohort(cohort)">
                     <i class="fas fa-file-export fa-fw"></i>
                     <span>Export</span>
                   </button>
-                  <button mat-menu-item>
-                    <i class="fas fa-chart-bar fa-fw"></i>
+                  <button mat-menu-item (click)="viewReports(cohort)">
+                    <i class="fas fa-file-alt fa-fw"></i>
                     <span>View Reports</span>
                   </button>
                   <mat-divider></mat-divider>

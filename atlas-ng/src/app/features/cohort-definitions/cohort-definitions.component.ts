@@ -1,6 +1,7 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
@@ -14,6 +15,12 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatSortModule, Sort } from '@angular/material/sort';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { GenerateDialogComponent } from './generate-dialog/generate-dialog.component';
+
+// Import mock data
+import cohortDefinitionsData from '../../core/mock-data/cohort-definitions.json';
 
 interface CohortDefinition {
   id: number;
@@ -46,11 +53,17 @@ interface CohortDefinition {
     MatMenuModule,
     MatDividerModule,
     MatSortModule,
+    MatDialogModule,
+    MatSnackBarModule,
   ],
   templateUrl: './cohort-definitions.component.html',
   styleUrl: './cohort-definitions.component.scss',
 })
 export class CohortDefinitionsComponent implements OnInit {
+  private dialog = inject(MatDialog);
+  private snackBar = inject(MatSnackBar);
+  private router = inject(Router);
+
   loading = signal(true);
   cohorts = signal<CohortDefinition[]>([]);
   filteredCohorts = signal<CohortDefinition[]>([]);
@@ -75,12 +88,18 @@ export class CohortDefinitionsComponent implements OnInit {
 
   private loadCohorts(): void {
     setTimeout(() => {
-      const cohorts = this.getMockCohorts();
+      const cohorts: CohortDefinition[] = (cohortDefinitionsData as any[]).map((c) => ({
+        ...c,
+        createdDate: new Date(c.createdDate),
+        modifiedDate: new Date(c.modifiedDate),
+        tags: c.tags || [],
+        hasGeneration: c.hasGeneration || false,
+      }));
       this.cohorts.set(cohorts);
       this.filteredCohorts.set(cohorts);
       this.totalResults.set(cohorts.length);
       this.loading.set(false);
-    }, 600);
+    }, 400);
   }
 
   applyFilter(): void {
@@ -141,93 +160,89 @@ export class CohortDefinitionsComponent implements OnInit {
   }
 
   createNew(): void {
-    console.log('Create new cohort');
+    this.snackBar.open('Create new cohort - feature coming soon', 'OK', { duration: 2000 });
   }
 
   editCohort(cohort: CohortDefinition): void {
-    console.log('Edit cohort:', cohort);
+    this.snackBar.open(`Opening cohort editor for "${cohort.name}"...`, '', { duration: 2000 });
   }
 
   copyCohort(cohort: CohortDefinition): void {
-    console.log('Copy cohort:', cohort);
+    this.snackBar.open(`Created copy of "${cohort.name}"`, 'OK', { duration: 3000 });
+  }
+
+  exportCohort(cohort: CohortDefinition): void {
+    // Create JSON export
+    const exportData = {
+      id: cohort.id,
+      name: cohort.name,
+      description: cohort.description,
+      expressionType: cohort.expressionType,
+      tags: cohort.tags,
+      expression: {
+        ConceptSets: [],
+        PrimaryCriteria: {},
+        AdditionalCriteria: {},
+        QualifiedLimit: {},
+        ExpressionLimit: {},
+        InclusionRules: [],
+        CensoringCriteria: [],
+        CollapseSettings: {},
+        CensorWindow: {},
+      },
+    };
+
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `cohort_${cohort.id}_${cohort.name.replace(/\s+/g, '_')}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+
+    this.snackBar.open(`Exported "${cohort.name}"`, 'OK', { duration: 3000 });
   }
 
   deleteCohort(cohort: CohortDefinition): void {
-    console.log('Delete cohort:', cohort);
+    this.snackBar.open(`Deleted "${cohort.name}"`, 'Undo', { duration: 5000 });
+    // In real app, would call API and refresh list
   }
 
   generateCohort(cohort: CohortDefinition): void {
-    console.log('Generate cohort:', cohort);
+    const dialogRef = this.dialog.open(GenerateDialogComponent, {
+      width: '600px',
+      data: {
+        cohortId: cohort.id,
+        cohortName: cohort.name,
+      },
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result && result.length > 0) {
+        this.snackBar.open(
+          `Generated cohort on ${result.length} source(s)`,
+          'View Results',
+          { duration: 5000 }
+        ).onAction().subscribe(() => {
+          this.viewResults(cohort);
+        });
+
+        // Update hasGeneration flag
+        this.cohorts.update((cohorts) =>
+          cohorts.map((c) =>
+            c.id === cohort.id ? { ...c, hasGeneration: true } : c
+          )
+        );
+        this.applyFilter();
+      }
+    });
   }
 
-  private getMockCohorts(): CohortDefinition[] {
-    return [
-      {
-        id: 1,
-        name: 'Type 2 Diabetes Mellitus',
-        description: 'Patients with T2DM diagnosis',
-        createdBy: 'admin',
-        createdDate: new Date('2024-01-15'),
-        modifiedDate: new Date('2024-03-20'),
-        expressionType: 'SIMPLE_EXPRESSION',
-        tags: ['diabetes', 'chronic'],
-        hasGeneration: true,
-      },
-      {
-        id: 2,
-        name: 'Hypertension - First Diagnosis',
-        description: 'First occurrence of hypertension',
-        createdBy: 'researcher1',
-        createdDate: new Date('2024-02-10'),
-        modifiedDate: new Date('2024-03-15'),
-        expressionType: 'SIMPLE_EXPRESSION',
-        tags: ['cardiovascular'],
-        hasGeneration: true,
-      },
-      {
-        id: 3,
-        name: 'COVID-19 Hospitalization',
-        description: 'COVID-19 patients requiring hospitalization',
-        createdBy: 'admin',
-        createdDate: new Date('2024-01-05'),
-        modifiedDate: new Date('2024-02-28'),
-        expressionType: 'SIMPLE_EXPRESSION',
-        tags: ['infectious', 'covid'],
-        hasGeneration: false,
-      },
-      {
-        id: 4,
-        name: 'Metformin New Users',
-        description: 'First-time metformin users with 365-day washout',
-        createdBy: 'researcher2',
-        createdDate: new Date('2024-03-01'),
-        modifiedDate: new Date('2024-03-25'),
-        expressionType: 'SIMPLE_EXPRESSION',
-        tags: ['drug', 'diabetes'],
-        hasGeneration: true,
-      },
-      {
-        id: 5,
-        name: 'Chronic Kidney Disease Stage 3+',
-        description: 'CKD patients at stage 3 or higher',
-        createdBy: 'admin',
-        createdDate: new Date('2024-02-20'),
-        modifiedDate: new Date('2024-03-10'),
-        expressionType: 'SIMPLE_EXPRESSION',
-        tags: ['renal', 'chronic'],
-        hasGeneration: true,
-      },
-      {
-        id: 6,
-        name: 'Heart Failure - Reduced EF',
-        description: 'Heart failure with reduced ejection fraction',
-        createdBy: 'researcher1',
-        createdDate: new Date('2024-01-25'),
-        modifiedDate: new Date('2024-03-05'),
-        expressionType: 'SIMPLE_EXPRESSION',
-        tags: ['cardiovascular', 'heart failure'],
-        hasGeneration: false,
-      },
-    ];
+  viewResults(cohort: CohortDefinition): void {
+    this.router.navigate(['/cohortdefinitions', cohort.id, 'results']);
+  }
+
+  viewReports(cohort: CohortDefinition): void {
+    this.snackBar.open(`Opening reports for "${cohort.name}"...`, '', { duration: 2000 });
   }
 }
