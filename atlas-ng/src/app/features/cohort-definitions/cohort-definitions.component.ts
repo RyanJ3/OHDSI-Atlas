@@ -18,6 +18,7 @@ import { MatSortModule, Sort } from '@angular/material/sort';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { GenerateDialogComponent } from './generate-dialog/generate-dialog.component';
+import { ReportsDialogComponent } from './reports-dialog/reports-dialog.component';
 
 // Import mock data
 import cohortDefinitionsData from '../../core/mock-data/cohort-definitions.json';
@@ -243,6 +244,13 @@ export class CohortDefinitionsComponent implements OnInit {
   }
 
   viewReports(cohort: CohortDefinition): void {
-    this.snackBar.open(`Opening reports for "${cohort.name}"...`, '', { duration: 2000 });
+    this.dialog.open(ReportsDialogComponent, {
+      width: '800px',
+      maxHeight: '90vh',
+      data: {
+        cohortId: cohort.id,
+        cohortName: cohort.name,
+      },
+    });
   }
 }

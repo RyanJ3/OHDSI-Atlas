@@ -1,0 +1,174 @@
+<h2 mat-dialog-title>
+  <i class="fas fa-chart-pie"></i>
+  Cohort Reports: {{ data.cohortName }}
+</h2>
+
+<mat-dialog-content>
+  <!-- Summary Stats -->
+  <div class="summary-cards">
+    <div class="summary-card">
+      <div class="summary-value">{{ totalPersons | number }}</div>
+      <div class="summary-label">Total Persons</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-value">{{ totalSources }}</div>
+      <div class="summary-label">Sources Generated</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-value">{{ avgPersonsPerSource | number }}</div>
+      <div class="summary-label">Avg per Source</div>
+    </div>
+  </div>
+
+  <mat-tab-group>
+    <!-- Inclusion Rules Tab -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <i class="fas fa-filter tab-icon"></i>
+        Inclusion Rules
+      </ng-template>
+
+      <div class="tab-content">
+        <p class="section-description">
+          Attrition analysis showing how each inclusion rule affects the final cohort size.
+        </p>
+
+        <table mat-table [dataSource]="inclusionRules" class="inclusion-table">
+          <ng-container matColumnDef="id">
+            <th mat-header-cell *matHeaderCellDef>#</th>
+            <td mat-cell *matCellDef="let rule">{{ rule.id }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef>Rule Name</th>
+            <td mat-cell *matCellDef="let rule">
+              <div class="rule-name" [matTooltip]="rule.description">
+                {{ rule.name }}
+              </div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="meetCount">
+            <th mat-header-cell *matHeaderCellDef>Persons</th>
+            <td mat-cell *matCellDef="let rule">{{ rule.meetCount | number }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="percentMeet">
+            <th mat-header-cell *matHeaderCellDef>% Meet</th>
+            <td mat-cell *matCellDef="let rule">{{ rule.percentMeet }}%</td>
+          </ng-container>
+
+          <ng-container matColumnDef="attrition">
+            <th mat-header-cell *matHeaderCellDef>Attrition</th>
+            <td mat-cell *matCellDef="let rule" class="attrition-cell">
+              <div class="attrition-bar">
+                <div
+                  class="attrition-fill"
+                  [style.width.%]="getAttritionWidth(rule)"
+                ></div>
+              </div>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="inclusionColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: inclusionColumns"></tr>
+        </table>
+
+        <div class="final-count">
+          <strong>Final Cohort:</strong>
+          {{ inclusionRules[inclusionRules.length - 1]?.meetCount | number }} persons
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- Demographics Tab -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <i class="fas fa-users tab-icon"></i>
+        Demographics
+      </ng-template>
+
+      <div class="tab-content">
+        <div class="demographics-grid">
+          <!-- Age Distribution -->
+          <div class="demo-section">
+            <h4>Age Distribution</h4>
+            <div class="bar-chart">
+              @for (item of ageDistribution; track item.range) {
+                <div class="bar-row">
+                  <span class="bar-label">{{ item.range }}</span>
+                  <div class="bar-container">
+                    <div class="bar-fill" [style.width.%]="item.percent * 3"></div>
+                  </div>
+                  <span class="bar-value">{{ item.percent }}%</span>
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- Gender Distribution -->
+          <div class="demo-section">
+            <h4>Gender Distribution</h4>
+            <div class="pie-legend">
+              @for (item of genderDistribution; track item.gender) {
+                <div class="legend-item">
+                  <div class="legend-color" [class]="item.gender.toLowerCase()"></div>
+                  <span class="legend-label">{{ item.gender }}</span>
+                  <span class="legend-value">{{ item.percent }}%</span>
+                  <span class="legend-count">({{ item.count | number }})</span>
+                </div>
+              }
+            </div>
+            <div class="gender-bars">
+              @for (item of genderDistribution; track item.gender) {
+                <div
+                  class="gender-segment"
+                  [class]="item.gender.toLowerCase()"
+                  [style.width.%]="item.percent"
+                  [matTooltip]="item.gender + ': ' + item.percent + '%'"
+                ></div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- Export Tab -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <i class="fas fa-download tab-icon"></i>
+        Export
+      </ng-template>
+
+      <div class="tab-content">
+        <p class="section-description">
+          Export cohort data and reports in various formats.
+        </p>
+
+        <div class="export-options">
+          <button mat-stroked-button class="export-btn">
+            <i class="fas fa-file-csv"></i>
+            Export Person IDs (CSV)
+          </button>
+          <button mat-stroked-button class="export-btn">
+            <i class="fas fa-file-excel"></i>
+            Export Demographics (Excel)
+          </button>
+          <button mat-stroked-button class="export-btn">
+            <i class="fas fa-file-pdf"></i>
+            Download Report (PDF)
+          </button>
+          <button mat-stroked-button class="export-btn">
+            <i class="fas fa-code"></i>
+            Export SQL
+          </button>
+        </div>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="close()">Close</button>
+</mat-dialog-actions>
