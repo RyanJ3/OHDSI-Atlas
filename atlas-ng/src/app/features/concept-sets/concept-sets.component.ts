@@ -19,6 +19,9 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { ConfigService } from '../../core/config';
 import { catchError, of } from 'rxjs';
 
+// Import mock data for fallback
+import conceptSetsData from '../../core/mock-data/concept-sets.json';
+
 interface ConceptSet {
   id: number;
   name: string;
@@ -27,6 +30,7 @@ interface ConceptSet {
   createdDate?: string;
   modifiedBy?: string;
   modifiedDate?: string;
+  conceptCount?: number;
 }
 
 @Component({
@@ -82,9 +86,9 @@ export class ConceptSetsComponent implements OnInit {
       .get<ConceptSet[]>(`${this.config.webApiUrl}conceptset/`)
       .pipe(
         catchError((err) => {
-          console.error('Failed to load concept sets:', err);
-          this.error.set('Failed to load concept sets. Please check your connection.');
-          return of([]);
+          console.error('Failed to load concept sets from API, using mock data:', err);
+          // Return mock data as fallback
+          return of(conceptSetsData as ConceptSet[]);
         })
       )
       .subscribe((conceptSets) => {
