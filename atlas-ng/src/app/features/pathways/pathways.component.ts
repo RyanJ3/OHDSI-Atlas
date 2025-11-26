@@ -18,6 +18,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 import pathwaysData from '../../core/mock-data/pathways.json';
+import { PathwayResultsDialogComponent } from './pathway-results-dialog/pathway-results-dialog.component';
 
 interface Cohort {
   id: number;
@@ -212,7 +213,11 @@ export class PathwaysComponent implements OnInit {
   }
 
   viewResults(analysis: PathwayAnalysis): void {
-    this.snackBar.open(`Viewing results for "${analysis.name}"...`, '', { duration: 2000 });
+    this.dialog.open(PathwayResultsDialogComponent, {
+      data: { analysis },
+      width: '900px',
+      maxHeight: '90vh',
+    });
   }
 
   exportAnalysis(analysis: PathwayAnalysis): void {
