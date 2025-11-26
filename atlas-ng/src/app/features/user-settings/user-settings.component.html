@@ -1,0 +1,467 @@
+<div class="settings-container">
+  <div class="settings-header">
+    <h1 class="settings-title">
+      <i class="fas fa-cog"></i>
+      Settings
+    </h1>
+    <p class="settings-description">
+      Customize your ATLAS experience and configure application preferences.
+    </p>
+  </div>
+
+  <div class="settings-layout">
+    <!-- Settings Navigation -->
+    <mat-card class="settings-nav-card">
+      <mat-nav-list>
+        @for (section of settingsSections; track section.key) {
+          <a
+            mat-list-item
+            [class.active]="activeSection() === section.key"
+            (click)="setActiveSection(section.key)"
+          >
+            <i class="fas {{ section.icon }} nav-icon"></i>
+            <span class="nav-text">{{ section.title }}</span>
+          </a>
+        }
+      </mat-nav-list>
+    </mat-card>
+
+    <!-- Settings Content -->
+    <mat-card class="settings-content-card">
+      @switch (activeSection()) {
+        @case ('appearance') {
+          <div class="settings-section">
+            <h2 class="section-title">
+              <i class="fas fa-palette"></i>
+              Appearance
+            </h2>
+            <p class="section-description">Customize the look and feel of ATLAS</p>
+
+            <form [formGroup]="appearanceForm" class="settings-form">
+              <div class="setting-item">
+                <div class="setting-info">
+                  <span class="setting-label">Theme</span>
+                  <span class="setting-hint">Choose your preferred color theme</span>
+                </div>
+                <mat-radio-group formControlName="theme" class="theme-options">
+                  <mat-radio-button value="light">
+                    <i class="fas fa-sun"></i> Light
+                  </mat-radio-button>
+                  <mat-radio-button value="dark">
+                    <i class="fas fa-moon"></i> Dark
+                  </mat-radio-button>
+                  <mat-radio-button value="system">
+                    <i class="fas fa-desktop"></i> System
+                  </mat-radio-button>
+                </mat-radio-group>
+              </div>
+
+              <mat-divider></mat-divider>
+
+              <div class="setting-item">
+                <div class="setting-info">
+                  <span class="setting-label">Sidebar Collapsed</span>
+                  <span class="setting-hint">Start with the sidebar collapsed</span>
+                </div>
+                <mat-slide-toggle formControlName="sidebarCollapsed"></mat-slide-toggle>
+              </div>
+
+              <mat-divider></mat-divider>
+
+              <div class="setting-item">
+                <div class="setting-info">
+                  <span class="setting-label">Compact Mode</span>
+                  <span class="setting-hint">Reduce spacing for more content on screen</span>
+                </div>
+                <mat-slide-toggle formControlName="compactMode"></mat-slide-toggle>
+              </div>
+
+              <mat-divider></mat-divider>
+
+              <div class="setting-item">
+                <div class="setting-info">
+                  <span class="setting-label">Table Rows Per Page</span>
+                  <span class="setting-hint">Default number of rows in data tables</span>
+                </div>
+                <mat-form-field appearance="outline" class="select-field">
+                  <mat-select formControlName="rowsPerPage">
+                    <mat-option [value]="10">10 rows</mat-option>
+                    <mat-option [value]="25">25 rows</mat-option>
+                    <mat-option [value]="50">50 rows</mat-option>
+                    <mat-option [value]="100">100 rows</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+            </form>
+          </div>
+        }
+
+        @case ('notifications') {
+          <div class="settings-section">
+            <h2 class="section-title">
+              <i class="fas fa-bell"></i>
+              Notifications
+            </h2>
+            <p class="section-description">Configure how you receive notifications</p>
+
+            <form [formGroup]="notificationsForm" class="settings-form">
+              <div class="setting-item">
+                <div class="setting-info">
+                  <span class="setting-label">Enable Notifications</span>
+                  <span class="setting-hint">Show notification badges and alerts</span>
+                </div>
+                <mat-slide-toggle formControlName="enabled"></mat-slide-toggle>
+              </div>
+
+              <mat-divider></mat-divider>
+
+              <div class="setting-item">
+                <div class="setting-info">
+                  <span class="setting-label">Job Completion Alerts</span>
+                  <span class="setting-hint">Notify when analysis jobs complete</span>
+                </div>
+                <mat-slide-toggle formControlName="jobCompletion"></mat-slide-toggle>
+              </div>
+
+              <mat-divider></mat-divider>
+
+              <div class="setting-item">
+                <div class="setting-info">
+                  <span class="setting-label">Job Failure Alerts</span>
+                  <span class="setting-hint">Notify when analysis jobs fail</span>
+                </div>
+                <mat-slide-toggle formControlName="jobFailure"></mat-slide-toggle>
+              </div>
+
+              <mat-divider></mat-divider>
+
+              <div class="setting-item">
+                <div class="setting-info">
+                  <span class="setting-label">Email Notifications</span>
+                  <span class="setting-hint">Receive email for important events</span>
+                </div>
+                <mat-slide-toggle formControlName="emailEnabled"></mat-slide-toggle>
+              </div>
+
+              <mat-divider></mat-divider>
+
+              <div class="setting-item">
+                <div class="setting-info">
+                  <span class="setting-label">Sound Alerts</span>
+                  <span class="setting-hint">Play sound for notifications</span>
+                </div>
+                <mat-slide-toggle formControlName="soundEnabled"></mat-slide-toggle>
+              </div>
+            </form>
+          </div>
+        }
+
+        @case ('analysis') {
+          <div class="settings-section">
+            <h2 class="section-title">
+              <i class="fas fa-chart-bar"></i>
+              Analysis Defaults
+            </h2>
+            <p class="section-description">Default settings for analysis operations</p>
+
+            <form [formGroup]="analysisForm" class="settings-form">
+              <div class="setting-item">
+                <div class="setting-info">
+                  <span class="setting-label">Default Data Source</span>
+                  <span class="setting-hint">Preferred data source for analyses</span>
+                </div>
+                <mat-form-field appearance="outline" class="select-field">
+                  <mat-select formControlName="defaultDataSource">
+                    <mat-option value="SYNPUF">CMS SynPUF 1K</mat-option>
+                    <mat-option value="CCAE">IBM CCAE</mat-option>
+                    <mat-option value="MDCR">IBM MDCR</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+
+              <mat-divider></mat-divider>
+
+              <div class="setting-item">
+                <div class="setting-info">
+                  <span class="setting-label">Auto-run on Save</span>
+                  <span class="setting-hint">Automatically execute after saving analysis</span>
+                </div>
+                <mat-slide-toggle formControlName="autoRunOnSave"></mat-slide-toggle>
+              </div>
+
+              <mat-divider></mat-divider>
+
+              <div class="setting-item">
+                <div class="setting-info">
+                  <span class="setting-label">Default Min Cell Count</span>
+                  <span class="setting-hint">Privacy threshold for result counts</span>
+                </div>
+                <mat-form-field appearance="outline" class="select-field">
+                  <mat-select formControlName="minCellCount">
+                    <mat-option [value]="1">1</mat-option>
+                    <mat-option [value]="5">5</mat-option>
+                    <mat-option [value]="10">10</mat-option>
+                    <mat-option [value]="20">20</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+
+              <mat-divider></mat-divider>
+
+              <div class="setting-item">
+                <div class="setting-info">
+                  <span class="setting-label">Include Descendant Concepts</span>
+                  <span class="setting-hint">Default setting for concept sets</span>
+                </div>
+                <mat-slide-toggle formControlName="includeDescendants"></mat-slide-toggle>
+              </div>
+
+              <mat-divider></mat-divider>
+
+              <div class="setting-item">
+                <div class="setting-info">
+                  <span class="setting-label">Results Retention (days)</span>
+                  <span class="setting-hint">How long to keep analysis results</span>
+                </div>
+                <mat-form-field appearance="outline" class="select-field">
+                  <mat-select formControlName="resultsRetention">
+                    <mat-option [value]="7">7 days</mat-option>
+                    <mat-option [value]="30">30 days</mat-option>
+                    <mat-option [value]="90">90 days</mat-option>
+                    <mat-option [value]="365">1 year</mat-option>
+                    <mat-option [value]="-1">Forever</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+            </form>
+          </div>
+        }
+
+        @case ('keyboard') {
+          <div class="settings-section">
+            <h2 class="section-title">
+              <i class="fas fa-keyboard"></i>
+              Keyboard Shortcuts
+            </h2>
+            <p class="section-description">Learn and customize keyboard shortcuts</p>
+
+            <div class="shortcuts-list">
+              <h4 class="shortcuts-category">Navigation</h4>
+              <div class="shortcut-item">
+                <span class="shortcut-description">Open Quick Search</span>
+                <div class="shortcut-keys">
+                  <kbd>Ctrl</kbd> + <kbd>K</kbd>
+                </div>
+              </div>
+              <div class="shortcut-item">
+                <span class="shortcut-description">Go to Home</span>
+                <div class="shortcut-keys">
+                  <kbd>G</kbd> then <kbd>H</kbd>
+                </div>
+              </div>
+              <div class="shortcut-item">
+                <span class="shortcut-description">Toggle Sidebar</span>
+                <div class="shortcut-keys">
+                  <kbd>Ctrl</kbd> + <kbd>B</kbd>
+                </div>
+              </div>
+
+              <h4 class="shortcuts-category">Actions</h4>
+              <div class="shortcut-item">
+                <span class="shortcut-description">Save</span>
+                <div class="shortcut-keys">
+                  <kbd>Ctrl</kbd> + <kbd>S</kbd>
+                </div>
+              </div>
+              <div class="shortcut-item">
+                <span class="shortcut-description">New Item</span>
+                <div class="shortcut-keys">
+                  <kbd>Ctrl</kbd> + <kbd>N</kbd>
+                </div>
+              </div>
+              <div class="shortcut-item">
+                <span class="shortcut-description">Close Dialog</span>
+                <div class="shortcut-keys">
+                  <kbd>Escape</kbd>
+                </div>
+              </div>
+
+              <h4 class="shortcuts-category">Tables</h4>
+              <div class="shortcut-item">
+                <span class="shortcut-description">Select All</span>
+                <div class="shortcut-keys">
+                  <kbd>Ctrl</kbd> + <kbd>A</kbd>
+                </div>
+              </div>
+              <div class="shortcut-item">
+                <span class="shortcut-description">Focus Search</span>
+                <div class="shortcut-keys">
+                  <kbd>/</kbd>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+
+        @case ('language') {
+          <div class="settings-section">
+            <h2 class="section-title">
+              <i class="fas fa-globe"></i>
+              Language & Region
+            </h2>
+            <p class="section-description">Configure language and regional settings</p>
+
+            <form [formGroup]="languageForm" class="settings-form">
+              <div class="setting-item">
+                <div class="setting-info">
+                  <span class="setting-label">Language</span>
+                  <span class="setting-hint">Display language for the interface</span>
+                </div>
+                <mat-form-field appearance="outline" class="select-field">
+                  <mat-select formControlName="language">
+                    <mat-option value="en">English</mat-option>
+                    <mat-option value="es">Espa&ntilde;ol</mat-option>
+                    <mat-option value="fr">Fran&ccedil;ais</mat-option>
+                    <mat-option value="de">Deutsch</mat-option>
+                    <mat-option value="zh">&#x4E2D;&#x6587;</mat-option>
+                    <mat-option value="ja">&#x65E5;&#x672C;&#x8A9E;</mat-option>
+                    <mat-option value="ko">&#xD55C;&#xAD6D;&#xC5B4;</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+
+              <mat-divider></mat-divider>
+
+              <div class="setting-item">
+                <div class="setting-info">
+                  <span class="setting-label">Date Format</span>
+                  <span class="setting-hint">How dates are displayed</span>
+                </div>
+                <mat-form-field appearance="outline" class="select-field">
+                  <mat-select formControlName="dateFormat">
+                    <mat-option value="MM/DD/YYYY">MM/DD/YYYY</mat-option>
+                    <mat-option value="DD/MM/YYYY">DD/MM/YYYY</mat-option>
+                    <mat-option value="YYYY-MM-DD">YYYY-MM-DD</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+
+              <mat-divider></mat-divider>
+
+              <div class="setting-item">
+                <div class="setting-info">
+                  <span class="setting-label">Time Format</span>
+                  <span class="setting-hint">12-hour or 24-hour time</span>
+                </div>
+                <mat-form-field appearance="outline" class="select-field">
+                  <mat-select formControlName="timeFormat">
+                    <mat-option value="12h">12-hour (AM/PM)</mat-option>
+                    <mat-option value="24h">24-hour</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+
+              <mat-divider></mat-divider>
+
+              <div class="setting-item">
+                <div class="setting-info">
+                  <span class="setting-label">Number Format</span>
+                  <span class="setting-hint">Decimal and thousand separators</span>
+                </div>
+                <mat-form-field appearance="outline" class="select-field">
+                  <mat-select formControlName="numberFormat">
+                    <mat-option value="1,234.56">1,234.56 (US)</mat-option>
+                    <mat-option value="1.234,56">1.234,56 (EU)</mat-option>
+                    <mat-option value="1 234.56">1 234.56 (FR)</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+            </form>
+          </div>
+        }
+
+        @case ('privacy') {
+          <div class="settings-section">
+            <h2 class="section-title">
+              <i class="fas fa-shield-alt"></i>
+              Privacy & Security
+            </h2>
+            <p class="section-description">Manage your privacy and security settings</p>
+
+            <form [formGroup]="privacyForm" class="settings-form">
+              <div class="setting-item">
+                <div class="setting-info">
+                  <span class="setting-label">Remember Session</span>
+                  <span class="setting-hint">Stay logged in between browser sessions</span>
+                </div>
+                <mat-slide-toggle formControlName="rememberSession"></mat-slide-toggle>
+              </div>
+
+              <mat-divider></mat-divider>
+
+              <div class="setting-item">
+                <div class="setting-info">
+                  <span class="setting-label">Session Timeout</span>
+                  <span class="setting-hint">Automatically log out after inactivity</span>
+                </div>
+                <mat-form-field appearance="outline" class="select-field">
+                  <mat-select formControlName="sessionTimeout">
+                    <mat-option [value]="15">15 minutes</mat-option>
+                    <mat-option [value]="30">30 minutes</mat-option>
+                    <mat-option [value]="60">1 hour</mat-option>
+                    <mat-option [value]="240">4 hours</mat-option>
+                    <mat-option [value]="-1">Never</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+
+              <mat-divider></mat-divider>
+
+              <div class="setting-item">
+                <div class="setting-info">
+                  <span class="setting-label">Activity Logging</span>
+                  <span class="setting-hint">Log your activity for audit purposes</span>
+                </div>
+                <mat-slide-toggle formControlName="activityLogging"></mat-slide-toggle>
+              </div>
+
+              <mat-divider></mat-divider>
+
+              <div class="setting-item">
+                <div class="setting-info">
+                  <span class="setting-label">Two-Factor Authentication</span>
+                  <span class="setting-hint">Add extra security to your account</span>
+                </div>
+                <button mat-stroked-button color="primary">
+                  <i class="fas fa-key"></i>
+                  Configure 2FA
+                </button>
+              </div>
+
+              <mat-divider></mat-divider>
+
+              <div class="setting-item danger-zone">
+                <div class="setting-info">
+                  <span class="setting-label">Clear Local Data</span>
+                  <span class="setting-hint">Remove cached data and preferences</span>
+                </div>
+                <button mat-stroked-button color="warn" (click)="clearLocalData()">
+                  <i class="fas fa-trash"></i>
+                  Clear Data
+                </button>
+              </div>
+            </form>
+          </div>
+        }
+      }
+
+      <div class="settings-actions">
+        <button mat-button (click)="resetSettings()">Reset to Defaults</button>
+        <button mat-raised-button color="primary" (click)="saveSettings()">
+          <i class="fas fa-save"></i>
+          Save Settings
+        </button>
+      </div>
+    </mat-card>
+  </div>
+</div>
