@@ -125,10 +125,9 @@ export const routes: Routes = [
       {
         path: 'configure',
         loadComponent: () =>
-          import('./shared/components/placeholder-page/placeholder-page.component').then(
-            (m) => m.PlaceholderPageComponent
+          import('./features/configuration/configuration.component').then(
+            (m) => m.ConfigurationComponent
           ),
-        data: { title: 'Configuration', icon: 'fa-cogs' },
       },
       {
         path: 'feedback',
