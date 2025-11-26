@@ -1,0 +1,284 @@
+<div class="profile-container">
+  <div class="page-header">
+    <div class="page-header__title">
+      <i class="fas fa-user-circle"></i>
+      <h1>My Profile</h1>
+    </div>
+    <div class="page-header__actions">
+      @if (!editing()) {
+        <button mat-raised-button color="primary" (click)="startEditing()">
+          <i class="fas fa-edit"></i>
+          Edit Profile
+        </button>
+      }
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-container">
+      <mat-spinner diameter="48"></mat-spinner>
+      <p>Loading profile...</p>
+    </div>
+  } @else {
+    <div class="profile-layout">
+      <!-- Profile Card -->
+      <div class="profile-main">
+        <mat-card class="profile-card">
+          <mat-card-content>
+            <div class="profile-header">
+              <div class="profile-avatar">
+                <span class="avatar-initials">{{ getUserInitials() }}</span>
+              </div>
+              <div class="profile-info">
+                @if (editing()) {
+                  <mat-form-field appearance="outline" class="name-field">
+                    <mat-label>Full Name</mat-label>
+                    <input matInput [(ngModel)]="editableProfile.name" />
+                  </mat-form-field>
+                } @else {
+                  <h2 class="profile-name">{{ profile().name }}</h2>
+                }
+                <span class="profile-role">{{ profile().role }}</span>
+                <span class="profile-login">{{'@'}}{{ profile().login }}</span>
+              </div>
+            </div>
+            <mat-divider></mat-divider>
+            <div class="profile-details">
+              @if (editing()) {
+                <div class="detail-item editable">
+                  <div class="detail-label">
+                    <i class="fas fa-envelope"></i>
+                    Email
+                  </div>
+                  <mat-form-field appearance="outline">
+                    <input matInput [(ngModel)]="editableProfile.email" />
+                  </mat-form-field>
+                </div>
+                <div class="detail-item editable">
+                  <div class="detail-label">
+                    <i class="fas fa-building"></i>
+                    Organization
+                  </div>
+                  <mat-form-field appearance="outline">
+                    <input matInput [(ngModel)]="editableProfile.organization" />
+                  </mat-form-field>
+                </div>
+                <div class="detail-item editable">
+                  <div class="detail-label">
+                    <i class="fas fa-sitemap"></i>
+                    Department
+                  </div>
+                  <mat-form-field appearance="outline">
+                    <input matInput [(ngModel)]="editableProfile.department" />
+                  </mat-form-field>
+                </div>
+                <div class="edit-actions">
+                  <button mat-button (click)="cancelEditing()">Cancel</button>
+                  <button mat-raised-button color="primary" (click)="saveProfile()">
+                    <i class="fas fa-save"></i>
+                    Save Changes
+                  </button>
+                </div>
+              } @else {
+                <div class="detail-item">
+                  <div class="detail-label">
+                    <i class="fas fa-envelope"></i>
+                    Email
+                  </div>
+                  <div class="detail-value">{{ profile().email }}</div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-label">
+                    <i class="fas fa-building"></i>
+                    Organization
+                  </div>
+                  <div class="detail-value">{{ profile().organization }}</div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-label">
+                    <i class="fas fa-sitemap"></i>
+                    Department
+                  </div>
+                  <div class="detail-value">{{ profile().department }}</div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-label">
+                    <i class="fas fa-calendar-alt"></i>
+                    Member Since
+                  </div>
+                  <div class="detail-value">{{ profile().joinDate }}</div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-label">
+                    <i class="fas fa-clock"></i>
+                    Last Login
+                  </div>
+                  <div class="detail-value">{{ profile().lastLogin }}</div>
+                </div>
+              }
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Tabs for Activity and Permissions -->
+        <mat-card class="tabs-card">
+          <mat-card-content>
+            <mat-tab-group [(selectedIndex)]="selectedTab" class="profile-tabs">
+              <!-- Activity Tab -->
+              <mat-tab>
+                <ng-template mat-tab-label>
+                  <i class="fas fa-history"></i>
+                  <span>Recent Activity</span>
+                </ng-template>
+                <div class="tab-content">
+                  <div class="tab-header">
+                    <h3>Activity Log</h3>
+                    <button mat-stroked-button (click)="exportActivityLog()">
+                      <i class="fas fa-download"></i>
+                      Export
+                    </button>
+                  </div>
+                  <div class="activity-list">
+                    @for (activity of recentActivity(); track activity.id) {
+                      <div class="activity-item">
+                        <div class="activity-icon">
+                          <i class="fas {{ activity.icon }}"></i>
+                        </div>
+                        <div class="activity-content">
+                          <span class="activity-action">
+                            <strong>{{ activity.action }}</strong> {{ activity.target }}
+                          </span>
+                          <span class="activity-meta">
+                            <span class="activity-type">{{ activity.targetType }}</span>
+                            <span class="activity-time">{{ activity.timestamp }}</span>
+                          </span>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                </div>
+              </mat-tab>
+
+              <!-- Permissions Tab -->
+              <mat-tab>
+                <ng-template mat-tab-label>
+                  <i class="fas fa-key"></i>
+                  <span>Permissions</span>
+                </ng-template>
+                <div class="tab-content">
+                  <div class="tab-header">
+                    <h3>Your Permissions</h3>
+                  </div>
+                  <div class="permissions-list">
+                    @for (permission of permissions(); track permission.name) {
+                      <div class="permission-item" [class.granted]="permission.granted" [class.denied]="!permission.granted">
+                        <div class="permission-status">
+                          @if (permission.granted) {
+                            <i class="fas fa-check-circle"></i>
+                          } @else {
+                            <i class="fas fa-times-circle"></i>
+                          }
+                        </div>
+                        <div class="permission-info">
+                          <span class="permission-name">{{ permission.name }}</span>
+                          <span class="permission-desc">{{ permission.description }}</span>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                </div>
+              </mat-tab>
+            </mat-tab-group>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <!-- Side Panel -->
+      <div class="profile-sidebar">
+        <!-- Statistics Card -->
+        <mat-card class="stats-card">
+          <mat-card-header>
+            <mat-card-title>
+              <i class="fas fa-chart-pie"></i>
+              Your Statistics
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="stats-grid">
+              <div class="stat-item">
+                <div class="stat-value">{{ statistics().cohortsCreated }}</div>
+                <div class="stat-label">Cohorts Created</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-value">{{ statistics().conceptSetsCreated }}</div>
+                <div class="stat-label">Concept Sets</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-value">{{ statistics().analysesRun }}</div>
+                <div class="stat-label">Analyses Run</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-value">{{ statistics().jobsExecuted }}</div>
+                <div class="stat-label">Jobs Executed</div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Security Card -->
+        <mat-card class="security-card">
+          <mat-card-header>
+            <mat-card-title>
+              <i class="fas fa-shield-alt"></i>
+              Account Security
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="security-actions">
+              <button mat-stroked-button (click)="changePassword()">
+                <i class="fas fa-key"></i>
+                Change Password
+              </button>
+              <div class="security-info">
+                <span class="security-label">Two-Factor Authentication</span>
+                <mat-chip-set>
+                  <mat-chip class="status-chip disabled">Not Enabled</mat-chip>
+                </mat-chip-set>
+              </div>
+              <div class="security-info">
+                <span class="security-label">Session Timeout</span>
+                <span class="security-value">30 minutes</span>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Quick Links Card -->
+        <mat-card class="quick-links-card">
+          <mat-card-header>
+            <mat-card-title>
+              <i class="fas fa-link"></i>
+              Quick Links
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="links-list">
+              <a mat-stroked-button routerLink="/user-settings">
+                <i class="fas fa-cog"></i>
+                User Settings
+              </a>
+              <a mat-stroked-button routerLink="/jobs">
+                <i class="fas fa-tasks"></i>
+                My Jobs
+              </a>
+              <a mat-stroked-button routerLink="/feedback">
+                <i class="fas fa-comment"></i>
+                Send Feedback
+              </a>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+  }
+</div>
