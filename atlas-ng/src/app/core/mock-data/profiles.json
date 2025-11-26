@@ -1,0 +1,162 @@
+[
+  {
+    "personId": 1001,
+    "gender": "Female",
+    "birthYear": 1965,
+    "deathYear": null,
+    "sourceName": "CDM Database",
+    "cohorts": ["Type 2 Diabetes Patients", "Hypertension Cohort"],
+    "recordCounts": {
+      "conditions": 24,
+      "drugs": 18,
+      "procedures": 8,
+      "measurements": 156,
+      "observations": 12,
+      "visits": 45
+    },
+    "observationPeriod": {
+      "start": "2015-03-15",
+      "end": "2024-10-30"
+    }
+  },
+  {
+    "personId": 1002,
+    "gender": "Male",
+    "birthYear": 1952,
+    "deathYear": null,
+    "sourceName": "CDM Database",
+    "cohorts": ["Heart Failure Cohort", "Atrial Fibrillation Patients"],
+    "recordCounts": {
+      "conditions": 45,
+      "drugs": 32,
+      "procedures": 15,
+      "measurements": 289,
+      "observations": 28,
+      "visits": 78
+    },
+    "observationPeriod": {
+      "start": "2012-01-10",
+      "end": "2024-09-15"
+    }
+  },
+  {
+    "personId": 1003,
+    "gender": "Female",
+    "birthYear": 1978,
+    "deathYear": null,
+    "sourceName": "SYNPUF 5%",
+    "cohorts": ["COPD Patients"],
+    "recordCounts": {
+      "conditions": 15,
+      "drugs": 12,
+      "procedures": 5,
+      "measurements": 98,
+      "observations": 8,
+      "visits": 32
+    },
+    "observationPeriod": {
+      "start": "2018-06-20",
+      "end": "2024-11-01"
+    }
+  },
+  {
+    "personId": 1004,
+    "gender": "Male",
+    "birthYear": 1948,
+    "deathYear": 2023,
+    "sourceName": "CDM Database",
+    "cohorts": ["Stroke Patients", "Cardiovascular Events"],
+    "recordCounts": {
+      "conditions": 68,
+      "drugs": 45,
+      "procedures": 22,
+      "measurements": 412,
+      "observations": 35,
+      "visits": 112
+    },
+    "observationPeriod": {
+      "start": "2008-04-05",
+      "end": "2023-08-20"
+    }
+  },
+  {
+    "personId": 1005,
+    "gender": "Female",
+    "birthYear": 1985,
+    "deathYear": null,
+    "sourceName": "SYNPUF 5%",
+    "cohorts": ["Rheumatoid Arthritis Cohort"],
+    "recordCounts": {
+      "conditions": 22,
+      "drugs": 28,
+      "procedures": 10,
+      "measurements": 145,
+      "observations": 18,
+      "visits": 55
+    },
+    "observationPeriod": {
+      "start": "2016-09-12",
+      "end": "2024-10-25"
+    }
+  },
+  {
+    "personId": 1006,
+    "gender": "Male",
+    "birthYear": 1970,
+    "deathYear": null,
+    "sourceName": "CDM Database",
+    "cohorts": ["Type 2 Diabetes Patients", "CKD Stage 3 Cohort"],
+    "recordCounts": {
+      "conditions": 35,
+      "drugs": 24,
+      "procedures": 12,
+      "measurements": 234,
+      "observations": 22,
+      "visits": 68
+    },
+    "observationPeriod": {
+      "start": "2014-02-28",
+      "end": "2024-11-10"
+    }
+  },
+  {
+    "personId": 1007,
+    "gender": "Female",
+    "birthYear": 1992,
+    "deathYear": null,
+    "sourceName": "SYNPUF 5%",
+    "cohorts": ["Depression Cohort"],
+    "recordCounts": {
+      "conditions": 8,
+      "drugs": 6,
+      "procedures": 2,
+      "measurements": 45,
+      "observations": 5,
+      "visits": 18
+    },
+    "observationPeriod": {
+      "start": "2020-01-15",
+      "end": "2024-08-30"
+    }
+  },
+  {
+    "personId": 1008,
+    "gender": "Male",
+    "birthYear": 1958,
+    "deathYear": null,
+    "sourceName": "CDM Database",
+    "cohorts": ["COPD Patients", "Heart Failure Cohort"],
+    "recordCounts": {
+      "conditions": 52,
+      "drugs": 38,
+      "procedures": 18,
+      "measurements": 312,
+      "observations": 28,
+      "visits": 95
+    },
+    "observationPeriod": {
+      "start": "2010-07-22",
+      "end": "2024-10-05"
+    }
+  }
+]

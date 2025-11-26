@@ -1,0 +1,84 @@
+<h2 mat-dialog-title>
+  <i class="fas fa-users"></i>
+  Sample Patients
+</h2>
+
+<mat-dialog-content>
+  <div class="report-header">
+    <div class="header-info">
+      <div class="cohort-name">{{ data.cohortName }}</div>
+      <div class="source-info">
+        <i class="fas fa-database"></i>
+        {{ data.sourceName }}
+      </div>
+    </div>
+    <div class="summary-stat">
+      <span class="stat-value">{{ data.personCount | number }}</span>
+      <span class="stat-label">Total Persons</span>
+    </div>
+  </div>
+
+  <div class="sample-note">
+    <i class="fas fa-info-circle"></i>
+    Showing {{ patients.length }} randomly sampled patients from the cohort
+  </div>
+
+  <div class="table-container">
+    <table mat-table [dataSource]="pagedPatients" class="patients-table">
+      <ng-container matColumnDef="personId">
+        <th mat-header-cell *matHeaderCellDef>Person ID</th>
+        <td mat-cell *matCellDef="let patient">
+          <span class="person-id">{{ patient.personId }}</span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="gender">
+        <th mat-header-cell *matHeaderCellDef>Gender</th>
+        <td mat-cell *matCellDef="let patient">
+          <span class="gender-badge" [class]="getGenderClass(patient.gender)">
+            <i [class]="getGenderIcon(patient.gender)"></i>
+            {{ patient.gender }}
+          </span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="age">
+        <th mat-header-cell *matHeaderCellDef>Age</th>
+        <td mat-cell *matCellDef="let patient">{{ patient.age }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="race">
+        <th mat-header-cell *matHeaderCellDef>Race</th>
+        <td mat-cell *matCellDef="let patient">
+          {{ patient.race }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="cohortStartDate">
+        <th mat-header-cell *matHeaderCellDef>Cohort Start</th>
+        <td mat-cell *matCellDef="let patient">{{ patient.cohortStartDate }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="cohortEndDate">
+        <th mat-header-cell *matHeaderCellDef>Cohort End</th>
+        <td mat-cell *matCellDef="let patient">{{ patient.cohortEndDate }}</td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns" class="patient-row"></tr>
+    </table>
+  </div>
+
+  <mat-paginator
+    [length]="patients.length"
+    [pageSize]="pageSize"
+    [pageIndex]="pageIndex"
+    [pageSizeOptions]="[5, 10, 20]"
+    (page)="onPageChange($event)"
+    showFirstLastButtons
+  ></mat-paginator>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="close()">Close</button>
+</mat-dialog-actions>

@@ -15,42 +15,146 @@
   </div>
 
   <div class="header__center">
-    <!-- Search bar placeholder - can be implemented later -->
+    <!-- Global Quick Search -->
+    <div class="header__search" [class.active]="showSearch()">
+      <button
+        mat-icon-button
+        class="header__search-toggle"
+        (click)="toggleSearch()"
+        matTooltip="Quick Search (Ctrl+K)"
+      >
+        <i class="fas fa-search"></i>
+      </button>
+
+      @if (showSearch()) {
+        <div class="header__search-container">
+          <input
+            #searchInput
+            type="text"
+            class="header__search-input"
+            placeholder="Search cohorts, concept sets, analyses..."
+            [value]="searchQuery()"
+            (input)="onSearchInput(searchInput.value)"
+            (keydown.escape)="toggleSearch()"
+            autofocus
+          />
+          @if (searchQuery()) {
+            <button mat-icon-button class="header__search-clear" (click)="clearSearch()">
+              <i class="fas fa-times"></i>
+            </button>
+          }
+
+          @if (searchResults().length > 0) {
+            <div class="header__search-results">
+              @for (result of searchResults(); track result.id + result.type) {
+                <div class="header__search-result" (click)="selectResult(result)">
+                  <i class="fas {{ result.icon }} result-icon"></i>
+                  <div class="result-info">
+                    <span class="result-name">{{ result.name }}</span>
+                    <span class="result-type">{{ result.typeLabel }}</span>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+
+          @if (searchQuery().length >= 2 && searchResults().length === 0) {
+            <div class="header__search-results">
+              <div class="header__search-empty">
+                <i class="fas fa-search"></i>
+                <span>No results found</span>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
   </div>
 
   <div class="header__right">
     <!-- Notifications -->
-    <button mat-icon-button matTooltip="Notifications" class="header__icon-button">
+    <button
+      mat-icon-button
+      [matMenuTriggerFor]="notificationsMenu"
+      matTooltip="Notifications"
+      class="header__icon-button"
+    >
       <i class="fas fa-bell"></i>
+      @if (unreadCount() > 0) {
+        <span class="notification-badge">{{ unreadCount() > 9 ? '9+' : unreadCount() }}</span>
+      }
     </button>
+    <mat-menu #notificationsMenu="matMenu" class="notifications-menu">
+      <div class="notifications-header" (click)="$event.stopPropagation()">
+        <span class="notifications-title">Notifications</span>
+        @if (unreadCount() > 0) {
+          <button mat-button class="mark-read-btn" (click)="markAllNotificationsRead()">
+            Mark all read
+          </button>
+        }
+      </div>
+      <mat-divider></mat-divider>
+      @if (notifications().length === 0) {
+        <div class="notifications-empty" (click)="$event.stopPropagation()">
+          <i class="fas fa-bell-slash"></i>
+          <span>No notifications</span>
+        </div>
+      } @else {
+        <div class="notifications-list">
+          @for (notification of notifications(); track notification.id) {
+            <div
+              class="notification-item"
+              [class.unread]="!notification.read"
+              [class]="'notification-' + notification.type"
+              (click)="markNotificationRead(notification)"
+            >
+              <div class="notification-icon">
+                <i class="fas {{ notification.icon }}"></i>
+              </div>
+              <div class="notification-content">
+                <span class="notification-title">{{ notification.title }}</span>
+                <span class="notification-message">{{ notification.message }}</span>
+                <span class="notification-time">{{ notification.time }}</span>
+              </div>
+            </div>
+          }
+        </div>
+        <mat-divider></mat-divider>
+        <button mat-menu-item class="view-all-btn" routerLink="/jobs">
+          <i class="fas fa-list"></i>
+          View all jobs
+        </button>
+      }
+    </mat-menu>
 
     <!-- User menu -->
-    @if (isAuthenticated$ | async) {
-      <button mat-button [matMenuTriggerFor]="userMenu" class="header__user-button">
-        <i class="fas fa-user-circle header__user-icon"></i>
-        <span class="header__user-name">{{ (user$ | async)?.name || (user$ | async)?.login }}</span>
-        <i class="fas fa-caret-down header__caret"></i>
+    <button mat-button [matMenuTriggerFor]="userMenu" class="header__user-button">
+      <span class="header__user-avatar">{{ getUserInitials() }}</span>
+      <span class="header__user-name">{{ getDisplayName() }}</span>
+      <i class="fas fa-caret-down header__caret"></i>
+    </button>
+    <mat-menu #userMenu="matMenu" class="header__user-menu">
+      <div class="user-menu-header">
+        <span class="user-menu-avatar">{{ getUserInitials() }}</span>
+        <div class="user-menu-info">
+          <span class="user-menu-name">{{ getDisplayName() }}</span>
+          <span class="user-menu-login">{{ user()?.login }}</span>
+        </div>
+      </div>
+      <mat-divider></mat-divider>
+      <button mat-menu-item>
+        <i class="fas fa-user fa-fw"></i>
+        <span>Profile</span>
       </button>
-      <mat-menu #userMenu="matMenu" class="header__user-menu">
-        <button mat-menu-item>
-          <i class="fas fa-user fa-fw"></i>
-          <span>Profile</span>
-        </button>
-        <button mat-menu-item>
-          <i class="fas fa-cog fa-fw"></i>
-          <span>Settings</span>
-        </button>
-        <mat-divider></mat-divider>
-        <button mat-menu-item (click)="logout()">
-          <i class="fas fa-sign-out-alt fa-fw"></i>
-          <span>Sign Out</span>
-        </button>
-      </mat-menu>
-    } @else {
-      <button mat-stroked-button color="primary" class="header__sign-in">
-        <i class="fas fa-sign-in-alt"></i>
-        Sign In
+      <button mat-menu-item>
+        <i class="fas fa-cog fa-fw"></i>
+        <span>Settings</span>
       </button>
-    }
+      <mat-divider></mat-divider>
+      <button mat-menu-item (click)="logout()">
+        <i class="fas fa-sign-out-alt fa-fw"></i>
+        <span>Sign Out</span>
+      </button>
+    </mat-menu>
   </div>
 </mat-toolbar>

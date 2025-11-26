@@ -1,0 +1,160 @@
+<div class="concept-sets-container">
+  <div class="page-header">
+    <div class="page-header__title">
+      <i class="fas fa-shopping-cart"></i>
+      <h1>Concept Sets</h1>
+    </div>
+    <div class="page-header__actions">
+      <button mat-raised-button color="primary" (click)="createNew()">
+        <i class="fas fa-plus"></i>
+        New Concept Set
+      </button>
+    </div>
+  </div>
+
+  <!-- Search/Filter -->
+  <mat-card class="filter-card">
+    <mat-card-content>
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Search concept sets</mat-label>
+        <input
+          matInput
+          [(ngModel)]="searchFilter"
+          (ngModelChange)="applyFilter()"
+          placeholder="Search by name, description, or author..."
+        />
+        <mat-icon matPrefix>search</mat-icon>
+        @if (searchFilter) {
+          <button mat-icon-button matSuffix (click)="searchFilter = ''; applyFilter()">
+            <mat-icon>close</mat-icon>
+          </button>
+        }
+      </mat-form-field>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Results -->
+  @if (loading()) {
+    <div class="loading-container">
+      <mat-spinner diameter="48"></mat-spinner>
+      <p>Loading concept sets...</p>
+    </div>
+  } @else if (error()) {
+    <div class="error-state">
+      <i class="fas fa-exclamation-triangle"></i>
+      <h3>Unable to Load Concept Sets</h3>
+      <p>{{ error() }}</p>
+      <button mat-raised-button color="primary" (click)="loadConceptSets()">
+        <i class="fas fa-redo"></i>
+        Try Again
+      </button>
+    </div>
+  } @else if (filteredConceptSets().length > 0) {
+    <mat-card class="results-card">
+      <mat-card-content>
+        <table
+          mat-table
+          [dataSource]="getPaginatedConceptSets()"
+          matSort
+          (matSortChange)="onSort($event)"
+          class="concept-sets-table"
+        >
+          <!-- ID -->
+          <ng-container matColumnDef="id">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>ID</th>
+            <td mat-cell *matCellDef="let cs">
+              <span class="concept-set-id">{{ cs.id }}</span>
+            </td>
+          </ng-container>
+
+          <!-- Name -->
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
+            <td mat-cell *matCellDef="let cs">
+              <div class="concept-set-name-cell">
+                <span class="concept-set-name">{{ cs.name }}</span>
+                @if (cs.description) {
+                  <span class="concept-set-description">{{ cs.description }}</span>
+                }
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Modified By -->
+          <ng-container matColumnDef="modifiedBy">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Modified By</th>
+            <td mat-cell *matCellDef="let cs">{{ cs.modifiedBy || cs.createdBy || '-' }}</td>
+          </ng-container>
+
+          <!-- Modified Date -->
+          <ng-container matColumnDef="modifiedDate">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Modified</th>
+            <td mat-cell *matCellDef="let cs">
+              {{ formatDate(cs.modifiedDate || cs.createdDate) }}
+            </td>
+          </ng-container>
+
+          <!-- Actions -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let cs">
+              <div class="actions-cell">
+                <button mat-icon-button matTooltip="Edit" (click)="editConceptSet(cs)">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button mat-icon-button [matMenuTriggerFor]="actionMenu">
+                  <i class="fas fa-ellipsis-v"></i>
+                </button>
+                <mat-menu #actionMenu="matMenu">
+                  <button mat-menu-item (click)="copyConceptSet(cs)">
+                    <i class="fas fa-copy fa-fw"></i>
+                    <span>Copy</span>
+                  </button>
+                  <button mat-menu-item (click)="exportConceptSet(cs)">
+                    <i class="fas fa-file-export fa-fw"></i>
+                    <span>Export</span>
+                  </button>
+                  <mat-divider></mat-divider>
+                  <button mat-menu-item class="delete-action" (click)="deleteConceptSet(cs)">
+                    <i class="fas fa-trash fa-fw"></i>
+                    <span>Delete</span>
+                  </button>
+                </mat-menu>
+              </div>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+        </table>
+
+        <mat-paginator
+          [length]="totalResults()"
+          [pageSize]="pageSize"
+          [pageIndex]="pageIndex"
+          [pageSizeOptions]="[10, 25, 50, 100]"
+          (page)="onPageChange($event)"
+          showFirstLastButtons
+        >
+        </mat-paginator>
+      </mat-card-content>
+    </mat-card>
+  } @else {
+    <div class="empty-state">
+      <i class="fas fa-shopping-cart"></i>
+      <h3>No Concept Sets Found</h3>
+      @if (searchFilter) {
+        <p>No concept sets match your search criteria.</p>
+        <button mat-button color="primary" (click)="searchFilter = ''; applyFilter()">
+          Clear Filter
+        </button>
+      } @else {
+        <p>Create your first concept set to get started.</p>
+        <button mat-raised-button color="primary" (click)="createNew()">
+          <i class="fas fa-plus"></i>
+          Create Concept Set
+        </button>
+      }
+    </div>
+  }
+</div>

@@ -1,0 +1,200 @@
+<div class="configuration-container">
+  <div class="page-header">
+    <div class="page-header__title">
+      <i class="fas fa-cogs"></i>
+      <h1>Configuration</h1>
+    </div>
+    <div class="page-header__actions">
+      <button mat-button (click)="resetSettings()">
+        <i class="fas fa-undo"></i>
+        Reset to Defaults
+      </button>
+      <button mat-raised-button color="primary" (click)="saveSettings()">
+        <i class="fas fa-save"></i>
+        Save Changes
+      </button>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-container">
+      <mat-spinner diameter="48"></mat-spinner>
+      <p>Loading configuration...</p>
+    </div>
+  } @else {
+    <div class="config-layout">
+      <!-- Settings Panel -->
+      <div class="settings-panel">
+        <mat-card>
+          <mat-card-content>
+            <mat-tab-group [(selectedIndex)]="selectedTab" class="config-tabs">
+              @for (section of configSections; track section.name) {
+                <mat-tab>
+                  <ng-template mat-tab-label>
+                    <i [class]="section.icon"></i>
+                    <span>{{ section.name }}</span>
+                  </ng-template>
+
+                  <div class="settings-section">
+                    @for (setting of section.settings; track setting.key) {
+                      <div class="setting-item">
+                        <div class="setting-info">
+                          <span class="setting-label">{{ setting.label }}</span>
+                          <span class="setting-description">{{ setting.description }}</span>
+                        </div>
+                        <div class="setting-control">
+                          @switch (setting.type) {
+                            @case ('text') {
+                              <mat-form-field appearance="outline">
+                                <input
+                                  matInput
+                                  [(ngModel)]="setting.value"
+                                  [placeholder]="setting.label"
+                                />
+                              </mat-form-field>
+                            }
+                            @case ('number') {
+                              <mat-form-field appearance="outline">
+                                <input
+                                  matInput
+                                  type="number"
+                                  [(ngModel)]="setting.value"
+                                />
+                              </mat-form-field>
+                            }
+                            @case ('boolean') {
+                              <mat-slide-toggle
+                                [(ngModel)]="setting.value"
+                                color="primary"
+                              >
+                              </mat-slide-toggle>
+                            }
+                            @case ('select') {
+                              <mat-form-field appearance="outline">
+                                <mat-select [(ngModel)]="setting.value">
+                                  @for (option of setting.options; track option.value) {
+                                    <mat-option [value]="option.value">{{ option.label }}</mat-option>
+                                  }
+                                </mat-select>
+                              </mat-form-field>
+                            }
+                          }
+                        </div>
+                      </div>
+                      <mat-divider></mat-divider>
+                    }
+                  </div>
+                </mat-tab>
+              }
+            </mat-tab-group>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <!-- Info Panel -->
+      <div class="info-panel">
+        <!-- System Info Card -->
+        <mat-card class="system-info-card">
+          <mat-card-header>
+            <mat-card-title>
+              <i class="fas fa-info-circle"></i>
+              System Information
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <mat-list>
+              <mat-list-item>
+                <span class="info-label">ATLAS Version</span>
+                <span class="info-value">{{ systemInfo.atlasVersion }}</span>
+              </mat-list-item>
+              <mat-list-item>
+                <span class="info-label">WebAPI Version</span>
+                <span class="info-value">{{ systemInfo.webApiVersion }}</span>
+              </mat-list-item>
+              <mat-list-item>
+                <span class="info-label">CDM Version</span>
+                <span class="info-value">{{ systemInfo.cdmVersion }}</span>
+              </mat-list-item>
+              <mat-list-item>
+                <span class="info-label">Vocabulary</span>
+                <span class="info-value">{{ systemInfo.vocabularyVersion }}</span>
+              </mat-list-item>
+              <mat-list-item>
+                <span class="info-label">Database</span>
+                <span class="info-value">{{ systemInfo.databasePlatform }}</span>
+              </mat-list-item>
+              <mat-list-item>
+                <span class="info-label">Java Version</span>
+                <span class="info-value">{{ systemInfo.javaVersion }}</span>
+              </mat-list-item>
+              <mat-list-item>
+                <span class="info-label">Build Date</span>
+                <span class="info-value">{{ systemInfo.buildDate }}</span>
+              </mat-list-item>
+            </mat-list>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Quick Actions Card -->
+        <mat-card class="quick-actions-card">
+          <mat-card-header>
+            <mat-card-title>
+              <i class="fas fa-bolt"></i>
+              Quick Actions
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="action-buttons">
+              <button mat-stroked-button (click)="testConnection()">
+                <i class="fas fa-plug"></i>
+                Test Connection
+              </button>
+              <button mat-stroked-button (click)="clearCache()">
+                <i class="fas fa-broom"></i>
+                Clear Cache
+              </button>
+              <button mat-stroked-button color="warn">
+                <i class="fas fa-database"></i>
+                Refresh Sources
+              </button>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Status Card -->
+        <mat-card class="status-card">
+          <mat-card-header>
+            <mat-card-title>
+              <i class="fas fa-heartbeat"></i>
+              Service Status
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="status-items">
+              <div class="status-item">
+                <span class="status-dot online"></span>
+                <span class="status-name">WebAPI</span>
+                <span class="status-label online">Online</span>
+              </div>
+              <div class="status-item">
+                <span class="status-dot online"></span>
+                <span class="status-name">Database</span>
+                <span class="status-label online">Connected</span>
+              </div>
+              <div class="status-item">
+                <span class="status-dot online"></span>
+                <span class="status-name">Vocabulary</span>
+                <span class="status-label online">Available</span>
+              </div>
+              <div class="status-item">
+                <span class="status-dot offline"></span>
+                <span class="status-name">Evidence</span>
+                <span class="status-label offline">Offline</span>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+  }
+</div>

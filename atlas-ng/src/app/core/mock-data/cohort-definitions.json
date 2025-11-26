@@ -1,0 +1,122 @@
+[
+  {
+    "id": 1,
+    "name": "New users of metformin",
+    "description": "Patients with first metformin prescription, no prior diabetes medication",
+    "expressionType": "SIMPLE_EXPRESSION",
+    "createdBy": "admin",
+    "createdDate": "2024-01-10T08:30:00Z",
+    "modifiedBy": "demo",
+    "modifiedDate": "2024-07-15T14:20:00Z",
+    "tags": ["drug", "diabetes", "new-user"],
+    "hasGeneration": true
+  },
+  {
+    "id": 2,
+    "name": "Type 2 Diabetes patients",
+    "description": "Patients with at least 2 diagnoses of T2DM",
+    "expressionType": "SIMPLE_EXPRESSION",
+    "createdBy": "admin",
+    "createdDate": "2024-02-05T10:00:00Z",
+    "modifiedBy": "admin",
+    "modifiedDate": "2024-02-05T10:00:00Z",
+    "tags": ["diabetes", "chronic"],
+    "hasGeneration": true
+  },
+  {
+    "id": 3,
+    "name": "Acute Myocardial Infarction",
+    "description": "Patients hospitalized with AMI as primary diagnosis",
+    "expressionType": "SIMPLE_EXPRESSION",
+    "createdBy": "researcher1",
+    "createdDate": "2024-03-12T11:45:00Z",
+    "modifiedBy": "researcher1",
+    "modifiedDate": "2024-08-20T09:15:00Z",
+    "tags": ["cardiovascular", "acute"],
+    "hasGeneration": false
+  },
+  {
+    "id": 4,
+    "name": "New users of ACE inhibitors",
+    "description": "First-time users of ACE inhibitors with hypertension diagnosis",
+    "expressionType": "SIMPLE_EXPRESSION",
+    "createdBy": "demo",
+    "createdDate": "2024-04-08T13:30:00Z",
+    "modifiedBy": "demo",
+    "modifiedDate": "2024-04-08T13:30:00Z",
+    "tags": ["drug", "cardiovascular", "new-user"],
+    "hasGeneration": true
+  },
+  {
+    "id": 5,
+    "name": "COPD patients on inhalers",
+    "description": "COPD patients receiving bronchodilator therapy",
+    "expressionType": "SIMPLE_EXPRESSION",
+    "createdBy": "admin",
+    "createdDate": "2024-05-20T09:00:00Z",
+    "modifiedBy": "researcher1",
+    "modifiedDate": "2024-09-10T16:30:00Z",
+    "tags": ["respiratory", "chronic"],
+    "hasGeneration": true
+  },
+  {
+    "id": 6,
+    "name": "Heart Failure with reduced EF",
+    "description": "HFrEF patients with EF < 40%",
+    "expressionType": "SIMPLE_EXPRESSION",
+    "createdBy": "researcher1",
+    "createdDate": "2024-06-15T14:00:00Z",
+    "modifiedBy": "researcher1",
+    "modifiedDate": "2024-06-15T14:00:00Z",
+    "tags": ["cardiovascular", "heart-failure"],
+    "hasGeneration": false
+  },
+  {
+    "id": 7,
+    "name": "Statin users with prior MI",
+    "description": "Patients on statins with history of myocardial infarction",
+    "expressionType": "SIMPLE_EXPRESSION",
+    "createdBy": "demo",
+    "createdDate": "2024-07-22T10:30:00Z",
+    "modifiedBy": "admin",
+    "modifiedDate": "2024-10-05T11:45:00Z",
+    "tags": ["drug", "cardiovascular"],
+    "hasGeneration": true
+  },
+  {
+    "id": 8,
+    "name": "GI Bleed outcomes",
+    "description": "Patients with gastrointestinal bleeding event",
+    "expressionType": "SIMPLE_EXPRESSION",
+    "createdBy": "admin",
+    "createdDate": "2024-08-10T15:15:00Z",
+    "modifiedBy": "admin",
+    "modifiedDate": "2024-08-10T15:15:00Z",
+    "tags": ["outcome", "safety"],
+    "hasGeneration": false
+  },
+  {
+    "id": 9,
+    "name": "Elderly diabetics (65+)",
+    "description": "Type 2 diabetes patients age 65 and older",
+    "expressionType": "SIMPLE_EXPRESSION",
+    "createdBy": "researcher1",
+    "createdDate": "2024-09-05T08:45:00Z",
+    "modifiedBy": "demo",
+    "modifiedDate": "2024-11-01T13:00:00Z",
+    "tags": ["diabetes", "elderly"],
+    "hasGeneration": true
+  },
+  {
+    "id": 10,
+    "name": "Hypertension control study",
+    "description": "Hypertensive patients for blood pressure control analysis",
+    "expressionType": "SIMPLE_EXPRESSION",
+    "createdBy": "admin",
+    "createdDate": "2024-10-12T11:00:00Z",
+    "modifiedBy": "admin",
+    "modifiedDate": "2024-10-12T11:00:00Z",
+    "tags": ["cardiovascular", "study"],
+    "hasGeneration": false
+  }
+]

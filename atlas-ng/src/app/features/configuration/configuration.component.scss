@@ -1,0 +1,261 @@
+.configuration-container {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+
+  &__title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    i {
+      font-size: 28px;
+      color: #607d8b;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 28px;
+      font-weight: 400;
+      color: #333;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    gap: 12px;
+
+    button i {
+      margin-right: 8px;
+    }
+  }
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  color: #666;
+
+  p {
+    margin-top: 16px;
+    font-size: 14px;
+  }
+}
+
+.config-layout {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 24px;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.settings-panel {
+  mat-card-content {
+    padding: 0 !important;
+  }
+}
+
+.config-tabs {
+  ::ng-deep .mat-mdc-tab {
+    min-width: 120px;
+
+    .mdc-tab__content {
+      gap: 8px;
+    }
+
+    i {
+      font-size: 14px;
+    }
+  }
+}
+
+.settings-section {
+  padding: 24px;
+
+  mat-divider:last-child {
+    display: none;
+  }
+}
+
+.setting-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 0;
+  gap: 24px;
+
+  .setting-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    .setting-label {
+      font-weight: 500;
+      color: #333;
+      font-size: 14px;
+    }
+
+    .setting-description {
+      font-size: 13px;
+      color: #666;
+    }
+  }
+
+  .setting-control {
+    min-width: 200px;
+    display: flex;
+    justify-content: flex-end;
+
+    mat-form-field {
+      width: 200px;
+    }
+  }
+}
+
+.info-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.system-info-card,
+.quick-actions-card,
+.status-card {
+  mat-card-header {
+    padding-bottom: 0;
+  }
+
+  mat-card-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 16px;
+    font-weight: 500;
+
+    i {
+      font-size: 16px;
+      color: #607d8b;
+    }
+  }
+
+  mat-card-content {
+    padding-top: 16px;
+  }
+}
+
+.system-info-card {
+  mat-list-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    height: auto;
+    min-height: 36px;
+
+    .info-label {
+      font-size: 13px;
+      color: #666;
+    }
+
+    .info-value {
+      font-size: 13px;
+      font-weight: 500;
+      color: #333;
+      font-family: monospace;
+    }
+  }
+}
+
+.quick-actions-card {
+  .action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    button {
+      justify-content: flex-start;
+      padding: 8px 16px;
+
+      i {
+        margin-right: 10px;
+        width: 16px;
+      }
+    }
+  }
+}
+
+.status-card {
+  .status-items {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .status-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+
+      &.online {
+        background: #4caf50;
+        box-shadow: 0 0 6px rgba(76, 175, 80, 0.5);
+      }
+
+      &.offline {
+        background: #f44336;
+        box-shadow: 0 0 6px rgba(244, 67, 54, 0.5);
+      }
+    }
+
+    .status-name {
+      flex: 1;
+      font-size: 13px;
+      color: #333;
+    }
+
+    .status-label {
+      font-size: 12px;
+      font-weight: 500;
+      padding: 2px 8px;
+      border-radius: 10px;
+
+      &.online {
+        background: #e8f5e9;
+        color: #2e7d32;
+      }
+
+      &.offline {
+        background: #ffebee;
+        color: #c62828;
+      }
+    }
+  }
+}
+
+::ng-deep {
+  .mat-mdc-form-field-subscript-wrapper {
+    display: none;
+  }
+
+  .mat-mdc-list-item {
+    padding: 0 !important;
+  }
+}

@@ -1,0 +1,139 @@
+<div class="feedback-container">
+  <div class="page-header">
+    <div class="page-header__title">
+      <i class="fas fa-comment"></i>
+      <h1>Feedback</h1>
+    </div>
+    <div class="page-header__subtitle">
+      Help us improve ATLAS by sharing your feedback
+    </div>
+  </div>
+
+  <div class="feedback-layout">
+    <!-- Feedback Form -->
+    <mat-card class="feedback-form-card">
+      <mat-card-header>
+        <mat-card-title>
+          <i class="fas fa-paper-plane"></i>
+          Submit Feedback
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <form (ngSubmit)="submitFeedback()" class="feedback-form">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Feedback Type</mat-label>
+            <mat-select [(ngModel)]="feedbackType" name="feedbackType">
+              @for (type of feedbackTypes; track type.value) {
+                <mat-option [value]="type.value">
+                  <i [class]="type.icon"></i>
+                  {{ type.label }}
+                </mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Subject *</mat-label>
+            <input
+              matInput
+              [(ngModel)]="subject"
+              name="subject"
+              placeholder="Brief summary of your feedback"
+              required
+            />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Description *</mat-label>
+            <textarea
+              matInput
+              [(ngModel)]="description"
+              name="description"
+              placeholder="Please provide details..."
+              rows="6"
+              required
+            ></textarea>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Email (optional)</mat-label>
+            <input
+              matInput
+              type="email"
+              [(ngModel)]="email"
+              name="email"
+              placeholder="For follow-up questions"
+            />
+            <mat-icon matPrefix>email</mat-icon>
+          </mat-form-field>
+
+          <div class="form-actions">
+            <button mat-button type="button" (click)="resetForm()">
+              Clear
+            </button>
+            <button
+              mat-raised-button
+              color="primary"
+              type="submit"
+              [disabled]="submitting()"
+            >
+              @if (submitting()) {
+                <i class="fas fa-spinner fa-spin"></i>
+                Submitting...
+              } @else {
+                <i class="fas fa-paper-plane"></i>
+                Submit Feedback
+              }
+            </button>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Resources Panel -->
+    <div class="resources-panel">
+      <mat-card class="resources-card">
+        <mat-card-header>
+          <mat-card-title>
+            <i class="fas fa-link"></i>
+            Helpful Resources
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="resources-list">
+            @for (resource of resources; track resource.title) {
+              <div class="resource-item" (click)="openResource(resource.url)">
+                <div class="resource-icon">
+                  <i [class]="resource.icon"></i>
+                </div>
+                <div class="resource-info">
+                  <span class="resource-title">{{ resource.title }}</span>
+                  <span class="resource-description">{{ resource.description }}</span>
+                </div>
+                <i class="fas fa-external-link-alt"></i>
+              </div>
+            }
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="tips-card">
+        <mat-card-header>
+          <mat-card-title>
+            <i class="fas fa-lightbulb"></i>
+            Tips for Good Feedback
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <ul class="tips-list">
+            <li>Be specific about the issue or suggestion</li>
+            <li>Include steps to reproduce bugs</li>
+            <li>Mention your browser and operating system</li>
+            <li>Attach screenshots if helpful</li>
+            <li>Check existing issues before submitting</li>
+          </ul>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,255 @@
+<div class="characterizations-container">
+  <mat-card class="page-header">
+    <div class="header-content">
+      <div class="title-section">
+        <h1>
+          <i class="fas fa-chart-bar"></i>
+          Characterizations
+        </h1>
+        <p class="subtitle">Compare baseline characteristics across cohorts</p>
+      </div>
+      <div class="header-actions">
+        <button mat-flat-button color="primary" (click)="createNew()">
+          <i class="fas fa-plus"></i>
+          New Characterization
+        </button>
+      </div>
+    </div>
+  </mat-card>
+
+  <div class="stats-row">
+    <mat-card class="stat-card total">
+      <div class="stat-icon">
+        <i class="fas fa-chart-bar"></i>
+      </div>
+      <div class="stat-info">
+        <span class="stat-value">{{ getTotalCount() }}</span>
+        <span class="stat-label">Total Analyses</span>
+      </div>
+    </mat-card>
+
+    <mat-card class="stat-card generated">
+      <div class="stat-icon">
+        <i class="fas fa-check-circle"></i>
+      </div>
+      <div class="stat-info">
+        <span class="stat-value">{{ getGeneratedCount() }}</span>
+        <span class="stat-label">With Results</span>
+      </div>
+    </mat-card>
+
+    <mat-card class="stat-card cohorts">
+      <div class="stat-icon">
+        <i class="fas fa-users"></i>
+      </div>
+      <div class="stat-info">
+        <span class="stat-value">{{ getTotalCohorts() }}</span>
+        <span class="stat-label">Total Cohorts</span>
+      </div>
+    </mat-card>
+
+    <mat-card class="stat-card running">
+      <div class="stat-icon">
+        <i class="fas fa-spinner"></i>
+      </div>
+      <div class="stat-info">
+        <span class="stat-value">{{ getRunningCount() }}</span>
+        <span class="stat-label">Running</span>
+      </div>
+    </mat-card>
+  </div>
+
+  <mat-card class="characterizations-table-card">
+    <div class="filters-row">
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Search characterizations</mat-label>
+        <input
+          matInput
+          [(ngModel)]="searchFilter"
+          (ngModelChange)="applyFilter()"
+          placeholder="Search by name, description, cohorts..."
+        />
+        <i matSuffix class="fas fa-search"></i>
+      </mat-form-field>
+
+      <span class="results-count">
+        {{ totalResults() }} characterizations
+      </span>
+    </div>
+
+    @if (loading()) {
+      <div class="loading-container">
+        <mat-spinner diameter="40"></mat-spinner>
+        <p>Loading characterizations...</p>
+      </div>
+    } @else {
+      <div class="table-container">
+        <table
+          mat-table
+          [dataSource]="getPaginatedCharacterizations()"
+          matSort
+          (matSortChange)="onSort($event)"
+          class="characterizations-table"
+        >
+          <ng-container matColumnDef="id">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>ID</th>
+            <td mat-cell *matCellDef="let char">
+              <span class="char-id">{{ char.id }}</span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
+            <td mat-cell *matCellDef="let char">
+              <div class="name-cell">
+                <span class="char-name" (click)="editCharacterization(char)">
+                  {{ char.name }}
+                </span>
+                @if (char.description) {
+                  <span class="char-description">{{ char.description }}</span>
+                }
+              </div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="cohorts">
+            <th mat-header-cell *matHeaderCellDef>Cohorts</th>
+            <td mat-cell *matCellDef="let char">
+              <div class="cohort-chips">
+                @for (cohort of char.cohorts.slice(0, 2); track cohort.id) {
+                  <span class="cohort-chip" [matTooltip]="cohort.name">
+                    <i class="fas fa-users"></i>
+                    {{ cohort.name }}
+                  </span>
+                }
+                @if (char.cohorts.length > 2) {
+                  <span class="cohort-chip more">
+                    +{{ char.cohorts.length - 2 }} more
+                  </span>
+                }
+              </div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="features">
+            <th mat-header-cell *matHeaderCellDef>Features</th>
+            <td mat-cell *matCellDef="let char">
+              <div class="features-info">
+                <span class="feature-count">
+                  {{ char.featureAnalyses.length }} analyses
+                </span>
+                <span class="feature-types">
+                  {{ getFeaturesSummary(char) }}
+                </span>
+              </div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="stratas">
+            <th mat-header-cell *matHeaderCellDef>Stratas</th>
+            <td mat-cell *matCellDef="let char">
+              @if (char.stratas.length > 0) {
+                <div class="strata-chips">
+                  @for (strata of char.stratas; track strata.id) {
+                    <span class="strata-chip">
+                      <i class="fas fa-layer-group"></i>
+                      {{ strata.name }}
+                    </span>
+                  }
+                </div>
+              } @else {
+                <span class="no-strata">None</span>
+              }
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="executions">
+            <th mat-header-cell *matHeaderCellDef>Status</th>
+            <td mat-cell *matCellDef="let char">
+              <div class="execution-status" [class]="getExecutionStatusClass(char)">
+                <span class="status-text">{{ getExecutionSummary(char) }}</span>
+                @if (hasResults(char)) {
+                  <span class="covariates-badge">
+                    {{ getCovariatesCount(char) }}
+                  </span>
+                }
+              </div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="modifiedDate">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Modified</th>
+            <td mat-cell *matCellDef="let char">
+              {{ formatDate(char.modifiedDate) }}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let char">
+              <button mat-icon-button [matMenuTriggerFor]="actionMenu" matTooltip="Actions">
+                <i class="fas fa-ellipsis-v"></i>
+              </button>
+              <mat-menu #actionMenu="matMenu">
+                <button mat-menu-item (click)="editCharacterization(char)">
+                  <i class="fas fa-edit"></i>
+                  <span>Edit</span>
+                </button>
+                <button mat-menu-item (click)="generateCharacterization(char)">
+                  <i class="fas fa-play"></i>
+                  <span>Generate</span>
+                </button>
+                @if (hasResults(char)) {
+                  <button mat-menu-item (click)="viewResults(char)">
+                    <i class="fas fa-table"></i>
+                    <span>View Results</span>
+                  </button>
+                }
+                <mat-divider></mat-divider>
+                <button mat-menu-item (click)="copyCharacterization(char)">
+                  <i class="fas fa-copy"></i>
+                  <span>Copy</span>
+                </button>
+                <button mat-menu-item (click)="exportCharacterization(char)">
+                  <i class="fas fa-download"></i>
+                  <span>Export</span>
+                </button>
+                <mat-divider></mat-divider>
+                <button mat-menu-item (click)="deleteCharacterization(char)" class="delete-action">
+                  <i class="fas fa-trash"></i>
+                  <span>Delete</span>
+                </button>
+              </mat-menu>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr
+            mat-row
+            *matRowDef="let row; columns: displayedColumns"
+            [class.has-results]="hasResults(row)"
+          ></tr>
+        </table>
+      </div>
+
+      @if (filteredCharacterizations().length === 0) {
+        <div class="empty-state">
+          <i class="fas fa-chart-bar"></i>
+          <p>No characterizations found</p>
+          <button mat-stroked-button color="primary" (click)="createNew()">
+            Create your first characterization
+          </button>
+        </div>
+      }
+
+      <mat-paginator
+        [length]="totalResults()"
+        [pageSize]="pageSize"
+        [pageIndex]="pageIndex"
+        [pageSizeOptions]="[10, 25, 50, 100]"
+        (page)="onPageChange($event)"
+        showFirstLastButtons
+      ></mat-paginator>
+    }
+  </mat-card>
+</div>

@@ -1,0 +1,112 @@
+[
+  {
+    "cohortId": 1,
+    "sourceKey": "SYNPUF1K",
+    "sourceName": "SynPUF 1K Sample",
+    "status": "COMPLETE",
+    "personCount": 12450,
+    "recordCount": 15230,
+    "startTime": "2024-03-20T10:30:00Z",
+    "endTime": "2024-03-20T10:32:45Z",
+    "duration": 165
+  },
+  {
+    "cohortId": 1,
+    "sourceKey": "SYNPUF5PCT",
+    "sourceName": "SynPUF 5% Sample",
+    "status": "COMPLETE",
+    "personCount": 45230,
+    "recordCount": 52100,
+    "startTime": "2024-03-20T10:30:00Z",
+    "endTime": "2024-03-20T10:35:20Z",
+    "duration": 320
+  },
+  {
+    "cohortId": 1,
+    "sourceKey": "MOCK",
+    "sourceName": "Mock Data (Demo)",
+    "status": "COMPLETE",
+    "personCount": 8920,
+    "recordCount": 10450,
+    "startTime": "2024-03-20T10:30:00Z",
+    "endTime": "2024-03-20T10:31:15Z",
+    "duration": 75
+  },
+  {
+    "cohortId": 2,
+    "sourceKey": "SYNPUF1K",
+    "sourceName": "SynPUF 1K Sample",
+    "status": "COMPLETE",
+    "personCount": 28340,
+    "recordCount": 31500,
+    "startTime": "2024-03-15T14:20:00Z",
+    "endTime": "2024-03-15T14:23:30Z",
+    "duration": 210
+  },
+  {
+    "cohortId": 2,
+    "sourceKey": "MOCK",
+    "sourceName": "Mock Data (Demo)",
+    "status": "COMPLETE",
+    "personCount": 15600,
+    "recordCount": 18200,
+    "startTime": "2024-03-15T14:20:00Z",
+    "endTime": "2024-03-15T14:21:45Z",
+    "duration": 105
+  },
+  {
+    "cohortId": 4,
+    "sourceKey": "SYNPUF1K",
+    "sourceName": "SynPUF 1K Sample",
+    "status": "COMPLETE",
+    "personCount": 8920,
+    "recordCount": 9450,
+    "startTime": "2024-03-25T09:00:00Z",
+    "endTime": "2024-03-25T09:02:10Z",
+    "duration": 130
+  },
+  {
+    "cohortId": 4,
+    "sourceKey": "SYNPUF5PCT",
+    "sourceName": "SynPUF 5% Sample",
+    "status": "COMPLETE",
+    "personCount": 34560,
+    "recordCount": 38200,
+    "startTime": "2024-03-25T09:00:00Z",
+    "endTime": "2024-03-25T09:04:45Z",
+    "duration": 285
+  },
+  {
+    "cohortId": 4,
+    "sourceKey": "MOCK",
+    "sourceName": "Mock Data (Demo)",
+    "status": "COMPLETE",
+    "personCount": 6780,
+    "recordCount": 7250,
+    "startTime": "2024-03-25T09:00:00Z",
+    "endTime": "2024-03-25T09:01:20Z",
+    "duration": 80
+  },
+  {
+    "cohortId": 5,
+    "sourceKey": "SYNPUF1K",
+    "sourceName": "SynPUF 1K Sample",
+    "status": "COMPLETE",
+    "personCount": 5620,
+    "recordCount": 6100,
+    "startTime": "2024-03-10T11:15:00Z",
+    "endTime": "2024-03-10T11:16:40Z",
+    "duration": 100
+  },
+  {
+    "cohortId": 5,
+    "sourceKey": "MOCK",
+    "sourceName": "Mock Data (Demo)",
+    "status": "COMPLETE",
+    "personCount": 4230,
+    "recordCount": 4850,
+    "startTime": "2024-03-10T11:15:00Z",
+    "endTime": "2024-03-10T11:16:05Z",
+    "duration": 65
+  }
+]

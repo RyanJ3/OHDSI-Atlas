@@ -1,0 +1,186 @@
+<div class="search-container">
+  <div class="page-header">
+    <div class="page-header__title">
+      <i class="fas fa-search"></i>
+      <h1>Search Vocabulary</h1>
+    </div>
+  </div>
+
+  <!-- Search Form -->
+  <mat-card class="search-card">
+    <mat-card-content>
+      <form (ngSubmit)="search()" class="search-form">
+        <mat-form-field appearance="outline" class="source-select">
+          <mat-label>Data Source</mat-label>
+          <mat-select [(ngModel)]="selectedSource" name="source" [disabled]="loadingSources()">
+            @for (source of sources(); track source.sourceKey) {
+              <mat-option [value]="source.sourceKey">{{ source.sourceName }}</mat-option>
+            }
+          </mat-select>
+          @if (loadingSources()) {
+            <mat-hint>Loading sources...</mat-hint>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="search-input">
+          <mat-label>Search concepts</mat-label>
+          <input
+            matInput
+            [(ngModel)]="searchQuery"
+            name="searchQuery"
+            placeholder="Enter concept name, code, or ID..."
+          />
+          <mat-icon matPrefix>search</mat-icon>
+          @if (searchQuery) {
+            <button mat-icon-button matSuffix type="button" (click)="clearSearch()">
+              <mat-icon>close</mat-icon>
+            </button>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="domain-select">
+          <mat-label>Domain</mat-label>
+          <mat-select [(ngModel)]="selectedDomain" name="domain">
+            @for (domain of domains; track domain.id) {
+              <mat-option [value]="domain.id">{{ domain.name }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-checkbox [(ngModel)]="standardOnly" name="standardOnly" class="standard-checkbox">
+          Standard concepts only
+        </mat-checkbox>
+
+        <button mat-raised-button color="primary" type="submit" [disabled]="!searchQuery.trim() || !selectedSource">
+          <i class="fas fa-search"></i>
+          Search
+        </button>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Results -->
+  @if (loading()) {
+    <div class="loading-container">
+      <mat-spinner diameter="48"></mat-spinner>
+      <p>Searching concepts...</p>
+    </div>
+  } @else if (concepts().length > 0) {
+    <mat-card class="results-card">
+      <mat-card-header>
+        <mat-card-title>
+          <span class="results-count">{{ totalResults() }} results</span>
+          <span class="results-query">for "{{ searchQuery }}"</span>
+        </mat-card-title>
+      </mat-card-header>
+
+      <mat-card-content>
+        <table mat-table [dataSource]="getPaginatedConcepts()" class="results-table">
+          <!-- Concept ID -->
+          <ng-container matColumnDef="conceptId">
+            <th mat-header-cell *matHeaderCellDef>ID</th>
+            <td mat-cell *matCellDef="let concept">
+              <span class="concept-id">{{ concept.conceptId }}</span>
+            </td>
+          </ng-container>
+
+          <!-- Concept Name -->
+          <ng-container matColumnDef="conceptName">
+            <th mat-header-cell *matHeaderCellDef>Concept Name</th>
+            <td mat-cell *matCellDef="let concept">
+              <span class="concept-name">{{ concept.conceptName }}</span>
+              <span class="concept-code">{{ concept.conceptCode }}</span>
+            </td>
+          </ng-container>
+
+          <!-- Domain -->
+          <ng-container matColumnDef="domainId">
+            <th mat-header-cell *matHeaderCellDef>Domain</th>
+            <td mat-cell *matCellDef="let concept">
+              <mat-chip class="domain-chip">{{ concept.domainId }}</mat-chip>
+            </td>
+          </ng-container>
+
+          <!-- Vocabulary -->
+          <ng-container matColumnDef="vocabularyId">
+            <th mat-header-cell *matHeaderCellDef>Vocabulary</th>
+            <td mat-cell *matCellDef="let concept">{{ concept.vocabularyId }}</td>
+          </ng-container>
+
+          <!-- Class -->
+          <ng-container matColumnDef="conceptClassId">
+            <th mat-header-cell *matHeaderCellDef>Class</th>
+            <td mat-cell *matCellDef="let concept">{{ concept.conceptClassId }}</td>
+          </ng-container>
+
+          <!-- Standard -->
+          <ng-container matColumnDef="standardConcept">
+            <th mat-header-cell *matHeaderCellDef>Standard</th>
+            <td mat-cell *matCellDef="let concept">
+              <span
+                class="standard-badge"
+                [class]="getStandardBadgeClass(concept.standardConcept)"
+              >
+                {{ getStandardLabel(concept.standardConcept) }}
+              </span>
+            </td>
+          </ng-container>
+
+          <!-- Actions -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let concept">
+              <button
+                mat-icon-button
+                matTooltip="Add to Concept Set"
+                (click)="addToConceptSet(concept)"
+              >
+                <i class="fas fa-plus"></i>
+              </button>
+              <button
+                mat-icon-button
+                matTooltip="View Details"
+                (click)="viewConceptDetails(concept)"
+              >
+                <i class="fas fa-external-link-alt"></i>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+        </table>
+
+        <mat-paginator
+          [length]="totalResults()"
+          [pageSize]="pageSize"
+          [pageIndex]="pageIndex"
+          [pageSizeOptions]="[10, 25, 50, 100]"
+          (page)="onPageChange($event)"
+          showFirstLastButtons
+        >
+        </mat-paginator>
+      </mat-card-content>
+    </mat-card>
+  } @else if (searchQuery && !loading()) {
+    <div class="empty-state">
+      <i class="fas fa-search"></i>
+      <h3>No Results Found</h3>
+      <p>Try adjusting your search terms or filters.</p>
+    </div>
+  } @else {
+    <div class="empty-state initial">
+      <i class="fas fa-book-medical"></i>
+      <h3>Search the OMOP Vocabulary</h3>
+      <p>Enter a concept name, code, or ID to search across all vocabularies.</p>
+      <div class="search-tips">
+        <h4>Search Tips:</h4>
+        <ul>
+          <li>Use specific medical terms for better results</li>
+          <li>Filter by domain to narrow results</li>
+          <li>Enable "Standard concepts only" for mapping targets</li>
+        </ul>
+      </div>
+    </div>
+  }
+</div>

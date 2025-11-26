@@ -1,0 +1,203 @@
+<div class="results-dialog">
+  <div mat-dialog-title class="dialog-header">
+    <div class="title-content">
+      <i class="fas fa-sitemap"></i>
+      <div class="title-text">
+        <h2>{{ analysis.name }}</h2>
+        <p class="subtitle">Pathway Analysis Results</p>
+      </div>
+    </div>
+    <button mat-icon-button (click)="close()" class="close-button">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+
+  <mat-dialog-content>
+    @if (completedExecutions().length === 0) {
+      <div class="no-results">
+        <i class="fas fa-chart-bar"></i>
+        <p>No completed executions with results available.</p>
+      </div>
+    } @else {
+      <div class="source-selector">
+        <mat-form-field appearance="outline">
+          <mat-label>Data Source</mat-label>
+          <mat-select
+            [value]="selectedSourceKey()"
+            (selectionChange)="onSourceChange($event.value)"
+          >
+            @for (exec of completedExecutions(); track exec.sourceKey) {
+              <mat-option [value]="exec.sourceKey">
+                {{ exec.sourceName }}
+              </mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      @if (selectedExecution(); as exec) {
+        <div class="summary-cards">
+          <div class="summary-card patients">
+            <div class="card-icon">
+              <i class="fas fa-users"></i>
+            </div>
+            <div class="card-content">
+              <span class="card-value">{{ formatNumber(exec.results!.totalPatients) }}</span>
+              <span class="card-label">Total Patients</span>
+            </div>
+          </div>
+
+          <div class="summary-card pathways">
+            <div class="card-icon">
+              <i class="fas fa-route"></i>
+            </div>
+            <div class="card-content">
+              <span class="card-value">{{ formatNumber(exec.results!.pathwaysFound) }}</span>
+              <span class="card-label">Unique Pathways</span>
+            </div>
+          </div>
+
+          <div class="summary-card execution">
+            <div class="card-icon">
+              <i class="fas fa-clock"></i>
+            </div>
+            <div class="card-content">
+              <span class="card-value execution-time">{{ formatDateTime(exec.endTime) }}</span>
+              <span class="card-label">Completed</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="analysis-settings">
+          <span class="setting">
+            <i class="fas fa-layer-group"></i>
+            Max Depth: {{ analysis.maxDepth }}
+          </span>
+          <span class="setting">
+            <i class="fas fa-calendar-day"></i>
+            Window: {{ analysis.combinationWindow }} days
+          </span>
+          <span class="setting">
+            <i class="fas fa-filter"></i>
+            Min Cell: {{ analysis.minCellCount }}
+          </span>
+          @if (analysis.allowRepeats) {
+            <span class="setting repeat">
+              <i class="fas fa-redo"></i>
+              Repeats Allowed
+            </span>
+          }
+        </div>
+
+        <mat-tab-group class="results-tabs">
+          <mat-tab label="Top Pathways">
+            <div class="pathways-table-container">
+              <table mat-table [dataSource]="exec.results!.topPathways" class="pathways-table">
+                <ng-container matColumnDef="rank">
+                  <th mat-header-cell *matHeaderCellDef>#</th>
+                  <td mat-cell *matCellDef="let pathway; let i = index">
+                    <span class="rank" [class.top-3]="i < 3">{{ i + 1 }}</span>
+                  </td>
+                </ng-container>
+
+                <ng-container matColumnDef="pathway">
+                  <th mat-header-cell *matHeaderCellDef>Pathway</th>
+                  <td mat-cell *matCellDef="let pathway">
+                    <div class="pathway-steps">
+                      @for (step of pathway.path; track $index; let last = $last) {
+                        <span
+                          class="step"
+                          [style.background-color]="getStepColor($index)"
+                          [matTooltip]="step"
+                        >
+                          {{ step }}
+                        </span>
+                        @if (!last) {
+                          <i class="fas fa-arrow-right arrow"></i>
+                        }
+                      }
+                    </div>
+                  </td>
+                </ng-container>
+
+                <ng-container matColumnDef="count">
+                  <th mat-header-cell *matHeaderCellDef>Patients</th>
+                  <td mat-cell *matCellDef="let pathway">
+                    <span class="count">{{ formatNumber(pathway.count) }}</span>
+                  </td>
+                </ng-container>
+
+                <ng-container matColumnDef="percentage">
+                  <th mat-header-cell *matHeaderCellDef>%</th>
+                  <td mat-cell *matCellDef="let pathway">
+                    <span class="percentage">{{ formatPercentage(pathway.pct) }}</span>
+                  </td>
+                </ng-container>
+
+                <ng-container matColumnDef="bar">
+                  <th mat-header-cell *matHeaderCellDef></th>
+                  <td mat-cell *matCellDef="let pathway">
+                    <div class="bar-container">
+                      <div
+                        class="bar"
+                        [style.width.%]="getBarWidth(pathway.pct)"
+                      ></div>
+                    </div>
+                  </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+              </table>
+            </div>
+          </mat-tab>
+
+          <mat-tab label="Event Cohorts">
+            <div class="event-cohorts-list">
+              <p class="section-description">
+                The following event cohorts were used to define pathway steps:
+              </p>
+              <div class="cohorts-grid">
+                @for (cohort of analysis.eventCohorts; track cohort.id) {
+                  <div class="cohort-item">
+                    <span
+                      class="cohort-color"
+                      [style.background-color]="getStepColor($index)"
+                    ></span>
+                    <span class="cohort-name">{{ cohort.name }}</span>
+                    <span class="cohort-id">#{{ cohort.id }}</span>
+                  </div>
+                }
+              </div>
+            </div>
+          </mat-tab>
+
+          <mat-tab label="Target Cohorts">
+            <div class="target-cohorts-list">
+              <p class="section-description">
+                Pathways were analyzed for patients in these target cohorts:
+              </p>
+              <div class="cohorts-grid">
+                @for (cohort of analysis.targetCohorts; track cohort.id) {
+                  <div class="cohort-item target">
+                    <i class="fas fa-users"></i>
+                    <span class="cohort-name">{{ cohort.name }}</span>
+                    <span class="cohort-id">#{{ cohort.id }}</span>
+                  </div>
+                }
+              </div>
+            </div>
+          </mat-tab>
+        </mat-tab-group>
+      }
+    }
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="close()">Close</button>
+    <button mat-flat-button color="primary">
+      <i class="fas fa-download"></i>
+      Export Results
+    </button>
+  </mat-dialog-actions>
+</div>

@@ -1,0 +1,169 @@
+[
+  {
+    "executionId": 1842,
+    "jobName": "generateCohort",
+    "jobParameters": {
+      "jobName": "generateCohort",
+      "cohort_definition_id": "101",
+      "source_id": "1",
+      "jobAuthor": "admin"
+    },
+    "status": "COMPLETED",
+    "startDate": "2024-11-25T10:15:00Z",
+    "endDate": "2024-11-25T10:17:32Z",
+    "exitStatus": "COMPLETED"
+  },
+  {
+    "executionId": 1841,
+    "jobName": "generateCohort",
+    "jobParameters": {
+      "jobName": "generateCohort",
+      "cohort_definition_id": "102",
+      "source_id": "2",
+      "jobAuthor": "jsmith"
+    },
+    "status": "RUNNING",
+    "startDate": "2024-11-25T10:30:00Z",
+    "endDate": null,
+    "exitStatus": null
+  },
+  {
+    "executionId": 1840,
+    "jobName": "runIRAnalysis",
+    "jobParameters": {
+      "jobName": "Incidence Rate Analysis",
+      "analysis_id": "45",
+      "source_id": "1",
+      "jobAuthor": "mjohnson"
+    },
+    "status": "COMPLETED",
+    "startDate": "2024-11-25T09:45:00Z",
+    "endDate": "2024-11-25T09:52:18Z",
+    "exitStatus": "COMPLETED"
+  },
+  {
+    "executionId": 1839,
+    "jobName": "runCharacterization",
+    "jobParameters": {
+      "jobName": "Characterization",
+      "characterization_id": "12",
+      "source_id": "1",
+      "jobAuthor": "admin"
+    },
+    "status": "FAILED",
+    "startDate": "2024-11-25T09:30:00Z",
+    "endDate": "2024-11-25T09:31:05Z",
+    "exitStatus": "FAILED"
+  },
+  {
+    "executionId": 1838,
+    "jobName": "generateCohort",
+    "jobParameters": {
+      "jobName": "generateCohort",
+      "cohort_definition_id": "103",
+      "source_id": "3",
+      "jobAuthor": "lwhite"
+    },
+    "status": "COMPLETED",
+    "startDate": "2024-11-25T08:15:00Z",
+    "endDate": "2024-11-25T08:19:45Z",
+    "exitStatus": "COMPLETED"
+  },
+  {
+    "executionId": 1837,
+    "jobName": "runPathwayAnalysis",
+    "jobParameters": {
+      "jobName": "Pathway Analysis",
+      "pathway_id": "8",
+      "source_id": "1",
+      "jobAuthor": "jsmith"
+    },
+    "status": "COMPLETED",
+    "startDate": "2024-11-24T16:00:00Z",
+    "endDate": "2024-11-24T16:08:22Z",
+    "exitStatus": "COMPLETED"
+  },
+  {
+    "executionId": 1836,
+    "jobName": "runPLEAnalysis",
+    "jobParameters": {
+      "jobName": "Estimation Study",
+      "estimation_id": "23",
+      "source_id": "2",
+      "jobAuthor": "admin"
+    },
+    "status": "COMPLETED",
+    "startDate": "2024-11-24T14:30:00Z",
+    "endDate": "2024-11-24T14:45:12Z",
+    "exitStatus": "COMPLETED"
+  },
+  {
+    "executionId": 1835,
+    "jobName": "generateCohort",
+    "jobParameters": {
+      "jobName": "generateCohort",
+      "cohort_definition_id": "104",
+      "source_id": "1",
+      "jobAuthor": "mjohnson"
+    },
+    "status": "STOPPED",
+    "startDate": "2024-11-24T13:00:00Z",
+    "endDate": "2024-11-24T13:02:15Z",
+    "exitStatus": "STOPPED"
+  },
+  {
+    "executionId": 1834,
+    "jobName": "runPLPAnalysis",
+    "jobParameters": {
+      "jobName": "Prediction Study",
+      "prediction_id": "7",
+      "source_id": "1",
+      "jobAuthor": "lwhite"
+    },
+    "status": "COMPLETED",
+    "startDate": "2024-11-24T11:00:00Z",
+    "endDate": "2024-11-24T11:25:33Z",
+    "exitStatus": "COMPLETED"
+  },
+  {
+    "executionId": 1833,
+    "jobName": "warmCache",
+    "jobParameters": {
+      "jobName": "Warm Cache",
+      "source_id": "1",
+      "jobAuthor": "system"
+    },
+    "status": "COMPLETED",
+    "startDate": "2024-11-24T06:00:00Z",
+    "endDate": "2024-11-24T06:12:08Z",
+    "exitStatus": "COMPLETED"
+  },
+  {
+    "executionId": 1832,
+    "jobName": "generateCohort",
+    "jobParameters": {
+      "jobName": "generateCohort",
+      "cohort_definition_id": "105",
+      "source_id": "2",
+      "jobAuthor": "jsmith"
+    },
+    "status": "COMPLETED",
+    "startDate": "2024-11-23T15:30:00Z",
+    "endDate": "2024-11-23T15:34:22Z",
+    "exitStatus": "COMPLETED"
+  },
+  {
+    "executionId": 1831,
+    "jobName": "runIRAnalysis",
+    "jobParameters": {
+      "jobName": "Incidence Rate Analysis",
+      "analysis_id": "46",
+      "source_id": "3",
+      "jobAuthor": "admin"
+    },
+    "status": "COMPLETED",
+    "startDate": "2024-11-23T14:00:00Z",
+    "endDate": "2024-11-23T14:08:55Z",
+    "exitStatus": "COMPLETED"
+  }
+]

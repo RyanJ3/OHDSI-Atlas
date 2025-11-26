@@ -1,0 +1,241 @@
+[
+  {
+    "id": 1,
+    "name": "Type 2 Diabetes Baseline Characteristics",
+    "description": "Comprehensive baseline characterization of newly diagnosed T2DM patients",
+    "createdBy": "admin",
+    "createdDate": "2024-08-15T10:00:00Z",
+    "modifiedBy": "admin",
+    "modifiedDate": "2024-11-23T14:30:00Z",
+    "cohorts": [
+      { "id": 108, "name": "Newly Diagnosed Type 2 Diabetes" }
+    ],
+    "featureAnalyses": [
+      { "id": 1, "name": "Demographics", "type": "PRESET" },
+      { "id": 2, "name": "Condition Occurrence", "type": "PRESET" },
+      { "id": 3, "name": "Drug Exposure", "type": "PRESET" },
+      { "id": 4, "name": "Measurement Values", "type": "PRESET" }
+    ],
+    "stratas": [],
+    "executions": [
+      {
+        "sourceKey": "SYNPUF",
+        "sourceName": "CMS SynPUF 1K",
+        "status": "COMPLETE",
+        "startTime": "2024-11-23T14:00:00Z",
+        "endTime": "2024-11-23T14:12:45Z",
+        "results": {
+          "cohortCount": 3245,
+          "featuresAnalyzed": 1456,
+          "covariatesFound": 892
+        }
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "name": "Hypertension vs Normotensive Comparison",
+    "description": "Compare baseline characteristics between hypertensive and normotensive patients",
+    "createdBy": "jsmith",
+    "createdDate": "2024-07-20T09:15:00Z",
+    "modifiedBy": "jsmith",
+    "modifiedDate": "2024-11-20T11:45:00Z",
+    "cohorts": [
+      { "id": 101, "name": "Hypertensive Patients" },
+      { "id": 112, "name": "Normotensive Controls" }
+    ],
+    "featureAnalyses": [
+      { "id": 1, "name": "Demographics", "type": "PRESET" },
+      { "id": 2, "name": "Condition Occurrence", "type": "PRESET" },
+      { "id": 5, "name": "Visit Context", "type": "PRESET" },
+      { "id": 6, "name": "Charlson Comorbidity Index", "type": "CUSTOM" }
+    ],
+    "stratas": [
+      { "id": 1, "name": "Age Group" },
+      { "id": 2, "name": "Gender" }
+    ],
+    "executions": [
+      {
+        "sourceKey": "SYNPUF",
+        "sourceName": "CMS SynPUF 1K",
+        "status": "COMPLETE",
+        "startTime": "2024-11-20T11:00:00Z",
+        "endTime": "2024-11-20T11:18:33Z",
+        "results": {
+          "cohortCount": 8934,
+          "featuresAnalyzed": 2341,
+          "covariatesFound": 1567
+        }
+      },
+      {
+        "sourceKey": "CCAE",
+        "sourceName": "IBM CCAE",
+        "status": "COMPLETE",
+        "startTime": "2024-11-20T11:00:00Z",
+        "endTime": "2024-11-20T11:32:15Z",
+        "results": {
+          "cohortCount": 125678,
+          "featuresAnalyzed": 4521,
+          "covariatesFound": 3245
+        }
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "name": "COVID-19 Patient Characterization",
+    "description": "Baseline features of hospitalized COVID-19 patients",
+    "createdBy": "mjohnson",
+    "createdDate": "2024-06-10T14:00:00Z",
+    "modifiedBy": "admin",
+    "modifiedDate": "2024-11-18T16:20:00Z",
+    "cohorts": [
+      { "id": 105, "name": "Hospitalized COVID-19 Patients" }
+    ],
+    "featureAnalyses": [
+      { "id": 1, "name": "Demographics", "type": "PRESET" },
+      { "id": 2, "name": "Condition Occurrence", "type": "PRESET" },
+      { "id": 3, "name": "Drug Exposure", "type": "PRESET" },
+      { "id": 7, "name": "Procedure Occurrence", "type": "PRESET" },
+      { "id": 8, "name": "Laboratory Tests", "type": "CUSTOM" }
+    ],
+    "stratas": [
+      { "id": 3, "name": "Severity Level" }
+    ],
+    "executions": [
+      {
+        "sourceKey": "SYNPUF",
+        "sourceName": "CMS SynPUF 1K",
+        "status": "RUNNING",
+        "startTime": "2024-11-25T10:30:00Z",
+        "endTime": null,
+        "results": null
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "name": "Cancer Patient Pre-Treatment Profile",
+    "description": "Characterize cancer patients before initiating systemic therapy",
+    "createdBy": "lwhite",
+    "createdDate": "2024-09-05T11:30:00Z",
+    "modifiedBy": "lwhite",
+    "modifiedDate": "2024-11-15T09:00:00Z",
+    "cohorts": [
+      { "id": 111, "name": "Newly Diagnosed Breast Cancer" },
+      { "id": 113, "name": "Newly Diagnosed Lung Cancer" },
+      { "id": 114, "name": "Newly Diagnosed Colorectal Cancer" }
+    ],
+    "featureAnalyses": [
+      { "id": 1, "name": "Demographics", "type": "PRESET" },
+      { "id": 2, "name": "Condition Occurrence", "type": "PRESET" },
+      { "id": 9, "name": "Cancer Stage", "type": "CUSTOM" },
+      { "id": 10, "name": "ECOG Performance Status", "type": "CUSTOM" }
+    ],
+    "stratas": [],
+    "executions": []
+  },
+  {
+    "id": 5,
+    "name": "Heart Failure Phenotype Analysis",
+    "description": "Detailed characterization of heart failure patients by ejection fraction",
+    "createdBy": "admin",
+    "createdDate": "2024-05-18T08:45:00Z",
+    "modifiedBy": "mjohnson",
+    "modifiedDate": "2024-11-10T13:15:00Z",
+    "cohorts": [
+      { "id": 115, "name": "HFrEF Patients (EF < 40%)" },
+      { "id": 116, "name": "HFpEF Patients (EF >= 50%)" }
+    ],
+    "featureAnalyses": [
+      { "id": 1, "name": "Demographics", "type": "PRESET" },
+      { "id": 2, "name": "Condition Occurrence", "type": "PRESET" },
+      { "id": 3, "name": "Drug Exposure", "type": "PRESET" },
+      { "id": 11, "name": "Cardiac Biomarkers", "type": "CUSTOM" },
+      { "id": 12, "name": "Echocardiogram Parameters", "type": "CUSTOM" }
+    ],
+    "stratas": [
+      { "id": 4, "name": "NYHA Class" }
+    ],
+    "executions": [
+      {
+        "sourceKey": "SYNPUF",
+        "sourceName": "CMS SynPUF 1K",
+        "status": "COMPLETE",
+        "startTime": "2024-11-10T12:45:00Z",
+        "endTime": "2024-11-10T13:02:18Z",
+        "results": {
+          "cohortCount": 2156,
+          "featuresAnalyzed": 1823,
+          "covariatesFound": 945
+        }
+      }
+    ]
+  },
+  {
+    "id": 6,
+    "name": "Rheumatoid Arthritis Treatment Response",
+    "description": "Characterize RA patients by treatment response phenotype",
+    "createdBy": "jsmith",
+    "createdDate": "2024-04-22T10:00:00Z",
+    "modifiedBy": "jsmith",
+    "modifiedDate": "2024-10-28T15:30:00Z",
+    "cohorts": [
+      { "id": 117, "name": "RA Treatment Responders" },
+      { "id": 118, "name": "RA Treatment Non-Responders" }
+    ],
+    "featureAnalyses": [
+      { "id": 1, "name": "Demographics", "type": "PRESET" },
+      { "id": 2, "name": "Condition Occurrence", "type": "PRESET" },
+      { "id": 3, "name": "Drug Exposure", "type": "PRESET" },
+      { "id": 13, "name": "Disease Activity Scores", "type": "CUSTOM" }
+    ],
+    "stratas": [],
+    "executions": [
+      {
+        "sourceKey": "CCAE",
+        "sourceName": "IBM CCAE",
+        "status": "FAILED",
+        "startTime": "2024-10-28T15:00:00Z",
+        "endTime": "2024-10-28T15:02:45Z",
+        "results": null,
+        "errorMessage": "Insufficient overlap between cohorts for comparison"
+      }
+    ]
+  },
+  {
+    "id": 7,
+    "name": "Pediatric Asthma Characterization",
+    "description": "Baseline characteristics of pediatric asthma patients",
+    "createdBy": "lwhite",
+    "createdDate": "2024-03-15T09:30:00Z",
+    "modifiedBy": "admin",
+    "modifiedDate": "2024-09-20T11:00:00Z",
+    "cohorts": [
+      { "id": 119, "name": "Pediatric Asthma (Age 5-17)" }
+    ],
+    "featureAnalyses": [
+      { "id": 1, "name": "Demographics", "type": "PRESET" },
+      { "id": 2, "name": "Condition Occurrence", "type": "PRESET" },
+      { "id": 3, "name": "Drug Exposure", "type": "PRESET" },
+      { "id": 14, "name": "Asthma Control Measures", "type": "CUSTOM" }
+    ],
+    "stratas": [
+      { "id": 5, "name": "Severity Classification" }
+    ],
+    "executions": [
+      {
+        "sourceKey": "SYNPUF",
+        "sourceName": "CMS SynPUF 1K",
+        "status": "COMPLETE",
+        "startTime": "2024-09-20T10:30:00Z",
+        "endTime": "2024-09-20T10:45:12Z",
+        "results": {
+          "cohortCount": 567,
+          "featuresAnalyzed": 1234,
+          "covariatesFound": 423
+        }
+      }
+    ]
+  }
+]

@@ -1,0 +1,112 @@
+<div class="job-details-dialog">
+  <div mat-dialog-title class="dialog-header">
+    <div class="title-content">
+      <div class="job-icon">
+        <i [class]="getJobTypeIcon()"></i>
+      </div>
+      <div class="title-text">
+        <h2>Job Details</h2>
+        <p class="job-id">Execution ID: {{ job.executionId }}</p>
+      </div>
+    </div>
+    <button mat-icon-button (click)="close()" class="close-button">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+
+  <mat-dialog-content>
+    <div class="status-banner" [class]="getStatusClass()">
+      <i [class]="getStatusIcon()"></i>
+      <span class="status-label">{{ job.status }}</span>
+      @if (job.exitStatus && job.exitStatus !== job.status) {
+        <span class="exit-status">(Exit: {{ job.exitStatus }})</span>
+      }
+    </div>
+
+    <div class="details-section">
+      <h3>General Information</h3>
+      <div class="details-grid">
+        <div class="detail-item">
+          <span class="detail-label">Job Name</span>
+          <span class="detail-value">{{ getJobDisplayName() }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Job Type</span>
+          <span class="detail-value type-badge">{{ job.jobName }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Author</span>
+          <span class="detail-value">
+            <i class="fas fa-user"></i>
+            {{ job.jobParameters.jobAuthor || 'Unknown' }}
+          </span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Execution ID</span>
+          <span class="detail-value mono">{{ job.executionId }}</span>
+        </div>
+      </div>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <div class="details-section">
+      <h3>Timing</h3>
+      <div class="details-grid">
+        <div class="detail-item">
+          <span class="detail-label">Started</span>
+          <span class="detail-value">
+            <i class="fas fa-play"></i>
+            {{ formatDateTime(job.startDate) }}
+          </span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Ended</span>
+          <span class="detail-value">
+            <i class="fas fa-stop"></i>
+            {{ formatDateTime(job.endDate) }}
+          </span>
+        </div>
+        <div class="detail-item full-width">
+          <span class="detail-label">Duration</span>
+          <span class="detail-value duration" [class.running]="job.status === 'RUNNING'">
+            <i class="fas fa-clock"></i>
+            {{ calculateDuration() }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    @if (getJobParameters().length > 0) {
+      <mat-divider></mat-divider>
+
+      <div class="details-section">
+        <h3>Job Parameters</h3>
+        <div class="parameters-list">
+          @for (param of getJobParameters(); track param.key) {
+            <div class="parameter-item">
+              <span class="param-key">{{ param.key }}</span>
+              <span class="param-value">{{ param.value }}</span>
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="close()">Close</button>
+    @if (job.status === 'RUNNING') {
+      <button mat-flat-button color="warn">
+        <i class="fas fa-stop"></i>
+        Stop Job
+      </button>
+    }
+    @if (job.status === 'COMPLETED') {
+      <button mat-flat-button color="primary">
+        <i class="fas fa-external-link-alt"></i>
+        View Results
+      </button>
+    }
+  </mat-dialog-actions>
+</div>

@@ -1,0 +1,34 @@
+[
+  {
+    "sourceId": 1,
+    "sourceName": "SynPUF 1K Sample",
+    "sourceDialect": "postgresql",
+    "sourceKey": "SYNPUF1K",
+    "daimons": [
+      { "daimonType": "CDM", "tableQualifier": "synpuf1k", "priority": 1 },
+      { "daimonType": "Vocabulary", "tableQualifier": "synpuf1k", "priority": 1 },
+      { "daimonType": "Results", "tableQualifier": "synpuf1k_results", "priority": 1 }
+    ]
+  },
+  {
+    "sourceId": 2,
+    "sourceName": "SynPUF 5% Sample",
+    "sourceDialect": "postgresql",
+    "sourceKey": "SYNPUF5PCT",
+    "daimons": [
+      { "daimonType": "CDM", "tableQualifier": "synpuf5pct", "priority": 0 },
+      { "daimonType": "Vocabulary", "tableQualifier": "synpuf5pct", "priority": 0 },
+      { "daimonType": "Results", "tableQualifier": "synpuf5pct_results", "priority": 0 }
+    ]
+  },
+  {
+    "sourceId": 3,
+    "sourceName": "Eunomia Demo",
+    "sourceDialect": "sqlite",
+    "sourceKey": "EUNOMIA",
+    "daimons": [
+      { "daimonType": "CDM", "tableQualifier": "main", "priority": 0 },
+      { "daimonType": "Vocabulary", "tableQualifier": "main", "priority": 0 }
+    ]
+  }
+]

@@ -7,52 +7,142 @@
     </p>
   </div>
 
-  <!-- Quick Actions Grid -->
-  <div class="home__section">
-    <h2 class="home__section-title">Quick Actions</h2>
-    <div class="home__actions-grid">
-      @for (action of quickActions; track action.route) {
-        <mat-card class="home__action-card" [routerLink]="action.route">
-          <mat-card-content>
-            <div class="home__action-icon" [style.background-color]="action.color">
-              <i class="fas {{ action.icon }}"></i>
-            </div>
-            <h3 class="home__action-title">{{ action.title }}</h3>
-            <p class="home__action-description">{{ action.description }}</p>
-          </mat-card-content>
-        </mat-card>
-      }
+  @if (loading()) {
+    <div class="loading-container">
+      <mat-spinner diameter="48"></mat-spinner>
+      <p>Loading dashboard...</p>
     </div>
-  </div>
+  } @else {
+    <!-- Statistics Overview -->
+    <div class="home__section">
+      <h2 class="home__section-title">Your Workspace</h2>
+      <div class="home__stats-grid">
+        @for (stat of stats(); track stat.label) {
+          <mat-card class="home__stat-card" [routerLink]="stat.route">
+            <div class="stat-icon" [style.background-color]="stat.color">
+              <i class="fas {{ stat.icon }}"></i>
+            </div>
+            <div class="stat-value">{{ stat.value }}</div>
+            <div class="stat-label">{{ stat.label }}</div>
+          </mat-card>
+        }
+      </div>
+    </div>
 
-  <!-- Recent Activity Section (Placeholder) -->
-  <div class="home__section">
-    <h2 class="home__section-title">Recent Activity</h2>
-    <mat-card class="home__recent-card">
-      <mat-card-content>
-        <div class="home__empty-state">
-          <i class="fas fa-history home__empty-icon"></i>
-          <p>No recent activity to display</p>
-          <p class="home__empty-hint">Your recent cohorts, concept sets, and analyses will appear here</p>
-        </div>
-      </mat-card-content>
-    </mat-card>
-  </div>
+    <!-- Quick Actions Grid -->
+    <div class="home__section">
+      <h2 class="home__section-title">Quick Actions</h2>
+      <div class="home__actions-grid">
+        @for (action of quickActions; track action.route) {
+          <mat-card class="home__action-card" [routerLink]="action.route">
+            <mat-card-content>
+              <div class="home__action-icon" [style.background-color]="action.color">
+                <i class="fas {{ action.icon }}"></i>
+              </div>
+              <h3 class="home__action-title">{{ action.title }}</h3>
+              <p class="home__action-description">{{ action.description }}</p>
+            </mat-card-content>
+          </mat-card>
+        }
+      </div>
+    </div>
 
-  <!-- Data Sources Overview (Placeholder) -->
-  <div class="home__section">
-    <h2 class="home__section-title">Data Sources</h2>
-    <mat-card class="home__sources-card">
-      <mat-card-content>
-        <div class="home__empty-state">
-          <i class="fas fa-database home__empty-icon"></i>
-          <p>Connect to view available data sources</p>
-          <button mat-raised-button color="primary" routerLink="/data-sources">
-            <i class="fas fa-plug"></i>
-            View Data Sources
+    <!-- Two Column Layout for Activity and Sources -->
+    <div class="home__two-col">
+      <!-- Recent Activity Section -->
+      <div class="home__section">
+        <div class="section-header">
+          <h2 class="home__section-title">Recent Activity</h2>
+          <button mat-button color="primary" routerLink="/jobs">
+            View All <i class="fas fa-arrow-right"></i>
           </button>
         </div>
-      </mat-card-content>
-    </mat-card>
-  </div>
+        <mat-card class="home__activity-card">
+          <mat-card-content>
+            @if (recentActivity().length > 0) {
+              <div class="activity-list">
+                @for (activity of recentActivity(); track activity.id) {
+                  <div class="activity-item" [routerLink]="activity.route">
+                    <div class="activity-icon">
+                      <i class="fas {{ activity.icon }}"></i>
+                    </div>
+                    <div class="activity-details">
+                      <div class="activity-name">{{ activity.name }}</div>
+                      <div class="activity-meta">
+                        <span class="activity-author">{{ activity.author }}</span>
+                        <span class="activity-time">{{ formatRelativeTime(activity.date) }}</span>
+                      </div>
+                    </div>
+                    <mat-chip [class]="getStatusClass(activity.status)">
+                      {{ activity.status }}
+                    </mat-chip>
+                  </div>
+                }
+              </div>
+            } @else {
+              <div class="home__empty-state">
+                <i class="fas fa-history home__empty-icon"></i>
+                <p>No recent activity to display</p>
+              </div>
+            }
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <!-- Data Sources Overview -->
+      <div class="home__section">
+        <div class="section-header">
+          <h2 class="home__section-title">Data Sources</h2>
+          <button mat-button color="primary" routerLink="/data-sources">
+            Manage <i class="fas fa-cog"></i>
+          </button>
+        </div>
+        <mat-card class="home__sources-card">
+          <mat-card-content>
+            @if (dataSources().length > 0) {
+              <div class="sources-list">
+                @for (source of dataSources(); track source.sourceId) {
+                  <div class="source-item">
+                    <div class="source-status" [class]="getSourceStatusClass(source.status)">
+                      <i class="fas fa-circle"></i>
+                    </div>
+                    <div class="source-details">
+                      <div class="source-name">{{ source.sourceName }}</div>
+                      <div class="source-meta">
+                        <span class="source-dialect">{{ source.sourceDialect }}</span>
+                        <span class="source-key">{{ source.sourceKey }}</span>
+                      </div>
+                      <div class="source-daimons">
+                        @for (daimon of source.daimons; track daimon.daimonType) {
+                          <mat-chip class="daimon-chip">{{ getDaimonLabel(daimon) }}</mat-chip>
+                        }
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
+            } @else {
+              <div class="home__empty-state">
+                <i class="fas fa-database home__empty-icon"></i>
+                <p>No data sources configured</p>
+                <button mat-raised-button color="primary" routerLink="/data-sources">
+                  <i class="fas fa-plug"></i>
+                  Configure Sources
+                </button>
+              </div>
+            }
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+
+    <!-- Job Status Banner -->
+    @if (getRunningJobsCount() > 0) {
+      <div class="home__job-banner">
+        <i class="fas fa-spinner fa-spin"></i>
+        <span>{{ getRunningJobsCount() }} job(s) currently running</span>
+        <button mat-button routerLink="/jobs">View Jobs</button>
+      </div>
+    }
+  }
 </div>

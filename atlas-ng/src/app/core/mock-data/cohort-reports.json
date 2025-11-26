@@ -1,0 +1,185 @@
+{
+  "inclusionRules": {
+    "1": [
+      {
+        "id": 1,
+        "name": "Age >= 18",
+        "description": "Patient must be 18 years or older at cohort start",
+        "meetCount": 45230,
+        "gainCount": 45230,
+        "totalCount": 52000,
+        "percentMeet": 87.0
+      },
+      {
+        "id": 2,
+        "name": "Has qualifying diagnosis",
+        "description": "Patient has at least one qualifying condition occurrence",
+        "meetCount": 38450,
+        "gainCount": 6780,
+        "totalCount": 45230,
+        "percentMeet": 85.0
+      },
+      {
+        "id": 3,
+        "name": "No prior treatment",
+        "description": "No evidence of treatment in 365 days prior",
+        "meetCount": 32100,
+        "gainCount": 6350,
+        "totalCount": 38450,
+        "percentMeet": 83.5
+      },
+      {
+        "id": 4,
+        "name": "Continuous observation",
+        "description": "At least 365 days of continuous observation prior",
+        "meetCount": 28500,
+        "gainCount": 3600,
+        "totalCount": 32100,
+        "percentMeet": 88.8
+      }
+    ],
+    "2": [
+      {
+        "id": 1,
+        "name": "Age >= 40",
+        "description": "Patient must be 40 years or older at cohort start",
+        "meetCount": 38200,
+        "gainCount": 38200,
+        "totalCount": 45000,
+        "percentMeet": 84.9
+      },
+      {
+        "id": 2,
+        "name": "Has hypertension diagnosis",
+        "description": "Patient has hypertension condition occurrence",
+        "meetCount": 31500,
+        "gainCount": 6700,
+        "totalCount": 38200,
+        "percentMeet": 82.5
+      },
+      {
+        "id": 3,
+        "name": "On antihypertensive medication",
+        "description": "Exposure to antihypertensive drug in prior 90 days",
+        "meetCount": 28340,
+        "gainCount": 3160,
+        "totalCount": 31500,
+        "percentMeet": 90.0
+      }
+    ],
+    "4": [
+      {
+        "id": 1,
+        "name": "Age >= 65",
+        "description": "Patient must be 65 years or older at cohort start",
+        "meetCount": 25600,
+        "gainCount": 25600,
+        "totalCount": 35000,
+        "percentMeet": 73.1
+      },
+      {
+        "id": 2,
+        "name": "Has COPD diagnosis",
+        "description": "Patient has COPD condition occurrence",
+        "meetCount": 18900,
+        "gainCount": 6700,
+        "totalCount": 25600,
+        "percentMeet": 73.8
+      },
+      {
+        "id": 3,
+        "name": "On inhaler medication",
+        "description": "Exposure to inhaled bronchodilator",
+        "meetCount": 15260,
+        "gainCount": 3640,
+        "totalCount": 18900,
+        "percentMeet": 80.7
+      },
+      {
+        "id": 4,
+        "name": "No asthma diagnosis",
+        "description": "No evidence of asthma diagnosis",
+        "meetCount": 12450,
+        "gainCount": 2810,
+        "totalCount": 15260,
+        "percentMeet": 81.6
+      }
+    ],
+    "5": [
+      {
+        "id": 1,
+        "name": "Age >= 18",
+        "description": "Patient must be 18 years or older",
+        "meetCount": 12500,
+        "gainCount": 12500,
+        "totalCount": 15000,
+        "percentMeet": 83.3
+      },
+      {
+        "id": 2,
+        "name": "Depression diagnosis",
+        "description": "Has major depressive disorder diagnosis",
+        "meetCount": 9850,
+        "gainCount": 2650,
+        "totalCount": 12500,
+        "percentMeet": 78.8
+      }
+    ]
+  },
+  "demographics": {
+    "1": {
+      "ageDistribution": [
+        { "range": "18-24", "count": 2850, "percent": 10 },
+        { "range": "25-34", "count": 4275, "percent": 15 },
+        { "range": "35-44", "count": 5700, "percent": 20 },
+        { "range": "45-54", "count": 7125, "percent": 25 },
+        { "range": "55-64", "count": 5130, "percent": 18 },
+        { "range": "65+", "count": 3420, "percent": 12 }
+      ],
+      "genderDistribution": [
+        { "gender": "Female", "count": 15390, "percent": 54 },
+        { "gender": "Male", "count": 13110, "percent": 46 }
+      ]
+    },
+    "2": {
+      "ageDistribution": [
+        { "range": "40-49", "count": 4250, "percent": 15 },
+        { "range": "50-59", "count": 7085, "percent": 25 },
+        { "range": "60-69", "count": 8502, "percent": 30 },
+        { "range": "70-79", "count": 5668, "percent": 20 },
+        { "range": "80+", "count": 2835, "percent": 10 }
+      ],
+      "genderDistribution": [
+        { "gender": "Female", "count": 14736, "percent": 52 },
+        { "gender": "Male", "count": 13604, "percent": 48 }
+      ]
+    },
+    "4": {
+      "ageDistribution": [
+        { "range": "65-69", "count": 2490, "percent": 20 },
+        { "range": "70-74", "count": 3113, "percent": 25 },
+        { "range": "75-79", "count": 2739, "percent": 22 },
+        { "range": "80-84", "count": 2241, "percent": 18 },
+        { "range": "85+", "count": 1867, "percent": 15 }
+      ],
+      "genderDistribution": [
+        { "gender": "Female", "count": 5604, "percent": 45 },
+        { "gender": "Male", "count": 6846, "percent": 55 }
+      ]
+    },
+    "5": {
+      "ageDistribution": [
+        { "range": "18-24", "count": 1970, "percent": 20 },
+        { "range": "25-34", "count": 2463, "percent": 25 },
+        { "range": "35-44", "count": 2167, "percent": 22 },
+        { "range": "45-54", "count": 1773, "percent": 18 },
+        { "range": "55-64", "count": 985, "percent": 10 },
+        { "range": "65+", "count": 492, "percent": 5 }
+      ],
+      "genderDistribution": [
+        { "gender": "Female", "count": 6501, "percent": 66 },
+        { "gender": "Male", "count": 3349, "percent": 34 }
+      ]
+    }
+  }
+}
