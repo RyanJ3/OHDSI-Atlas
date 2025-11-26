@@ -1,8 +1,11 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { HttpClient } from '@angular/common/http';
+import { Observable, of, delay } from 'rxjs';
 import { ConfigService } from '../config';
+import { MOCK_SOURCE_KEY } from './source.service';
+
+// Import mock concepts data
+import conceptsData from '../mock-data/concepts.json';
 
 export interface Concept {
   CONCEPT_ID: number;
@@ -85,9 +88,21 @@ export class VocabularyService {
   }
 
   /**
+   * Check if source is mock
+   */
+  private isMockSource(sourceKey?: string): boolean {
+    return sourceKey === MOCK_SOURCE_KEY;
+  }
+
+  /**
    * Search for concepts
    */
   search(params: ConceptSearchParams, sourceKey?: string): Observable<Concept[]> {
+    // Handle mock source
+    if (this.isMockSource(sourceKey)) {
+      return this.searchMockData(params);
+    }
+
     const url = this.getVocabularyUrl(sourceKey);
 
     // Simple search via GET if only QUERY is provided
@@ -102,9 +117,53 @@ export class VocabularyService {
   }
 
   /**
+   * Search mock data
+   */
+  private searchMockData(params: ConceptSearchParams): Observable<Concept[]> {
+    let results = conceptsData as unknown as Concept[];
+
+    // Filter by search query
+    if (params.QUERY) {
+      const lowerQuery = params.QUERY.toLowerCase();
+      results = results.filter(
+        (c) =>
+          c.CONCEPT_NAME.toLowerCase().includes(lowerQuery) ||
+          c.CONCEPT_CODE.toLowerCase().includes(lowerQuery) ||
+          c.CONCEPT_ID.toString().includes(params.QUERY!)
+      );
+    }
+
+    // Filter by domain
+    if (params.DOMAIN_ID && params.DOMAIN_ID.length > 0) {
+      results = results.filter((c) => params.DOMAIN_ID!.includes(c.DOMAIN_ID));
+    }
+
+    // Filter by vocabulary
+    if (params.VOCABULARY_ID && params.VOCABULARY_ID.length > 0) {
+      results = results.filter((c) =>
+        params.VOCABULARY_ID!.includes(c.VOCABULARY_ID)
+      );
+    }
+
+    // Filter by standard concept
+    if (params.STANDARD_CONCEPT) {
+      results = results.filter((c) => c.STANDARD_CONCEPT === params.STANDARD_CONCEPT);
+    }
+
+    return of(results).pipe(delay(300));
+  }
+
+  /**
    * Get a single concept by ID
    */
   getConcept(conceptId: number, sourceKey?: string): Observable<Concept> {
+    if (this.isMockSource(sourceKey)) {
+      const concept = (conceptsData as unknown as Concept[]).find((c) => c.CONCEPT_ID === conceptId);
+      if (concept) {
+        return of(concept).pipe(delay(200));
+      }
+    }
+
     const url = this.getVocabularyUrl(sourceKey);
     return this.http.get<Concept>(`${url}concept/${conceptId}`);
   }
@@ -157,6 +216,18 @@ export class VocabularyService {
    * Get all domains
    */
   getDomains(sourceKey?: string): Observable<Domain[]> {
+    if (this.isMockSource(sourceKey)) {
+      // Get unique domains from mock data
+      const domains = [...new Set((conceptsData as unknown as Concept[]).map((c) => c.DOMAIN_ID))];
+      return of(
+        domains.map((d) => ({
+          DOMAIN_ID: d,
+          DOMAIN_NAME: d,
+          DOMAIN_CONCEPT_ID: 0,
+        }))
+      ).pipe(delay(200));
+    }
+
     const url = this.getVocabularyUrl(sourceKey);
     return this.http.get<Domain[]>(`${url}domains`);
   }

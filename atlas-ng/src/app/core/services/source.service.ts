@@ -1,8 +1,26 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, forkJoin, of } from 'rxjs';
+import { Observable, forkJoin, of, delay } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { ConfigService } from '../config';
+
+// Mock data source constant
+export const MOCK_SOURCE_KEY = 'MOCK';
+export const MOCK_SOURCE: Source = {
+  sourceId: 0,
+  sourceName: 'Mock Data (Demo)',
+  sourceDialect: 'mock',
+  sourceConnection: '',
+  sourceKey: MOCK_SOURCE_KEY,
+  daimons: [
+    { daimonType: 'CDM' as any, tableQualifier: 'mock', priority: 1 },
+    { daimonType: 'Vocabulary' as any, tableQualifier: 'mock', priority: 1 },
+    { daimonType: 'Results' as any, tableQualifier: 'mock_results', priority: 1 },
+  ],
+  hasVocabulary: true,
+  hasResults: true,
+  hasCDM: true,
+};
 
 export enum DaimonType {
   CDM = 'CDM',
@@ -60,10 +78,23 @@ export class SourceService {
   private config = inject(ConfigService);
 
   /**
-   * Get all sources
+   * Check if a source key refers to the mock data source
+   */
+  isMockSource(sourceKey: string): boolean {
+    return sourceKey === MOCK_SOURCE_KEY;
+  }
+
+  /**
+   * Get all sources (includes mock source as first option)
    */
   getSources(): Observable<Source[]> {
-    return this.http.get<Source[]>(`${this.config.webApiUrl}source/sources`);
+    return this.http.get<Source[]>(`${this.config.webApiUrl}source/sources`).pipe(
+      map((sources) => [MOCK_SOURCE, ...sources]),
+      catchError(() => {
+        // If API fails, return mock source only
+        return of([MOCK_SOURCE]);
+      })
+    );
   }
 
   /**
@@ -127,6 +158,11 @@ export class SourceService {
   checkSourceConnection(
     sourceKey: string
   ): Observable<{ sourceId: number; sourceKey: string }> {
+    // Mock source always connects successfully
+    if (this.isMockSource(sourceKey)) {
+      return of({ sourceId: 0, sourceKey: MOCK_SOURCE_KEY }).pipe(delay(300));
+    }
+
     return this.http.get<{ sourceId: number; sourceKey: string }>(
       `${this.config.webApiUrl}source/connection/${sourceKey}`
     );
@@ -178,7 +214,9 @@ export class SourceService {
   }> {
     return forkJoin({
       sources: this.getSources(),
-      priorities: this.getDaimonPriorities(),
+      priorities: this.getDaimonPriorities().pipe(
+        catchError(() => of({} as PriorityDaimons))
+      ),
     }).pipe(
       map(({ sources, priorities }) => {
         const enrichedSources = sources.map((source) =>

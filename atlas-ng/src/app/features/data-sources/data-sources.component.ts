@@ -10,7 +10,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { SourceService, Source, Daimon } from '../../core/services/source.service';
+import { SourceService, Source } from '../../core/services/source.service';
 import { catchError, of } from 'rxjs';
 
 interface SourceWithStatus extends Source {
@@ -110,9 +110,7 @@ export class DataSourcesComponent implements OnInit {
 
     this.sourceService
       .checkSourceConnection(source.sourceKey)
-      .pipe(
-        catchError(() => of(null))
-      )
+      .pipe(catchError(() => of(null)))
       .subscribe((result) => {
         const status = result ? 'connected' : 'disconnected';
         this.updateSourceStatus(source.sourceKey, status);
@@ -182,6 +180,7 @@ export class DataSourcesComponent implements OnInit {
       spark: 'Spark',
       snowflake: 'Snowflake',
       synapse: 'Synapse',
+      mock: 'Mock Data',
     };
     return dialects[dialect?.toLowerCase()] || dialect;
   }

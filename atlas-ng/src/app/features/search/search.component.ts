@@ -17,10 +17,9 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import {
   VocabularyService,
   Concept as ApiConcept,
-  Domain as ApiDomain,
 } from '../../core/services/vocabulary.service';
 import { SourceService, Source } from '../../core/services/source.service';
-import { catchError, of, forkJoin } from 'rxjs';
+import { catchError, of } from 'rxjs';
 
 interface DisplayConcept {
   conceptId: number;
@@ -211,15 +210,10 @@ export class SearchComponent implements OnInit {
     this.snackBar.open(`Added "${concept.conceptName}" to concept set`, 'OK', {
       duration: 2000,
     });
-    // Would dispatch action to add to concept set
   }
 
   viewConceptDetails(concept: DisplayConcept): void {
-    // Would navigate to concept detail page
-    window.open(
-      `#/concept/${concept.conceptId}`,
-      '_blank'
-    );
+    window.open(`#/concept/${concept.conceptId}`, '_blank');
   }
 
   getStandardBadgeClass(standardConcept: string): string {

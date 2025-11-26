@@ -1,0 +1,102 @@
+[
+  {
+    "id": 1,
+    "name": "Type 2 Diabetes",
+    "description": "Concept set for Type 2 Diabetes Mellitus conditions",
+    "createdBy": "admin",
+    "createdDate": "2024-01-15T10:30:00Z",
+    "modifiedBy": "demo",
+    "modifiedDate": "2024-06-20T14:45:00Z",
+    "conceptCount": 45
+  },
+  {
+    "id": 2,
+    "name": "Cardiovascular Events",
+    "description": "Acute myocardial infarction and related cardiovascular conditions",
+    "createdBy": "admin",
+    "createdDate": "2024-02-10T09:15:00Z",
+    "modifiedBy": "admin",
+    "modifiedDate": "2024-02-10T09:15:00Z",
+    "conceptCount": 128
+  },
+  {
+    "id": 3,
+    "name": "Hypertension Medications",
+    "description": "ACE inhibitors, ARBs, and other antihypertensive drugs",
+    "createdBy": "demo",
+    "createdDate": "2024-03-05T16:20:00Z",
+    "modifiedBy": "demo",
+    "modifiedDate": "2024-07-12T11:30:00Z",
+    "conceptCount": 89
+  },
+  {
+    "id": 4,
+    "name": "Diabetes Medications",
+    "description": "Metformin, sulfonylureas, GLP-1 agonists, and insulin products",
+    "createdBy": "admin",
+    "createdDate": "2024-01-20T08:00:00Z",
+    "modifiedBy": "researcher1",
+    "modifiedDate": "2024-08-15T10:00:00Z",
+    "conceptCount": 156
+  },
+  {
+    "id": 5,
+    "name": "Lab Tests - Metabolic Panel",
+    "description": "Comprehensive metabolic panel lab measurements",
+    "createdBy": "researcher1",
+    "createdDate": "2024-04-01T13:45:00Z",
+    "modifiedBy": "researcher1",
+    "modifiedDate": "2024-04-01T13:45:00Z",
+    "conceptCount": 24
+  },
+  {
+    "id": 6,
+    "name": "COPD and Respiratory Conditions",
+    "description": "Chronic obstructive pulmonary disease and related respiratory diagnoses",
+    "createdBy": "demo",
+    "createdDate": "2024-05-12T11:00:00Z",
+    "modifiedBy": "demo",
+    "modifiedDate": "2024-09-01T09:30:00Z",
+    "conceptCount": 67
+  },
+  {
+    "id": 7,
+    "name": "GI Bleeding Events",
+    "description": "Gastrointestinal hemorrhage and bleeding events",
+    "createdBy": "admin",
+    "createdDate": "2024-06-01T14:30:00Z",
+    "modifiedBy": "admin",
+    "modifiedDate": "2024-06-01T14:30:00Z",
+    "conceptCount": 34
+  },
+  {
+    "id": 8,
+    "name": "Heart Failure",
+    "description": "Congestive heart failure and related conditions",
+    "createdBy": "researcher1",
+    "createdDate": "2024-07-08T10:15:00Z",
+    "modifiedBy": "demo",
+    "modifiedDate": "2024-10-20T16:45:00Z",
+    "conceptCount": 52
+  },
+  {
+    "id": 9,
+    "name": "Statin Medications",
+    "description": "HMG-CoA reductase inhibitors (statins)",
+    "createdBy": "admin",
+    "createdDate": "2024-08-22T09:00:00Z",
+    "modifiedBy": "admin",
+    "modifiedDate": "2024-08-22T09:00:00Z",
+    "conceptCount": 78
+  },
+  {
+    "id": 10,
+    "name": "Blood Pressure Measurements",
+    "description": "Systolic and diastolic blood pressure measurements",
+    "createdBy": "demo",
+    "createdDate": "2024-09-15T15:30:00Z",
+    "modifiedBy": "demo",
+    "modifiedDate": "2024-09-15T15:30:00Z",
+    "conceptCount": 12
+  }
+]
