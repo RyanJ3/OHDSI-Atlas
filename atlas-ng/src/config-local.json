@@ -1,0 +1,12 @@
+{
+  "api": {
+    "url": "http://localhost:8080/WebAPI/"
+  },
+  "userAuthenticationEnabled": false,
+  "plpRespecVersion": "3.0.0",
+  "enableCosts": false,
+  "viewProfileDates": false,
+  "supportUrl": "https://github.com/OHDSI/Atlas/issues",
+  "feedbackContacts": [],
+  "feedbackEnabled": false
+}

@@ -38,16 +38,41 @@
   }
 }
 
-.loading-container {
+.loading-container,
+.error-state {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 80px 20px;
   color: #666;
+  text-align: center;
 
   p {
     margin-top: 16px;
+  }
+}
+
+.error-state {
+  i {
+    font-size: 64px;
+    color: #f44336;
+    margin-bottom: 16px;
+  }
+
+  h3 {
+    margin: 0 0 8px 0;
+    font-size: 20px;
+    font-weight: 500;
+    color: #333;
+  }
+
+  p {
+    margin: 0 0 24px 0;
+  }
+
+  button i {
+    margin-right: 8px;
   }
 }
 
@@ -116,6 +141,11 @@
   &.checking {
     background: #e3f2fd !important;
     color: #1565c0 !important;
+  }
+
+  &.unknown {
+    background: #fafafa !important;
+    color: #666 !important;
   }
 
   i,

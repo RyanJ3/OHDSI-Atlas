@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatTableModule } from '@angular/material/table';
@@ -9,20 +9,12 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { SourceService, Source, Daimon } from '../../core/services/source.service';
+import { catchError, of } from 'rxjs';
 
-interface DataSource {
-  sourceId: number;
-  sourceName: string;
-  sourceDialect: string;
-  sourceKey: string;
-  connectionStatus: 'connected' | 'disconnected' | 'checking';
-  daimons: Daimon[];
-}
-
-interface Daimon {
-  daimonType: string;
-  tableQualifier: string;
-  priority: number;
+interface SourceWithStatus extends Source {
+  connectionStatus: 'connected' | 'disconnected' | 'checking' | 'unknown';
 }
 
 @Component({
@@ -39,85 +31,129 @@ interface Daimon {
     MatTooltipModule,
     MatMenuModule,
     MatDividerModule,
+    MatSnackBarModule,
   ],
   templateUrl: './data-sources.component.html',
   styleUrl: './data-sources.component.scss',
 })
 export class DataSourcesComponent implements OnInit {
+  private sourceService = inject(SourceService);
+  private snackBar = inject(MatSnackBar);
+
   loading = signal(true);
-  sources = signal<DataSource[]>([]);
+  sources = signal<SourceWithStatus[]>([]);
+  error = signal<string | null>(null);
 
   ngOnInit(): void {
     this.loadSources();
   }
 
-  private loadSources(): void {
-    // Simulate loading data sources (would call SourceService in real app)
-    setTimeout(() => {
-      this.sources.set([
-        {
-          sourceId: 1,
-          sourceName: 'SYNPUF 1K',
-          sourceDialect: 'postgresql',
-          sourceKey: 'SYNPUF1K',
-          connectionStatus: 'connected',
-          daimons: [
-            { daimonType: 'CDM', tableQualifier: 'cdm_synpuf', priority: 1 },
-            { daimonType: 'Vocabulary', tableQualifier: 'cdm_synpuf', priority: 1 },
-            { daimonType: 'Results', tableQualifier: 'results_synpuf', priority: 1 },
-            { daimonType: 'Temp', tableQualifier: 'temp_synpuf', priority: 0 },
-          ],
-        },
-        {
-          sourceId: 2,
-          sourceName: 'SYNPUF 5%',
-          sourceDialect: 'sql server',
-          sourceKey: 'SYNPUF5PCT',
-          connectionStatus: 'connected',
-          daimons: [
-            { daimonType: 'CDM', tableQualifier: 'cdm_synpuf5', priority: 1 },
-            { daimonType: 'Vocabulary', tableQualifier: 'vocab', priority: 1 },
-            { daimonType: 'Results', tableQualifier: 'results_synpuf5', priority: 1 },
-          ],
-        },
-        {
-          sourceId: 3,
-          sourceName: 'Production CDM',
-          sourceDialect: 'oracle',
-          sourceKey: 'PRODCDM',
-          connectionStatus: 'disconnected',
-          daimons: [
-            { daimonType: 'CDM', tableQualifier: 'CDM_PROD', priority: 1 },
-            { daimonType: 'Vocabulary', tableQualifier: 'VOCAB', priority: 1 },
-          ],
-        },
-      ]);
-      this.loading.set(false);
-    }, 800);
+  loadSources(): void {
+    this.loading.set(true);
+    this.error.set(null);
+
+    this.sourceService
+      .initializeSources()
+      .pipe(
+        catchError((err) => {
+          console.error('Failed to load sources:', err);
+          this.error.set('Failed to load data sources. Please check your connection.');
+          return of({ sources: [], priorities: {} });
+        })
+      )
+      .subscribe(({ sources }) => {
+        const sourcesWithStatus: SourceWithStatus[] = sources.map((s) => ({
+          ...s,
+          connectionStatus: 'unknown' as const,
+        }));
+        this.sources.set(sourcesWithStatus);
+        this.loading.set(false);
+
+        // Auto-check connections for all sources
+        sourcesWithStatus.forEach((source) => {
+          this.checkConnectionSilent(source);
+        });
+      });
   }
 
   refreshAll(): void {
-    this.loading.set(true);
     this.loadSources();
   }
 
-  checkConnection(source: DataSource): void {
-    const sources = this.sources();
-    const index = sources.findIndex((s) => s.sourceId === source.sourceId);
-    if (index >= 0) {
-      sources[index] = { ...sources[index], connectionStatus: 'checking' };
-      this.sources.set([...sources]);
+  checkConnection(source: SourceWithStatus): void {
+    this.updateSourceStatus(source.sourceKey, 'checking');
 
-      // Simulate connection check
-      setTimeout(() => {
-        const updated = this.sources();
-        updated[index] = {
-          ...updated[index],
-          connectionStatus: Math.random() > 0.3 ? 'connected' : 'disconnected',
-        };
-        this.sources.set([...updated]);
-      }, 1500);
+    this.sourceService
+      .checkSourceConnection(source.sourceKey)
+      .pipe(
+        catchError((err) => {
+          console.error(`Connection check failed for ${source.sourceKey}:`, err);
+          return of(null);
+        })
+      )
+      .subscribe((result) => {
+        const status = result ? 'connected' : 'disconnected';
+        this.updateSourceStatus(source.sourceKey, status);
+
+        this.snackBar.open(
+          result
+            ? `${source.sourceName} is connected`
+            : `${source.sourceName} connection failed`,
+          'OK',
+          { duration: 3000 }
+        );
+      });
+  }
+
+  private checkConnectionSilent(source: SourceWithStatus): void {
+    this.updateSourceStatus(source.sourceKey, 'checking');
+
+    this.sourceService
+      .checkSourceConnection(source.sourceKey)
+      .pipe(
+        catchError(() => of(null))
+      )
+      .subscribe((result) => {
+        const status = result ? 'connected' : 'disconnected';
+        this.updateSourceStatus(source.sourceKey, status);
+      });
+  }
+
+  private updateSourceStatus(
+    sourceKey: string,
+    status: 'connected' | 'disconnected' | 'checking' | 'unknown'
+  ): void {
+    const sources = this.sources();
+    const index = sources.findIndex((s) => s.sourceKey === sourceKey);
+    if (index >= 0) {
+      const updated = [...sources];
+      updated[index] = { ...updated[index], connectionStatus: status };
+      this.sources.set(updated);
     }
+  }
+
+  refreshCache(source: SourceWithStatus): void {
+    this.snackBar.open(`Refreshing cache for ${source.sourceName}...`, '', {
+      duration: 2000,
+    });
+
+    this.sourceService
+      .refreshSourceCache(source.sourceKey)
+      .pipe(
+        catchError((err) => {
+          console.error('Cache refresh failed:', err);
+          return of(null);
+        })
+      )
+      .subscribe((result) => {
+        if (result) {
+          this.snackBar.open(`Cache refreshed for ${source.sourceName}`, 'OK', {
+            duration: 3000,
+          });
+        } else {
+          this.snackBar.open(`Failed to refresh cache`, 'OK', { duration: 3000 });
+        }
+      });
   }
 
   getDaimonIcon(type: string): string {
@@ -127,11 +163,26 @@ export class DataSourcesComponent implements OnInit {
       Results: 'fas fa-chart-bar',
       Temp: 'fas fa-clock',
       CEM: 'fas fa-project-diagram',
+      CEMResults: 'fas fa-flask',
     };
     return icons[type] || 'fas fa-cube';
   }
 
   formatDaimonType(type: string): string {
     return type;
+  }
+
+  getDialectDisplayName(dialect: string): string {
+    const dialects: Record<string, string> = {
+      postgresql: 'PostgreSQL',
+      'sql server': 'SQL Server',
+      oracle: 'Oracle',
+      redshift: 'Redshift',
+      bigquery: 'BigQuery',
+      spark: 'Spark',
+      snowflake: 'Snowflake',
+      synapse: 'Synapse',
+    };
+    return dialects[dialect?.toLowerCase()] || dialect;
   }
 }

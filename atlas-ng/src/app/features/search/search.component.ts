@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -13,8 +13,16 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import {
+  VocabularyService,
+  Concept as ApiConcept,
+  Domain as ApiDomain,
+} from '../../core/services/vocabulary.service';
+import { SourceService, Source } from '../../core/services/source.service';
+import { catchError, of, forkJoin } from 'rxjs';
 
-interface Concept {
+interface DisplayConcept {
   conceptId: number;
   conceptName: string;
   domainId: string;
@@ -48,18 +56,28 @@ interface Domain {
     MatTooltipModule,
     MatSelectModule,
     MatCheckboxModule,
+    MatSnackBarModule,
   ],
   templateUrl: './search.component.html',
   styleUrl: './search.component.scss',
 })
 export class SearchComponent implements OnInit {
+  private vocabularyService = inject(VocabularyService);
+  private sourceService = inject(SourceService);
+  private snackBar = inject(MatSnackBar);
+
   searchQuery = '';
   selectedDomain = '';
+  selectedSource = '';
   standardOnly = true;
 
   loading = signal(false);
-  concepts = signal<Concept[]>([]);
+  loadingSources = signal(true);
+  concepts = signal<DisplayConcept[]>([]);
   totalResults = signal(0);
+  sources = signal<Source[]>([]);
+  error = signal<string | null>(null);
+
   pageSize = 25;
   pageIndex = 0;
 
@@ -86,43 +104,122 @@ export class SearchComponent implements OnInit {
   ];
 
   ngOnInit(): void {
-    // Initial empty state
+    this.loadSources();
+  }
+
+  private loadSources(): void {
+    this.loadingSources.set(true);
+
+    this.sourceService
+      .getSources()
+      .pipe(
+        catchError((err) => {
+          console.error('Failed to load sources:', err);
+          return of([]);
+        })
+      )
+      .subscribe((sources) => {
+        // Filter to sources with vocabulary
+        const vocabSources = sources.filter((s) =>
+          s.daimons?.some(
+            (d) => d.daimonType === 'Vocabulary' || d.daimonType === 'CDM'
+          )
+        );
+        this.sources.set(vocabSources);
+
+        // Auto-select first source if available
+        if (vocabSources.length > 0 && !this.selectedSource) {
+          this.selectedSource = vocabSources[0].sourceKey;
+        }
+
+        this.loadingSources.set(false);
+      });
   }
 
   search(): void {
     if (!this.searchQuery.trim()) return;
+    if (!this.selectedSource) {
+      this.snackBar.open('Please select a data source', 'OK', { duration: 3000 });
+      return;
+    }
 
     this.loading.set(true);
+    this.error.set(null);
     this.pageIndex = 0;
 
-    // Simulate API call
-    setTimeout(() => {
-      this.concepts.set(this.getMockResults());
-      this.totalResults.set(127);
-      this.loading.set(false);
-    }, 600);
+    const searchParams: any = {
+      QUERY: this.searchQuery,
+    };
+
+    if (this.selectedDomain) {
+      searchParams.DOMAIN_ID = [this.selectedDomain];
+    }
+
+    if (this.standardOnly) {
+      searchParams.STANDARD_CONCEPT = 'S';
+    }
+
+    this.vocabularyService
+      .search(searchParams, this.selectedSource)
+      .pipe(
+        catchError((err) => {
+          console.error('Search failed:', err);
+          this.error.set('Search failed. Please try again.');
+          return of([]);
+        })
+      )
+      .subscribe((results) => {
+        const displayConcepts = this.mapToDisplayConcepts(results);
+        this.concepts.set(displayConcepts);
+        this.totalResults.set(displayConcepts.length);
+        this.loading.set(false);
+
+        if (displayConcepts.length === 0 && !this.error()) {
+          this.snackBar.open('No concepts found matching your search', 'OK', {
+            duration: 3000,
+          });
+        }
+      });
+  }
+
+  private mapToDisplayConcepts(apiConcepts: ApiConcept[]): DisplayConcept[] {
+    return apiConcepts.map((c) => ({
+      conceptId: c.CONCEPT_ID,
+      conceptName: c.CONCEPT_NAME,
+      domainId: c.DOMAIN_ID,
+      vocabularyId: c.VOCABULARY_ID,
+      conceptClassId: c.CONCEPT_CLASS_ID,
+      standardConcept: c.STANDARD_CONCEPT,
+      conceptCode: c.CONCEPT_CODE,
+      invalidReason: c.INVALID_REASON,
+    }));
   }
 
   onPageChange(event: PageEvent): void {
     this.pageIndex = event.pageIndex;
     this.pageSize = event.pageSize;
-    this.search();
   }
 
   clearSearch(): void {
     this.searchQuery = '';
     this.concepts.set([]);
     this.totalResults.set(0);
+    this.error.set(null);
   }
 
-  addToConceptSet(concept: Concept): void {
-    console.log('Add to concept set:', concept);
+  addToConceptSet(concept: DisplayConcept): void {
+    this.snackBar.open(`Added "${concept.conceptName}" to concept set`, 'OK', {
+      duration: 2000,
+    });
     // Would dispatch action to add to concept set
   }
 
-  viewConceptDetails(concept: Concept): void {
-    console.log('View concept:', concept);
+  viewConceptDetails(concept: DisplayConcept): void {
     // Would navigate to concept detail page
+    window.open(
+      `#/concept/${concept.conceptId}`,
+      '_blank'
+    );
   }
 
   getStandardBadgeClass(standardConcept: string): string {
@@ -147,88 +244,9 @@ export class SearchComponent implements OnInit {
     }
   }
 
-  private getMockResults(): Concept[] {
-    return [
-      {
-        conceptId: 201826,
-        conceptName: 'Type 2 diabetes mellitus',
-        domainId: 'Condition',
-        vocabularyId: 'SNOMED',
-        conceptClassId: 'Clinical Finding',
-        standardConcept: 'S',
-        conceptCode: '44054006',
-        invalidReason: null,
-      },
-      {
-        conceptId: 443238,
-        conceptName: 'Diabetic nephropathy',
-        domainId: 'Condition',
-        vocabularyId: 'SNOMED',
-        conceptClassId: 'Clinical Finding',
-        standardConcept: 'S',
-        conceptCode: '127013003',
-        invalidReason: null,
-      },
-      {
-        conceptId: 377821,
-        conceptName: 'Diabetes mellitus type 2 without complication',
-        domainId: 'Condition',
-        vocabularyId: 'SNOMED',
-        conceptClassId: 'Clinical Finding',
-        standardConcept: 'S',
-        conceptCode: '359642000',
-        invalidReason: null,
-      },
-      {
-        conceptId: 4193704,
-        conceptName: 'Type 2 diabetes mellitus with diabetic chronic kidney disease',
-        domainId: 'Condition',
-        vocabularyId: 'SNOMED',
-        conceptClassId: 'Clinical Finding',
-        standardConcept: 'S',
-        conceptCode: '731000119105',
-        invalidReason: null,
-      },
-      {
-        conceptId: 1503297,
-        conceptName: 'Metformin',
-        domainId: 'Drug',
-        vocabularyId: 'RxNorm',
-        conceptClassId: 'Ingredient',
-        standardConcept: 'S',
-        conceptCode: '6809',
-        invalidReason: null,
-      },
-      {
-        conceptId: 1529331,
-        conceptName: 'Insulin glargine',
-        domainId: 'Drug',
-        vocabularyId: 'RxNorm',
-        conceptClassId: 'Ingredient',
-        standardConcept: 'S',
-        conceptCode: '274783',
-        invalidReason: null,
-      },
-      {
-        conceptId: 3004410,
-        conceptName: 'Hemoglobin A1c/Hemoglobin.total in Blood',
-        domainId: 'Measurement',
-        vocabularyId: 'LOINC',
-        conceptClassId: 'Lab Test',
-        standardConcept: 'S',
-        conceptCode: '4548-4',
-        invalidReason: null,
-      },
-      {
-        conceptId: 3034639,
-        conceptName: 'Glucose [Mass/volume] in Blood',
-        domainId: 'Measurement',
-        vocabularyId: 'LOINC',
-        conceptClassId: 'Lab Test',
-        standardConcept: 'S',
-        conceptCode: '2339-0',
-        invalidReason: null,
-      },
-    ];
+  getPaginatedConcepts(): DisplayConcept[] {
+    const start = this.pageIndex * this.pageSize;
+    const end = start + this.pageSize;
+    return this.concepts().slice(start, end);
   }
 }

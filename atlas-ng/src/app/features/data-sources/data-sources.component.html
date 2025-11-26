@@ -17,6 +17,16 @@
       <mat-spinner diameter="48"></mat-spinner>
       <p>Loading data sources...</p>
     </div>
+  } @else if (error()) {
+    <div class="error-state">
+      <i class="fas fa-exclamation-triangle"></i>
+      <h3>Unable to Load Data Sources</h3>
+      <p>{{ error() }}</p>
+      <button mat-raised-button color="primary" (click)="loadSources()">
+        <i class="fas fa-redo"></i>
+        Try Again
+      </button>
+    </div>
   } @else {
     <div class="sources-grid">
       @for (source of sources(); track source.sourceId) {
@@ -47,6 +57,12 @@
                       Checking...
                     </mat-chip>
                   }
+                  @case ('unknown') {
+                    <mat-chip class="status-chip unknown">
+                      <i class="fas fa-question-circle"></i>
+                      Unknown
+                    </mat-chip>
+                  }
                 }
               </div>
             </div>
@@ -56,7 +72,7 @@
             <div class="source-details">
               <div class="detail-row">
                 <span class="detail-label">Dialect</span>
-                <span class="detail-value dialect-badge">{{ source.sourceDialect }}</span>
+                <span class="detail-value dialect-badge">{{ getDialectDisplayName(source.sourceDialect) }}</span>
               </div>
             </div>
 
@@ -92,6 +108,10 @@
               <button mat-menu-item>
                 <i class="fas fa-chart-bar fa-fw"></i>
                 <span>View Reports</span>
+              </button>
+              <button mat-menu-item (click)="refreshCache(source)">
+                <i class="fas fa-sync fa-fw"></i>
+                <span>Refresh Cache</span>
               </button>
               <mat-divider></mat-divider>
               <button mat-menu-item>

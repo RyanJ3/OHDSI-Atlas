@@ -41,10 +41,9 @@ export const routes: Routes = [
       {
         path: 'conceptsets',
         loadComponent: () =>
-          import('./shared/components/placeholder-page/placeholder-page.component').then(
-            (m) => m.PlaceholderPageComponent
+          import('./features/concept-sets/concept-sets.component').then(
+            (m) => m.ConceptSetsComponent
           ),
-        data: { title: 'Concept Sets', icon: 'fa-shopping-cart' },
       },
       {
         path: 'cohortdefinitions',
