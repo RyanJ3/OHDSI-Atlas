@@ -15,9 +15,11 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSortModule, Sort } from '@angular/material/sort';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 
 // Import mock data
 import jobsData from '../../core/mock-data/jobs.json';
+import { JobDetailsDialogComponent } from './job-details-dialog/job-details-dialog.component';
 
 interface JobParameters {
   jobName: string;
@@ -61,12 +63,14 @@ interface Job {
     MatSelectModule,
     MatSortModule,
     MatSnackBarModule,
+    MatDialogModule,
   ],
   templateUrl: './jobs.component.html',
   styleUrl: './jobs.component.scss',
 })
 export class JobsComponent implements OnInit, OnDestroy {
   private snackBar = inject(MatSnackBar);
+  private dialog = inject(MatDialog);
   private refreshInterval: ReturnType<typeof setInterval> | null = null;
 
   loading = signal(true);
@@ -329,7 +333,10 @@ export class JobsComponent implements OnInit, OnDestroy {
   }
 
   viewJobDetails(job: Job): void {
-    this.snackBar.open(`View details for job ${job.executionId}`, '', { duration: 2000 });
+    this.dialog.open(JobDetailsDialogComponent, {
+      data: { job },
+      width: '600px',
+    });
   }
 
   getRunningCount(): number {
