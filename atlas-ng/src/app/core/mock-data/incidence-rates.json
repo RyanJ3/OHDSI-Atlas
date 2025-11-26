@@ -1,0 +1,257 @@
+[
+  {
+    "id": 1,
+    "name": "Type 2 Diabetes Incidence in Hypertensive Patients",
+    "description": "Calculates incidence rate of new T2DM diagnoses among patients with hypertension",
+    "createdBy": "admin",
+    "createdDate": "2024-09-15T10:30:00Z",
+    "modifiedBy": "admin",
+    "modifiedDate": "2024-11-20T14:22:00Z",
+    "targetCohorts": [
+      { "id": 101, "name": "Hypertensive Patients" }
+    ],
+    "outcomeCohorts": [
+      { "id": 201, "name": "New Type 2 Diabetes Diagnosis" }
+    ],
+    "timeAtRisk": {
+      "start": { "offset": 1, "anchor": "cohort start" },
+      "end": { "offset": 365, "anchor": "cohort start" }
+    },
+    "executions": [
+      {
+        "sourceKey": "SYNPUF",
+        "sourceName": "CMS SynPUF 1K",
+        "status": "COMPLETE",
+        "startTime": "2024-11-20T14:00:00Z",
+        "endTime": "2024-11-20T14:02:15Z",
+        "results": {
+          "totalPersons": 1245,
+          "cases": 87,
+          "timeAtRisk": 425890,
+          "incidenceRate": 20.43,
+          "incidenceProportion": 6.99
+        }
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "name": "Stroke Incidence Post-MI",
+    "description": "Incidence of stroke following myocardial infarction within 90 days",
+    "createdBy": "jsmith",
+    "createdDate": "2024-08-10T09:15:00Z",
+    "modifiedBy": "jsmith",
+    "modifiedDate": "2024-11-18T16:45:00Z",
+    "targetCohorts": [
+      { "id": 102, "name": "Acute Myocardial Infarction Patients" }
+    ],
+    "outcomeCohorts": [
+      { "id": 202, "name": "Ischemic Stroke" },
+      { "id": 203, "name": "Hemorrhagic Stroke" }
+    ],
+    "timeAtRisk": {
+      "start": { "offset": 1, "anchor": "cohort start" },
+      "end": { "offset": 90, "anchor": "cohort start" }
+    },
+    "executions": [
+      {
+        "sourceKey": "SYNPUF",
+        "sourceName": "CMS SynPUF 1K",
+        "status": "COMPLETE",
+        "startTime": "2024-11-18T16:30:00Z",
+        "endTime": "2024-11-18T16:32:45Z",
+        "results": {
+          "totalPersons": 892,
+          "cases": 34,
+          "timeAtRisk": 78234,
+          "incidenceRate": 43.46,
+          "incidenceProportion": 3.81
+        }
+      },
+      {
+        "sourceKey": "CCAE",
+        "sourceName": "IBM CCAE",
+        "status": "COMPLETE",
+        "startTime": "2024-11-18T16:30:00Z",
+        "endTime": "2024-11-18T16:35:12Z",
+        "results": {
+          "totalPersons": 15678,
+          "cases": 612,
+          "timeAtRisk": 1345890,
+          "incidenceRate": 45.47,
+          "incidenceProportion": 3.90
+        }
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "name": "GI Bleeding on NSAIDs",
+    "description": "Gastrointestinal bleeding incidence among NSAID users",
+    "createdBy": "mjohnson",
+    "createdDate": "2024-07-22T11:00:00Z",
+    "modifiedBy": "mjohnson",
+    "modifiedDate": "2024-11-15T10:30:00Z",
+    "targetCohorts": [
+      { "id": 103, "name": "New NSAID Users" }
+    ],
+    "outcomeCohorts": [
+      { "id": 204, "name": "GI Bleeding Event" }
+    ],
+    "timeAtRisk": {
+      "start": { "offset": 0, "anchor": "cohort start" },
+      "end": { "offset": 0, "anchor": "cohort end" }
+    },
+    "executions": [
+      {
+        "sourceKey": "SYNPUF",
+        "sourceName": "CMS SynPUF 1K",
+        "status": "RUNNING",
+        "startTime": "2024-11-25T10:30:00Z",
+        "endTime": null,
+        "results": null
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "name": "Heart Failure After Chemotherapy",
+    "description": "New onset heart failure in cancer patients receiving chemotherapy",
+    "createdBy": "lwhite",
+    "createdDate": "2024-10-05T14:20:00Z",
+    "modifiedBy": "admin",
+    "modifiedDate": "2024-11-22T09:15:00Z",
+    "targetCohorts": [
+      { "id": 104, "name": "Cancer Patients on Chemotherapy" }
+    ],
+    "outcomeCohorts": [
+      { "id": 205, "name": "New Heart Failure Diagnosis" }
+    ],
+    "timeAtRisk": {
+      "start": { "offset": 1, "anchor": "cohort start" },
+      "end": { "offset": 730, "anchor": "cohort start" }
+    },
+    "executions": []
+  },
+  {
+    "id": 5,
+    "name": "DVT/PE Incidence in COVID-19",
+    "description": "Venous thromboembolism events in hospitalized COVID-19 patients",
+    "createdBy": "admin",
+    "createdDate": "2024-06-18T08:45:00Z",
+    "modifiedBy": "jsmith",
+    "modifiedDate": "2024-11-10T11:20:00Z",
+    "targetCohorts": [
+      { "id": 105, "name": "Hospitalized COVID-19 Patients" }
+    ],
+    "outcomeCohorts": [
+      { "id": 206, "name": "Deep Vein Thrombosis" },
+      { "id": 207, "name": "Pulmonary Embolism" }
+    ],
+    "timeAtRisk": {
+      "start": { "offset": 0, "anchor": "cohort start" },
+      "end": { "offset": 30, "anchor": "cohort start" }
+    },
+    "executions": [
+      {
+        "sourceKey": "SYNPUF",
+        "sourceName": "CMS SynPUF 1K",
+        "status": "COMPLETE",
+        "startTime": "2024-11-10T11:00:00Z",
+        "endTime": "2024-11-10T11:04:33Z",
+        "results": {
+          "totalPersons": 2341,
+          "cases": 189,
+          "timeAtRisk": 62450,
+          "incidenceRate": 302.64,
+          "incidenceProportion": 8.07
+        }
+      }
+    ]
+  },
+  {
+    "id": 6,
+    "name": "Depression Following Cancer Diagnosis",
+    "description": "New depression diagnosis within 1 year of cancer diagnosis",
+    "createdBy": "mjohnson",
+    "createdDate": "2024-05-12T16:30:00Z",
+    "modifiedBy": "mjohnson",
+    "modifiedDate": "2024-10-28T13:45:00Z",
+    "targetCohorts": [
+      { "id": 106, "name": "Newly Diagnosed Cancer Patients" }
+    ],
+    "outcomeCohorts": [
+      { "id": 208, "name": "Major Depressive Disorder" }
+    ],
+    "timeAtRisk": {
+      "start": { "offset": 1, "anchor": "cohort start" },
+      "end": { "offset": 365, "anchor": "cohort start" }
+    },
+    "executions": [
+      {
+        "sourceKey": "CCAE",
+        "sourceName": "IBM CCAE",
+        "status": "FAILED",
+        "startTime": "2024-10-28T13:30:00Z",
+        "endTime": "2024-10-28T13:31:15Z",
+        "results": null,
+        "errorMessage": "Target cohort has no subjects in this data source"
+      }
+    ]
+  },
+  {
+    "id": 7,
+    "name": "Acute Kidney Injury on Contrast Media",
+    "description": "AKI incidence following contrast-enhanced imaging procedures",
+    "createdBy": "lwhite",
+    "createdDate": "2024-04-08T10:00:00Z",
+    "modifiedBy": "lwhite",
+    "modifiedDate": "2024-11-05T15:30:00Z",
+    "targetCohorts": [
+      { "id": 107, "name": "Patients Receiving IV Contrast" }
+    ],
+    "outcomeCohorts": [
+      { "id": 209, "name": "Acute Kidney Injury" }
+    ],
+    "timeAtRisk": {
+      "start": { "offset": 0, "anchor": "cohort start" },
+      "end": { "offset": 7, "anchor": "cohort start" }
+    },
+    "executions": [
+      {
+        "sourceKey": "SYNPUF",
+        "sourceName": "CMS SynPUF 1K",
+        "status": "COMPLETE",
+        "startTime": "2024-11-05T15:00:00Z",
+        "endTime": "2024-11-05T15:01:45Z",
+        "results": {
+          "totalPersons": 4521,
+          "cases": 156,
+          "timeAtRisk": 31245,
+          "incidenceRate": 499.28,
+          "incidenceProportion": 3.45
+        }
+      }
+    ]
+  },
+  {
+    "id": 8,
+    "name": "Diabetes Complications - Retinopathy",
+    "description": "Diabetic retinopathy incidence in Type 2 Diabetes patients",
+    "createdBy": "admin",
+    "createdDate": "2024-03-20T09:30:00Z",
+    "modifiedBy": "admin",
+    "modifiedDate": "2024-09-15T14:00:00Z",
+    "targetCohorts": [
+      { "id": 108, "name": "Type 2 Diabetes Patients" }
+    ],
+    "outcomeCohorts": [
+      { "id": 210, "name": "Diabetic Retinopathy" }
+    ],
+    "timeAtRisk": {
+      "start": { "offset": 365, "anchor": "cohort start" },
+      "end": { "offset": 1825, "anchor": "cohort start" }
+    },
+    "executions": []
+  }
+]

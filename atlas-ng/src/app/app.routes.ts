@@ -78,10 +78,9 @@ export const routes: Routes = [
       {
         path: 'incidence-rates',
         loadComponent: () =>
-          import('./shared/components/placeholder-page/placeholder-page.component').then(
-            (m) => m.PlaceholderPageComponent
+          import('./features/incidence-rates/incidence-rates.component').then(
+            (m) => m.IncidenceRatesComponent
           ),
-        data: { title: 'Incidence Rates', icon: 'fa-bolt' },
       },
       {
         path: 'profiles',
