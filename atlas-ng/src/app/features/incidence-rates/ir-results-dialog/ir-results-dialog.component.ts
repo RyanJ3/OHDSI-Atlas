@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
@@ -8,6 +8,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 interface StrataResult {
   strataName: string;
@@ -32,6 +33,7 @@ interface StrataResult {
     MatChipsModule,
     MatDividerModule,
     MatTooltipModule,
+    MatSnackBarModule,
   ],
   template: `
     <h2 mat-dialog-title>
@@ -289,6 +291,8 @@ interface StrataResult {
   `],
 })
 export class IrResultsDialogComponent {
+  private snackBar = inject(MatSnackBar);
+
   overallResult!: StrataResult;
   strataResults: StrataResult[] = [];
   yearlyRates: { year: number; rate: number }[] = [];
@@ -350,6 +354,22 @@ export class IrResultsDialogComponent {
   }
 
   exportResults(): void {
-    alert('Exporting results... (feature simulation)');
+    const exportData = {
+      analysis: this.data.analysis.name,
+      overallResults: this.overallResult,
+      strataResults: this.strataResults,
+      yearlyRates: this.yearlyRates,
+      exportedAt: new Date().toISOString(),
+    };
+
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `ir-results-${this.data.analysis.name?.replace(/[^a-z0-9]/gi, '_').toLowerCase() || 'analysis'}.json`;
+    link.click();
+    window.URL.revokeObjectURL(url);
+
+    this.snackBar.open('Results exported successfully', 'OK', { duration: 3000 });
   }
 }

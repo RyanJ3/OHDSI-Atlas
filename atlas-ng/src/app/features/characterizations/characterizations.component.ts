@@ -21,6 +21,7 @@ import characterizationsData from '../../core/mock-data/characterizations.json';
 import { CharacterizationResultsDialogComponent } from './characterization-results-dialog/characterization-results-dialog.component';
 import { CreateCharacterizationDialogComponent } from './create-characterization-dialog/create-characterization-dialog.component';
 import { EditCharacterizationDialogComponent } from './edit-characterization-dialog/edit-characterization-dialog.component';
+import { ConfirmDialogComponent, ConfirmDialogData } from '../../shared/confirm-dialog/confirm-dialog.component';
 
 interface Cohort {
   id: number;
@@ -247,11 +248,23 @@ export class CharacterizationsComponent implements OnInit {
   }
 
   deleteCharacterization(char: Characterization): void {
-    if (confirm(`Are you sure you want to delete "${char.name}"?`)) {
-      this.characterizations.update(current => current.filter(c => c.id !== char.id));
-      this.applyFilter();
-      this.snackBar.open(`Deleted "${char.name}"`, 'OK', { duration: 2000 });
-    }
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        title: 'Delete Characterization',
+        message: `Are you sure you want to delete "${char.name}"?`,
+        confirmText: 'Delete',
+        cancelText: 'Cancel',
+        type: 'danger',
+      } as ConfirmDialogData,
+    });
+
+    dialogRef.afterClosed().subscribe(confirmed => {
+      if (confirmed) {
+        this.characterizations.update(current => current.filter(c => c.id !== char.id));
+        this.applyFilter();
+        this.snackBar.open(`Deleted "${char.name}"`, 'OK', { duration: 2000 });
+      }
+    });
   }
 
   generateCharacterization(char: Characterization): void {

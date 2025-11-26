@@ -21,6 +21,7 @@ import pathwaysData from '../../core/mock-data/pathways.json';
 import { PathwayResultsDialogComponent } from './pathway-results-dialog/pathway-results-dialog.component';
 import { CreatePathwayDialogComponent } from './create-pathway-dialog/create-pathway-dialog.component';
 import { EditPathwayDialogComponent } from './edit-pathway-dialog/edit-pathway-dialog.component';
+import { ConfirmDialogComponent, ConfirmDialogData } from '../../shared/confirm-dialog/confirm-dialog.component';
 
 interface Cohort {
   id: number;
@@ -244,11 +245,23 @@ export class PathwaysComponent implements OnInit {
   }
 
   deleteAnalysis(analysis: PathwayAnalysis): void {
-    if (confirm(`Are you sure you want to delete "${analysis.name}"?`)) {
-      this.analyses.update(current => current.filter(a => a.id !== analysis.id));
-      this.applyFilter();
-      this.snackBar.open(`Deleted "${analysis.name}"`, 'OK', { duration: 2000 });
-    }
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        title: 'Delete Analysis',
+        message: `Are you sure you want to delete "${analysis.name}"?`,
+        confirmText: 'Delete',
+        cancelText: 'Cancel',
+        type: 'danger',
+      } as ConfirmDialogData,
+    });
+
+    dialogRef.afterClosed().subscribe(confirmed => {
+      if (confirmed) {
+        this.analyses.update(current => current.filter(a => a.id !== analysis.id));
+        this.applyFilter();
+        this.snackBar.open(`Deleted "${analysis.name}"`, 'OK', { duration: 2000 });
+      }
+    });
   }
 
   generateAnalysis(analysis: PathwayAnalysis): void {

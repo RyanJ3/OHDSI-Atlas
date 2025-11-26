@@ -11,6 +11,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatTableModule } from '@angular/material/table';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 interface Cohort {
   id: number;
@@ -59,6 +60,7 @@ interface Characterization {
     MatTabsModule,
     MatTableModule,
     MatChipsModule,
+    MatSnackBarModule,
   ],
   template: `
     <h2 mat-dialog-title>
@@ -422,6 +424,7 @@ interface Characterization {
 export class EditCharacterizationDialogComponent implements OnInit {
   private fb = inject(FormBuilder);
   private dialogRef = inject(MatDialogRef<EditCharacterizationDialogComponent>);
+  private snackBar = inject(MatSnackBar);
   data = inject<{ characterization: Characterization }>(MAT_DIALOG_DATA);
 
   cohortColumns = ['id', 'name', 'actions'];
@@ -538,7 +541,7 @@ export class EditCharacterizationDialogComponent implements OnInit {
 
   addCustomFeature(): void {
     // Demo: Would open a custom feature dialog
-    alert('Custom feature analysis dialog would open here');
+    this.snackBar.open('Custom feature analysis dialog would open here', 'OK', { duration: 3000 });
   }
 
   hasChanges(): boolean {

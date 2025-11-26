@@ -8,6 +8,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
 import { selectAuthLoading, selectAuthError } from '../../core/store/auth/auth.selectors';
 
@@ -23,6 +24,7 @@ import { selectAuthLoading, selectAuthError } from '../../core/store/auth/auth.s
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
+    MatSnackBarModule,
   ],
   template: `
     <div class="login-container">
@@ -222,6 +224,7 @@ import { selectAuthLoading, selectAuthError } from '../../core/store/auth/auth.s
 export class LoginComponent {
   private store = inject(Store);
   private router = inject(Router);
+  private snackBar = inject(MatSnackBar);
 
   username = '';
   password = '';
@@ -245,8 +248,7 @@ export class LoginComponent {
         }));
         this.router.navigate(['/home']);
       } else {
-        // Show error through a simple alert for now
-        alert('Invalid credentials. Use demo/demo');
+        this.snackBar.open('Invalid credentials. Use demo/demo', 'OK', { duration: 4000 });
       }
     }
   }

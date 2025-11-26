@@ -23,6 +23,7 @@ import predictionsData from '../../core/mock-data/predictions.json';
 import { PredictionResultsDialogComponent } from './prediction-results-dialog/prediction-results-dialog.component';
 import { CreatePredictionDialogComponent } from './create-prediction-dialog/create-prediction-dialog.component';
 import { EditPredictionDialogComponent } from './edit-prediction-dialog/edit-prediction-dialog.component';
+import { ConfirmDialogComponent, ConfirmDialogData } from '../../shared/confirm-dialog/confirm-dialog.component';
 
 interface LatestExecution {
   status: 'COMPLETED' | 'RUNNING' | 'FAILED' | 'STOPPED';
@@ -405,11 +406,23 @@ export class PredictionComponent implements OnInit {
   }
 
   deletePrediction(prediction: Prediction): void {
-    if (confirm(`Are you sure you want to delete "${prediction.name}"?`)) {
-      this.snackBar.open(`Deleted "${prediction.name}"`, '', { duration: 2000 });
-      this.predictions.set(this.predictions().filter((p) => p.id !== prediction.id));
-      this.applyFilters();
-    }
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        title: 'Delete Prediction',
+        message: `Are you sure you want to delete "${prediction.name}"?`,
+        confirmText: 'Delete',
+        cancelText: 'Cancel',
+        type: 'danger',
+      } as ConfirmDialogData,
+    });
+
+    dialogRef.afterClosed().subscribe(confirmed => {
+      if (confirmed) {
+        this.predictions.set(this.predictions().filter((p) => p.id !== prediction.id));
+        this.applyFilters();
+        this.snackBar.open(`Deleted "${prediction.name}"`, 'OK', { duration: 2000 });
+      }
+    });
   }
 
   getCompletedCount(): number {

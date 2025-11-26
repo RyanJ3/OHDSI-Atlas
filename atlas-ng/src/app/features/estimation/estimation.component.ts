@@ -23,6 +23,7 @@ import estimationsData from '../../core/mock-data/estimations.json';
 import { EstimationResultsDialogComponent } from './estimation-results-dialog/estimation-results-dialog.component';
 import { CreateEstimationDialogComponent } from './create-estimation-dialog/create-estimation-dialog.component';
 import { EditEstimationDialogComponent } from './edit-estimation-dialog/edit-estimation-dialog.component';
+import { ConfirmDialogComponent, ConfirmDialogData } from '../../shared/confirm-dialog/confirm-dialog.component';
 
 interface Comparison {
   targetCohort: string;
@@ -368,11 +369,23 @@ export class EstimationComponent implements OnInit {
   }
 
   deleteEstimation(estimation: Estimation): void {
-    if (confirm(`Are you sure you want to delete "${estimation.name}"?`)) {
-      this.snackBar.open(`Deleted "${estimation.name}"`, '', { duration: 2000 });
-      this.estimations.set(this.estimations().filter((e) => e.id !== estimation.id));
-      this.applyFilters();
-    }
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        title: 'Delete Estimation',
+        message: `Are you sure you want to delete "${estimation.name}"?`,
+        confirmText: 'Delete',
+        cancelText: 'Cancel',
+        type: 'danger',
+      } as ConfirmDialogData,
+    });
+
+    dialogRef.afterClosed().subscribe(confirmed => {
+      if (confirmed) {
+        this.estimations.set(this.estimations().filter((e) => e.id !== estimation.id));
+        this.applyFilters();
+        this.snackBar.open(`Deleted "${estimation.name}"`, 'OK', { duration: 2000 });
+      }
+    });
   }
 
   getComparisonSummary(estimation: Estimation): string {

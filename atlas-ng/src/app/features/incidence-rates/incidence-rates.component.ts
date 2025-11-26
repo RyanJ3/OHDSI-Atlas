@@ -23,6 +23,7 @@ import incidenceRatesData from '../../core/mock-data/incidence-rates.json';
 import { IrResultsDialogComponent } from './ir-results-dialog/ir-results-dialog.component';
 import { CreateIrDialogComponent } from './create-ir-dialog/create-ir-dialog.component';
 import { EditIrDialogComponent } from './edit-ir-dialog/edit-ir-dialog.component';
+import { ConfirmDialogComponent, ConfirmDialogData } from '../../shared/confirm-dialog/confirm-dialog.component';
 
 interface Cohort {
   id: number;
@@ -252,11 +253,23 @@ export class IncidenceRatesComponent implements OnInit {
   }
 
   deleteAnalysis(analysis: IncidenceRateAnalysis): void {
-    if (confirm(`Are you sure you want to delete "${analysis.name}"?`)) {
-      this.analyses.update(current => current.filter(a => a.id !== analysis.id));
-      this.applyFilter();
-      this.snackBar.open(`Deleted "${analysis.name}"`, 'OK', { duration: 2000 });
-    }
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        title: 'Delete Analysis',
+        message: `Are you sure you want to delete "${analysis.name}"?`,
+        confirmText: 'Delete',
+        cancelText: 'Cancel',
+        type: 'danger',
+      } as ConfirmDialogData,
+    });
+
+    dialogRef.afterClosed().subscribe(confirmed => {
+      if (confirmed) {
+        this.analyses.update(current => current.filter(a => a.id !== analysis.id));
+        this.applyFilter();
+        this.snackBar.open(`Deleted "${analysis.name}"`, 'OK', { duration: 2000 });
+      }
+    });
   }
 
   generateAnalysis(analysis: IncidenceRateAnalysis): void {
