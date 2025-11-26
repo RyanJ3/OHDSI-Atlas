@@ -126,10 +126,7 @@ export const routes: Routes = [
       {
         path: 'jobs',
         loadComponent: () =>
-          import('./shared/components/placeholder-page/placeholder-page.component').then(
-            (m) => m.PlaceholderPageComponent
-          ),
-        data: { title: 'Jobs', icon: 'fa-tasks' },
+          import('./features/jobs/jobs.component').then((m) => m.JobsComponent),
       },
       {
         path: 'configure',
