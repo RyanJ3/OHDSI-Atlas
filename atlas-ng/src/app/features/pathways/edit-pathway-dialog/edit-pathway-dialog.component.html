@@ -1,0 +1,204 @@
+<h2 mat-dialog-title>
+  <mat-icon>route</mat-icon>
+  Edit Pathway Analysis
+</h2>
+
+<mat-dialog-content>
+  <mat-tab-group>
+    <!-- Definition Tab -->
+    <mat-tab label="Definition">
+      <form [formGroup]="form" class="edit-form">
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="id-field">
+            <mat-label>ID</mat-label>
+            <input matInput [value]="data.analysis.id" disabled />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="name-field">
+            <mat-label>Name</mat-label>
+            <input matInput formControlName="name" />
+            @if (form.get('name')?.hasError('required') && form.get('name')?.touched) {
+              <mat-error>Name is required</mat-error>
+            }
+          </mat-form-field>
+        </div>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Description</mat-label>
+          <textarea
+            matInput
+            formControlName="description"
+            rows="3"
+          ></textarea>
+        </mat-form-field>
+      </form>
+    </mat-tab>
+
+    <!-- Target Cohorts Tab -->
+    <mat-tab label="Target Cohorts">
+      <div class="cohorts-tab">
+        <p class="tab-description">Target cohorts define the population to analyze for treatment pathways.</p>
+        @if (targetCohorts.length > 0) {
+          <table mat-table [dataSource]="targetCohortsDataSource" class="cohorts-table">
+            <ng-container matColumnDef="id">
+              <th mat-header-cell *matHeaderCellDef>ID</th>
+              <td mat-cell *matCellDef="let cohort">{{ cohort.id }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef>Name</th>
+              <td mat-cell *matCellDef="let cohort">{{ cohort.name }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef>Actions</th>
+              <td mat-cell *matCellDef="let cohort">
+                <button
+                  mat-icon-button
+                  color="warn"
+                  (click)="removeTargetCohort(cohort)"
+                  matTooltip="Remove target cohort"
+                >
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="cohortColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: cohortColumns"></tr>
+          </table>
+        } @else {
+          <div class="empty-state">
+            <mat-icon>groups</mat-icon>
+            <p>No target cohorts defined</p>
+            <p class="hint">Add target cohorts to define the population to analyze</p>
+          </div>
+        }
+        <div class="add-action">
+          <button mat-stroked-button color="primary" (click)="addTargetCohort()">
+            <mat-icon>add</mat-icon>
+            Add Target Cohort
+          </button>
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- Event Cohorts Tab -->
+    <mat-tab label="Event Cohorts">
+      <div class="cohorts-tab">
+        <p class="tab-description">Event cohorts represent the treatments or events that form pathways.</p>
+        @if (eventCohorts.length > 0) {
+          <table mat-table [dataSource]="eventCohortsDataSource" class="cohorts-table">
+            <ng-container matColumnDef="id">
+              <th mat-header-cell *matHeaderCellDef>ID</th>
+              <td mat-cell *matCellDef="let cohort">{{ cohort.id }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef>Name</th>
+              <td mat-cell *matCellDef="let cohort">{{ cohort.name }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef>Actions</th>
+              <td mat-cell *matCellDef="let cohort">
+                <button
+                  mat-icon-button
+                  color="warn"
+                  (click)="removeEventCohort(cohort)"
+                  matTooltip="Remove event cohort"
+                >
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="cohortColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: cohortColumns"></tr>
+          </table>
+        } @else {
+          <div class="empty-state">
+            <mat-icon>event</mat-icon>
+            <p>No event cohorts defined</p>
+            <p class="hint">Add event cohorts to define the treatments or events to track</p>
+          </div>
+        }
+        <div class="add-action">
+          <button mat-stroked-button color="primary" (click)="addEventCohort()">
+            <mat-icon>add</mat-icon>
+            Add Event Cohort
+          </button>
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- Settings Tab -->
+    <mat-tab label="Settings">
+      <form [formGroup]="form" class="settings-tab">
+        <div class="settings-grid">
+          <mat-form-field appearance="outline">
+            <mat-label>Combination Window (days)</mat-label>
+            <input matInput type="number" formControlName="combinationWindow" />
+            <mat-hint>Days to combine concurrent events</mat-hint>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Minimum Cell Count</mat-label>
+            <input matInput type="number" formControlName="minCellCount" />
+            <mat-hint>Privacy threshold for counts</mat-hint>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Max Depth</mat-label>
+            <input matInput type="number" formControlName="maxDepth" />
+            <mat-hint>Maximum pathway steps</mat-hint>
+          </mat-form-field>
+        </div>
+
+        <div class="toggle-option">
+          <mat-slide-toggle formControlName="allowRepeats">
+            Allow Repeats
+          </mat-slide-toggle>
+          <span class="toggle-hint">Allow the same event to appear multiple times in a pathway</span>
+        </div>
+      </form>
+    </mat-tab>
+
+    <!-- Metadata Tab -->
+    <mat-tab label="Metadata">
+      <div class="metadata-tab">
+        <div class="metadata-grid">
+          <div class="metadata-item">
+            <span class="label">Created By</span>
+            <span class="value">{{ data.analysis.createdBy || 'Unknown' }}</span>
+          </div>
+          <div class="metadata-item">
+            <span class="label">Created Date</span>
+            <span class="value">{{ formatDate(data.analysis.createdDate) }}</span>
+          </div>
+          <div class="metadata-item">
+            <span class="label">Modified By</span>
+            <span class="value">{{ data.analysis.modifiedBy || 'Unknown' }}</span>
+          </div>
+          <div class="metadata-item">
+            <span class="label">Last Modified</span>
+            <span class="value">{{ formatDate(data.analysis.modifiedDate) }}</span>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancel</button>
+  <button
+    mat-raised-button
+    color="primary"
+    [disabled]="!form.valid || !hasChanges()"
+    (click)="save()"
+  >
+    <mat-icon>save</mat-icon>
+    Save Changes
+  </button>
+</mat-dialog-actions>

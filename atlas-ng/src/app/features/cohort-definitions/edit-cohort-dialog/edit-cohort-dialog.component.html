@@ -1,0 +1,123 @@
+<h2 mat-dialog-title>
+  <mat-icon>edit</mat-icon>
+  Edit Cohort Definition
+</h2>
+
+<mat-dialog-content>
+  <mat-tab-group>
+    <!-- Definition Tab -->
+    <mat-tab label="Definition">
+      <form [formGroup]="form" class="edit-form">
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="id-field">
+            <mat-label>ID</mat-label>
+            <input matInput [value]="data.cohort.id" disabled />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="name-field">
+            <mat-label>Name</mat-label>
+            <input matInput formControlName="name" />
+            @if (form.get('name')?.hasError('required') && form.get('name')?.touched) {
+              <mat-error>Name is required</mat-error>
+            }
+          </mat-form-field>
+        </div>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Description</mat-label>
+          <textarea
+            matInput
+            formControlName="description"
+            rows="3"
+          ></textarea>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Expression Type</mat-label>
+          <mat-select formControlName="expressionType">
+            <mat-option value="SIMPLE_EXPRESSION">Simple Expression</mat-option>
+            <mat-option value="CUSTOM_EXPRESSION">Custom Expression</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <div class="tags-section">
+          <mat-label>Tags</mat-label>
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-chip-grid #chipGrid>
+              @for (tag of tags; track tag) {
+                <mat-chip-row (removed)="removeTag(tag)">
+                  {{ tag }}
+                  <button matChipRemove>
+                    <mat-icon>cancel</mat-icon>
+                  </button>
+                </mat-chip-row>
+              }
+            </mat-chip-grid>
+            <input
+              placeholder="Add tag..."
+              [matChipInputFor]="chipGrid"
+              [matChipInputSeparatorKeyCodes]="separatorKeyCodes"
+              (matChipInputTokenEnd)="addTag($event)"
+            />
+          </mat-form-field>
+        </div>
+      </form>
+    </mat-tab>
+
+    <!-- Expression Tab -->
+    <mat-tab label="Expression">
+      <div class="expression-tab">
+        <div class="expression-placeholder">
+          <mat-icon>code</mat-icon>
+          <h3>Cohort Expression Builder</h3>
+          <p>The full expression builder would allow defining:</p>
+          <ul>
+            <li>Primary criteria (initial events)</li>
+            <li>Additional qualifying criteria</li>
+            <li>Inclusion rules</li>
+            <li>Censoring criteria</li>
+            <li>Concept sets</li>
+          </ul>
+          <p class="note">This is a demo interface - full expression editing requires the complete ATLAS cohort builder.</p>
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- Metadata Tab -->
+    <mat-tab label="Metadata">
+      <div class="metadata-tab">
+        <div class="metadata-grid">
+          <div class="metadata-item">
+            <span class="label">Created By</span>
+            <span class="value">{{ data.cohort.createdBy }}</span>
+          </div>
+          <div class="metadata-item">
+            <span class="label">Created Date</span>
+            <span class="value">{{ data.cohort.createdDate | date:'medium' }}</span>
+          </div>
+          <div class="metadata-item">
+            <span class="label">Last Modified</span>
+            <span class="value">{{ data.cohort.modifiedDate | date:'medium' }}</span>
+          </div>
+          <div class="metadata-item">
+            <span class="label">Expression Type</span>
+            <span class="value">{{ data.cohort.expressionType }}</span>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancel</button>
+  <button
+    mat-raised-button
+    color="primary"
+    [disabled]="!form.valid || !hasChanges()"
+    (click)="save()"
+  >
+    <mat-icon>save</mat-icon>
+    Save Changes
+  </button>
+</mat-dialog-actions>

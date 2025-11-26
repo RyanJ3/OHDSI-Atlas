@@ -1,0 +1,76 @@
+<h2 mat-dialog-title>
+  <mat-icon>trending_up</mat-icon>
+  Create New Incidence Rate Analysis
+</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="form" class="create-form">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Name</mat-label>
+      <input matInput formControlName="name" placeholder="Enter analysis name" />
+      @if (form.get('name')?.hasError('required') && form.get('name')?.touched) {
+        <mat-error>Name is required</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Description</mat-label>
+      <textarea
+        matInput
+        formControlName="description"
+        placeholder="Describe the incidence rate analysis..."
+        rows="3"
+      ></textarea>
+    </mat-form-field>
+
+    <div class="time-at-risk-section">
+      <div class="section-label">Time at Risk</div>
+      <div class="tar-grid">
+        <div class="tar-row">
+          <span class="tar-label">Start:</span>
+          <mat-form-field appearance="outline" class="tar-field">
+            <input matInput type="number" formControlName="tarStartOffset" />
+          </mat-form-field>
+          <span class="tar-text">days</span>
+          <mat-form-field appearance="outline" class="tar-field">
+            <mat-select formControlName="tarStartAnchor">
+              <mat-option value="cohort start">after cohort start</mat-option>
+              <mat-option value="cohort end">after cohort end</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="tar-row">
+          <span class="tar-label">End:</span>
+          <mat-form-field appearance="outline" class="tar-field">
+            <input matInput type="number" formControlName="tarEndOffset" />
+          </mat-form-field>
+          <span class="tar-text">days</span>
+          <mat-form-field appearance="outline" class="tar-field">
+            <mat-select formControlName="tarEndAnchor">
+              <mat-option value="cohort start">after cohort start</mat-option>
+              <mat-option value="cohort end">after cohort end</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-box">
+      <mat-icon>info</mat-icon>
+      <span>After creating, you'll select target and outcome cohorts to calculate the incidence rate.</span>
+    </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancel</button>
+  <button
+    mat-raised-button
+    color="primary"
+    [disabled]="!form.valid"
+    (click)="create()"
+  >
+    <mat-icon>add</mat-icon>
+    Create
+  </button>
+</mat-dialog-actions>

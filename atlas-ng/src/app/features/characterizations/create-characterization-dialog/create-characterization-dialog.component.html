@@ -1,0 +1,58 @@
+<h2 mat-dialog-title>
+  <mat-icon>bar_chart</mat-icon>
+  Create New Characterization
+</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="form" class="create-form">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Name</mat-label>
+      <input matInput formControlName="name" placeholder="Enter characterization name" />
+      @if (form.get('name')?.hasError('required') && form.get('name')?.touched) {
+        <mat-error>Name is required</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Description</mat-label>
+      <textarea
+        matInput
+        formControlName="description"
+        placeholder="Describe the characterization analysis..."
+        rows="3"
+      ></textarea>
+    </mat-form-field>
+
+    <div class="features-section">
+      <div class="section-label">Default Feature Analyses</div>
+      <div class="features-grid">
+        @for (feature of defaultFeatures; track feature.id) {
+          <mat-checkbox
+            [checked]="selectedFeatures.includes(feature.id)"
+            (change)="toggleFeature(feature.id, $event.checked)"
+          >
+            {{ feature.name }}
+          </mat-checkbox>
+        }
+      </div>
+    </div>
+
+    <div class="info-box">
+      <mat-icon>info</mat-icon>
+      <span>After creating, you'll select cohorts to characterize and configure additional feature analyses and stratification criteria.</span>
+    </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancel</button>
+  <button
+    mat-raised-button
+    color="primary"
+    [disabled]="!form.valid"
+    (click)="create()"
+  >
+    <mat-icon>add</mat-icon>
+    Create
+  </button>
+</mat-dialog-actions>

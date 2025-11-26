@@ -1,0 +1,77 @@
+<h2 mat-dialog-title>
+  <mat-icon>psychology</mat-icon>
+  Create New Prediction Model
+</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="form" class="create-form">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Name</mat-label>
+      <input matInput formControlName="name" placeholder="Enter prediction model name" />
+      @if (form.get('name')?.hasError('required') && form.get('name')?.touched) {
+        <mat-error>Name is required</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Description</mat-label>
+      <textarea
+        matInput
+        formControlName="description"
+        placeholder="Describe the prediction model..."
+        rows="3"
+      ></textarea>
+    </mat-form-field>
+
+    <div class="model-section">
+      <div class="section-label">Model Configuration</div>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Model Type</mat-label>
+        <mat-select formControlName="modelType">
+          <mat-option value="LASSO_LOGISTIC_REGRESSION">LASSO Logistic Regression</mat-option>
+          <mat-option value="GRADIENT_BOOSTING">Gradient Boosting Machine</mat-option>
+          <mat-option value="RANDOM_FOREST">Random Forest</mat-option>
+          <mat-option value="DECISION_TREE">Decision Tree</mat-option>
+          <mat-option value="NEURAL_NETWORK">Neural Network</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <div class="settings-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Time at Risk Start (days)</mat-label>
+          <input matInput type="number" formControlName="tarStart" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Time at Risk End (days)</mat-label>
+          <input matInput type="number" formControlName="tarEnd" />
+        </mat-form-field>
+      </div>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Minimum Covariate Fraction</mat-label>
+        <input matInput type="number" formControlName="minCovariateFraction" step="0.001" />
+        <mat-hint>Minimum fraction of population with covariate (e.g., 0.001)</mat-hint>
+      </mat-form-field>
+    </div>
+
+    <div class="info-box">
+      <mat-icon>info</mat-icon>
+      <span>After creating, you'll define target and outcome cohorts and configure covariate settings for training the prediction model.</span>
+    </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancel</button>
+  <button
+    mat-raised-button
+    color="primary"
+    [disabled]="!form.valid"
+    (click)="create()"
+  >
+    <mat-icon>add</mat-icon>
+    Create
+  </button>
+</mat-dialog-actions>

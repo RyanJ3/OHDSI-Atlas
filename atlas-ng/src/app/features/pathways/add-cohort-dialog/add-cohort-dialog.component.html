@@ -1,0 +1,66 @@
+<h2 mat-dialog-title>
+  <mat-icon>{{ data.type === 'event' ? 'event' : 'groups' }}</mat-icon>
+  {{ data.title }}
+</h2>
+
+<mat-dialog-content>
+  <div class="add-mode-section">
+    <mat-radio-group [(ngModel)]="addMode" class="add-mode-group">
+      <mat-radio-button value="select">Select from existing cohorts</mat-radio-button>
+      <mat-radio-button value="custom">Enter custom cohort</mat-radio-button>
+    </mat-radio-group>
+  </div>
+
+  @if (addMode === 'select') {
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Select Cohort</mat-label>
+      <mat-select [(ngModel)]="selectedCohort">
+        @for (cohort of availableCohorts; track cohort.id) {
+          <mat-option [value]="cohort">
+            <span class="cohort-option">
+              <span class="cohort-id">#{{ cohort.id }}</span>
+              {{ cohort.name }}
+            </span>
+          </mat-option>
+        }
+      </mat-select>
+      @if (availableCohorts.length === 0) {
+        <mat-hint>No available cohorts to add</mat-hint>
+      }
+    </mat-form-field>
+  } @else {
+    <form [formGroup]="customForm" class="custom-form">
+      <mat-form-field appearance="outline" class="id-field">
+        <mat-label>ID</mat-label>
+        <input matInput type="number" formControlName="id" />
+        @if (customForm.get('id')?.hasError('required')) {
+          <mat-error>ID is required</mat-error>
+        }
+        @if (customForm.get('id')?.hasError('min')) {
+          <mat-error>ID must be positive</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="name-field">
+        <mat-label>Cohort Name</mat-label>
+        <input matInput formControlName="name" />
+        @if (customForm.get('name')?.hasError('required')) {
+          <mat-error>Name is required</mat-error>
+        }
+      </mat-form-field>
+    </form>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancel</button>
+  <button
+    mat-raised-button
+    color="primary"
+    [disabled]="!canAdd()"
+    (click)="add()"
+  >
+    <mat-icon>add</mat-icon>
+    Add Cohort
+  </button>
+</mat-dialog-actions>

@@ -1,0 +1,80 @@
+<h2 mat-dialog-title>
+  <mat-icon>shopping_cart</mat-icon>
+  Create New Concept Set
+</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="form" class="create-form">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Name</mat-label>
+      <input matInput formControlName="name" placeholder="Enter concept set name" />
+      @if (form.get('name')?.hasError('required') && form.get('name')?.touched) {
+        <mat-error>Name is required</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Description</mat-label>
+      <textarea
+        matInput
+        formControlName="description"
+        placeholder="Describe the concept set..."
+        rows="3"
+      ></textarea>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Domain</mat-label>
+      <mat-select formControlName="domain">
+        <mat-option value="">All Domains</mat-option>
+        <mat-option value="Condition">Condition</mat-option>
+        <mat-option value="Drug">Drug</mat-option>
+        <mat-option value="Procedure">Procedure</mat-option>
+        <mat-option value="Measurement">Measurement</mat-option>
+        <mat-option value="Observation">Observation</mat-option>
+        <mat-option value="Device">Device</mat-option>
+        <mat-option value="Visit">Visit</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <div class="tags-section">
+      <mat-label>Tags</mat-label>
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-chip-grid #chipGrid>
+          @for (tag of tags; track tag) {
+            <mat-chip-row (removed)="removeTag(tag)">
+              {{ tag }}
+              <button matChipRemove>
+                <mat-icon>cancel</mat-icon>
+              </button>
+            </mat-chip-row>
+          }
+        </mat-chip-grid>
+        <input
+          placeholder="Add tag..."
+          [matChipInputFor]="chipGrid"
+          [matChipInputSeparatorKeyCodes]="separatorKeyCodes"
+          (matChipInputTokenEnd)="addTag($event)"
+        />
+      </mat-form-field>
+    </div>
+
+    <div class="info-box">
+      <mat-icon>info</mat-icon>
+      <span>After creating the concept set, you'll be able to add concepts using the vocabulary search.</span>
+    </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancel</button>
+  <button
+    mat-raised-button
+    color="primary"
+    [disabled]="!form.valid"
+    (click)="create()"
+  >
+    <mat-icon>add</mat-icon>
+    Create
+  </button>
+</mat-dialog-actions>

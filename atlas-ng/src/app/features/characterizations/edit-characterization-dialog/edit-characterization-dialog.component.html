@@ -1,0 +1,189 @@
+<h2 mat-dialog-title>
+  <mat-icon>bar_chart</mat-icon>
+  Edit Characterization
+</h2>
+
+<mat-dialog-content>
+  <mat-tab-group>
+    <!-- Definition Tab -->
+    <mat-tab label="Definition">
+      <form [formGroup]="form" class="edit-form">
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="id-field">
+            <mat-label>ID</mat-label>
+            <input matInput [value]="data.characterization.id" disabled />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="name-field">
+            <mat-label>Name</mat-label>
+            <input matInput formControlName="name" />
+            @if (form.get('name')?.hasError('required') && form.get('name')?.touched) {
+              <mat-error>Name is required</mat-error>
+            }
+          </mat-form-field>
+        </div>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Description</mat-label>
+          <textarea
+            matInput
+            formControlName="description"
+            rows="3"
+          ></textarea>
+        </mat-form-field>
+      </form>
+    </mat-tab>
+
+    <!-- Cohorts Tab -->
+    <mat-tab label="Cohorts">
+      <div class="cohorts-tab">
+        @if (data.characterization.cohorts.length > 0) {
+          <table mat-table [dataSource]="data.characterization.cohorts" class="cohorts-table">
+            <ng-container matColumnDef="id">
+              <th mat-header-cell *matHeaderCellDef>ID</th>
+              <td mat-cell *matCellDef="let cohort">{{ cohort.id }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef>Name</th>
+              <td mat-cell *matCellDef="let cohort">{{ cohort.name }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef>Actions</th>
+              <td mat-cell *matCellDef="let cohort">
+                <button mat-icon-button color="warn" (click)="removeCohort(cohort)" matTooltip="Remove">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="cohortColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: cohortColumns"></tr>
+          </table>
+        } @else {
+          <div class="empty-state">
+            <mat-icon>groups</mat-icon>
+            <p>No cohorts selected</p>
+            <p class="hint">Add cohorts to analyze their baseline characteristics</p>
+          </div>
+        }
+        <div class="add-action">
+          <button mat-stroked-button color="primary" (click)="addCohort()">
+            <mat-icon>add</mat-icon>
+            Add Cohort
+          </button>
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- Features Tab -->
+    <mat-tab label="Feature Analyses">
+      <div class="features-tab">
+        <div class="section-label">Selected Feature Analyses</div>
+        <div class="features-grid">
+          @for (feature of defaultFeatures; track feature.id) {
+            <mat-checkbox
+              [checked]="isFeatureSelected(feature.id)"
+              (change)="toggleFeature(feature.id, $event.checked)"
+            >
+              {{ feature.name }}
+            </mat-checkbox>
+          }
+        </div>
+
+        @if (getCustomFeatures().length > 0) {
+          <div class="section-label">Custom Feature Analyses</div>
+          <mat-chip-set>
+            @for (feature of getCustomFeatures(); track feature.id) {
+              <mat-chip>{{ feature.name }}</mat-chip>
+            }
+          </mat-chip-set>
+        }
+
+        <div class="add-action">
+          <button mat-stroked-button color="primary" (click)="addCustomFeature()">
+            <mat-icon>add</mat-icon>
+            Add Custom Feature Analysis
+          </button>
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- Stratas Tab -->
+    <mat-tab label="Stratification">
+      <div class="stratas-tab">
+        @if (stratas.length > 0) {
+          <div class="strata-list">
+            @for (strata of stratas; track strata.id) {
+              <div class="strata-item">
+                <mat-icon>layers</mat-icon>
+                <span class="strata-name">{{ strata.name }}</span>
+                <button mat-icon-button color="warn" (click)="removeStrata(strata)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="empty-state">
+            <mat-icon>layers</mat-icon>
+            <p>No stratification criteria defined</p>
+            <p class="hint">Add stratas to segment your analysis</p>
+          </div>
+        }
+        <div class="add-action">
+          <button mat-stroked-button color="primary" (click)="addStrata()">
+            <mat-icon>add</mat-icon>
+            Add Stratification Criteria
+          </button>
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- Metadata Tab -->
+    <mat-tab label="Metadata">
+      <div class="metadata-tab">
+        <div class="metadata-grid">
+          <div class="metadata-item">
+            <span class="label">Created By</span>
+            <span class="value">{{ data.characterization.createdBy || 'Unknown' }}</span>
+          </div>
+          <div class="metadata-item">
+            <span class="label">Created Date</span>
+            <span class="value">{{ formatDate(data.characterization.createdDate) }}</span>
+          </div>
+          <div class="metadata-item">
+            <span class="label">Modified By</span>
+            <span class="value">{{ data.characterization.modifiedBy || 'Unknown' }}</span>
+          </div>
+          <div class="metadata-item">
+            <span class="label">Last Modified</span>
+            <span class="value">{{ formatDate(data.characterization.modifiedDate) }}</span>
+          </div>
+          <div class="metadata-item">
+            <span class="label">Total Cohorts</span>
+            <span class="value">{{ data.characterization.cohorts.length }}</span>
+          </div>
+          <div class="metadata-item">
+            <span class="label">Feature Analyses</span>
+            <span class="value">{{ data.characterization.featureAnalyses.length }}</span>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancel</button>
+  <button
+    mat-raised-button
+    color="primary"
+    [disabled]="!form.valid || !hasChanges()"
+    (click)="save()"
+  >
+    <mat-icon>save</mat-icon>
+    Save Changes
+  </button>
+</mat-dialog-actions>

@@ -1,0 +1,116 @@
+h2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  i { color: #1976d2; }
+}
+
+mat-dialog-content {
+  min-width: 750px;
+  max-height: 70vh;
+}
+
+.analysis-info {
+  padding: 16px 0;
+  h3 { margin: 0 0 8px 0; color: #333; }
+  .description { color: #666; font-size: 14px; margin: 0 0 12px 0; }
+  .cohort-info {
+    display: flex;
+    gap: 8px;
+    .target-chip { background: #e3f2fd !important; color: #1565c0 !important; }
+    .outcome-chip { background: #fce4ec !important; color: #c2185b !important; }
+    mat-chip i { margin-right: 6px; }
+  }
+}
+
+h4 { margin: 16px 0 12px 0; color: #333; font-weight: 500; }
+
+.overall-results { padding: 8px 0; }
+
+.results-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.result-card {
+  padding: 16px;
+  text-align: center;
+
+  .result-label { font-size: 11px; color: #666; text-transform: uppercase; }
+  .result-value { font-size: 24px; font-weight: 600; color: #333; margin: 8px 0; }
+  .result-unit { font-size: 11px; color: #888; }
+  .result-ci { font-size: 11px; color: #888; margin-top: 4px; }
+
+  &.highlight {
+    background: #e3f2fd;
+    .result-value { color: #1565c0; }
+  }
+}
+
+.strata-table {
+  width: 100%;
+  margin-top: 12px;
+
+  th { background: #fafafa; font-weight: 600; font-size: 12px; }
+  td { padding: 10px 16px; font-size: 13px; }
+
+  .ir-value { font-weight: 600; color: #1565c0; }
+  .ir-ci { font-size: 11px; color: #888; margin-left: 4px; }
+}
+
+.ir-bar-container {
+  width: 100px;
+  height: 12px;
+  background: #e0e0e0;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.ir-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #1976d2, #42a5f5);
+  border-radius: 6px;
+  transition: width 0.3s;
+}
+
+.time-trends { padding: 8px 0; }
+
+.trend-chart {
+  background: #fafafa;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.chart-bars {
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-end;
+  height: 150px;
+  gap: 8px;
+}
+
+.year-bar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+
+  .bar-fill {
+    width: 100%;
+    max-width: 40px;
+    background: linear-gradient(180deg, #1976d2, #42a5f5);
+    border-radius: 4px 4px 0 0;
+    min-height: 4px;
+    transition: height 0.3s;
+  }
+
+  .year-label {
+    font-size: 11px;
+    color: #666;
+    margin-top: 8px;
+  }
+}
+
+mat-dialog-actions button i { margin-right: 6px; }

@@ -1,0 +1,178 @@
+<h2 mat-dialog-title>
+  <i class="fas fa-brain"></i>
+  Prediction Model Results
+</h2>
+
+<mat-dialog-content>
+  <!-- Model Info -->
+  <div class="model-info">
+    <h3>{{ data.prediction.name }}</h3>
+    <p class="description">{{ data.prediction.description }}</p>
+    <div class="model-meta">
+      <mat-chip>{{ data.prediction.modelType }}</mat-chip>
+      <mat-chip class="tar-chip">
+        <i class="fas fa-clock"></i>
+        {{ data.prediction.timeAtRisk }}
+      </mat-chip>
+    </div>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <mat-tab-group>
+    <!-- Performance Tab -->
+    <mat-tab label="Performance">
+      <div class="tab-content">
+        <!-- Key Metrics -->
+        <div class="metrics-grid">
+          <mat-card class="metric-card auc">
+            <div class="metric-label">AUC-ROC</div>
+            <div class="metric-value" [ngClass]="getAucClass(result.auc)">
+              {{ result.auc.toFixed(3) }}
+            </div>
+            <div class="metric-ci">
+              95% CI: {{ result.aucLower.toFixed(3) }} - {{ result.aucUpper.toFixed(3) }}
+            </div>
+          </mat-card>
+
+          <mat-card class="metric-card">
+            <div class="metric-label">Calibration Slope</div>
+            <div class="metric-value">{{ result.calibrationSlope.toFixed(3) }}</div>
+            <div class="metric-ideal">Ideal: 1.0</div>
+          </mat-card>
+
+          <mat-card class="metric-card">
+            <div class="metric-label">Brier Score</div>
+            <div class="metric-value">{{ result.brierScore.toFixed(4) }}</div>
+            <div class="metric-ideal">Lower is better</div>
+          </mat-card>
+
+          <mat-card class="metric-card">
+            <div class="metric-label">Sensitivity</div>
+            <div class="metric-value">{{ (result.sensitivity * 100).toFixed(1) }}%</div>
+          </mat-card>
+
+          <mat-card class="metric-card">
+            <div class="metric-label">Specificity</div>
+            <div class="metric-value">{{ (result.specificity * 100).toFixed(1) }}%</div>
+          </mat-card>
+
+          <mat-card class="metric-card">
+            <div class="metric-label">PPV</div>
+            <div class="metric-value">{{ (result.ppv * 100).toFixed(1) }}%</div>
+          </mat-card>
+        </div>
+
+        <!-- ROC Curve Placeholder -->
+        <div class="chart-section">
+          <h4>ROC Curve</h4>
+          <div class="chart-placeholder">
+            <div class="roc-visualization">
+              <div class="roc-axes">
+                <div class="y-axis-label">Sensitivity</div>
+                <div class="x-axis-label">1 - Specificity</div>
+              </div>
+              <svg viewBox="0 0 100 100" class="roc-chart">
+                <line x1="0" y1="100" x2="100" y2="0" class="diagonal" />
+                <path [attr.d]="rocPath" class="roc-curve" />
+                <circle [attr.cx]="(1 - result.specificity) * 100"
+                        [attr.cy]="(1 - result.sensitivity) * 100"
+                        r="3"
+                        class="operating-point" />
+              </svg>
+              <div class="auc-annotation">AUC = {{ result.auc.toFixed(3) }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- Confusion Matrix Tab -->
+    <mat-tab label="Confusion Matrix">
+      <div class="tab-content">
+        <div class="confusion-matrix">
+          <div class="matrix-header"></div>
+          <div class="matrix-header predicted">Predicted Positive</div>
+          <div class="matrix-header predicted">Predicted Negative</div>
+
+          <div class="matrix-header actual">Actual Positive</div>
+          <div class="matrix-cell tp">
+            <span class="cell-value">{{ result.confusionMatrix.truePositive | number }}</span>
+            <span class="cell-label">True Positive</span>
+          </div>
+          <div class="matrix-cell fn">
+            <span class="cell-value">{{ result.confusionMatrix.falseNegative | number }}</span>
+            <span class="cell-label">False Negative</span>
+          </div>
+
+          <div class="matrix-header actual">Actual Negative</div>
+          <div class="matrix-cell fp">
+            <span class="cell-value">{{ result.confusionMatrix.falsePositive | number }}</span>
+            <span class="cell-label">False Positive</span>
+          </div>
+          <div class="matrix-cell tn">
+            <span class="cell-value">{{ result.confusionMatrix.trueNegative | number }}</span>
+            <span class="cell-label">True Negative</span>
+          </div>
+        </div>
+
+        <div class="matrix-stats">
+          <div class="stat">
+            <span class="stat-label">Total Subjects:</span>
+            <span class="stat-value">{{ getTotalSubjects() | number }}</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Outcome Rate:</span>
+            <span class="stat-value">{{ (getOutcomeRate() * 100).toFixed(2) }}%</span>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- Features Tab -->
+    <mat-tab label="Top Features">
+      <div class="tab-content">
+        <p class="features-intro">Top predictive features in the model:</p>
+        <div class="features-list">
+          @for (feature of result.topFeatures; track feature.name; let i = $index) {
+            <div class="feature-item">
+              <span class="feature-rank">{{ i + 1 }}</span>
+              <div class="feature-info">
+                <span class="feature-name">{{ feature.name }}</span>
+                <mat-progress-bar
+                  mode="determinate"
+                  [value]="feature.importance * 100"
+                  [color]="feature.coefficient > 0 ? 'primary' : 'warn'"
+                ></mat-progress-bar>
+              </div>
+              <span class="feature-coef" [ngClass]="feature.coefficient > 0 ? 'positive' : 'negative'">
+                {{ feature.coefficient > 0 ? '+' : '' }}{{ feature.coefficient.toFixed(3) }}
+              </span>
+            </div>
+          }
+        </div>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button [matMenuTriggerFor]="exportMenu">
+    <i class="fas fa-download"></i>
+    Export
+    <i class="fas fa-caret-down" style="margin-left: 4px;"></i>
+  </button>
+  <mat-menu #exportMenu="matMenu">
+    <button mat-menu-item (click)="exportResults()">
+      <i class="fas fa-file-csv"></i>
+      Export as CSV
+    </button>
+    <button mat-menu-item (click)="exportJSON()">
+      <i class="fas fa-file-code"></i>
+      Export as JSON
+    </button>
+  </mat-menu>
+  <button mat-raised-button color="primary" mat-dialog-close>
+    Close
+  </button>
+</mat-dialog-actions>

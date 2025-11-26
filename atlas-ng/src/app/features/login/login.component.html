@@ -1,0 +1,77 @@
+<div class="login-container">
+  <mat-card class="login-card">
+    <mat-card-header>
+      <div class="logo-container">
+        <img src="images/Atlas_logo_rgb.png" alt="ATLAS" class="logo" />
+      </div>
+    </mat-card-header>
+
+    <mat-card-content>
+      <h2>Sign in to ATLAS</h2>
+      <p class="subtitle">Enter your credentials to continue</p>
+
+      @if (error$ | async; as error) {
+        <div class="error-message">
+          <mat-icon>error</mat-icon>
+          {{ error }}
+        </div>
+      }
+
+      <form (ngSubmit)="onSubmit()" class="login-form">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Username</mat-label>
+          <input
+            matInput
+            [(ngModel)]="username"
+            name="username"
+            placeholder="Enter your username"
+            required
+          />
+          <mat-icon matPrefix>person</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Password</mat-label>
+          <input
+            matInput
+            [type]="hidePassword ? 'password' : 'text'"
+            [(ngModel)]="password"
+            name="password"
+            placeholder="Enter your password"
+            required
+          />
+          <mat-icon matPrefix>lock</mat-icon>
+          <button
+            mat-icon-button
+            matSuffix
+            type="button"
+            (click)="hidePassword = !hidePassword"
+          >
+            <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+        </mat-form-field>
+
+        <button
+          mat-raised-button
+          color="primary"
+          type="submit"
+          class="login-button"
+          [disabled]="isLoading$ | async"
+        >
+          @if (isLoading$ | async) {
+            <mat-spinner diameter="20"></mat-spinner>
+          } @else {
+            Sign In
+          }
+        </button>
+      </form>
+
+      <div class="demo-hint">
+        <mat-icon>info</mat-icon>
+        <span>Demo: use <strong>demo</strong> / <strong>demo</strong></span>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <p class="version">ATLAS v3.0.0 (Angular)</p>
+</div>
