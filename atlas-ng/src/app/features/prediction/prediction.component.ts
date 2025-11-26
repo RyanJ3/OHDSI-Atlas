@@ -22,6 +22,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import predictionsData from '../../core/mock-data/predictions.json';
 import { PredictionResultsDialogComponent } from './prediction-results-dialog/prediction-results-dialog.component';
 import { CreatePredictionDialogComponent } from './create-prediction-dialog/create-prediction-dialog.component';
+import { EditPredictionDialogComponent } from './edit-prediction-dialog/edit-prediction-dialog.component';
 
 interface LatestExecution {
   status: 'COMPLETED' | 'RUNNING' | 'FAILED' | 'STOPPED';
@@ -284,11 +285,68 @@ export class PredictionComponent implements OnInit {
   }
 
   editPrediction(prediction: Prediction): void {
-    this.snackBar.open(`Opening "${prediction.name}"...`, '', { duration: 1500 });
+    const dialogRef = this.dialog.open(EditPredictionDialogComponent, {
+      width: '750px',
+      maxHeight: '90vh',
+      data: { prediction: { ...prediction, tags: [...(prediction.tags || [])] } },
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.predictions.update(current =>
+          current.map(p => p.id === result.id ? result : p)
+        );
+        this.applyFilters();
+        this.snackBar.open(`Updated "${result.name}"`, 'OK', { duration: 3000 });
+      }
+    });
   }
 
   executePrediction(prediction: Prediction): void {
-    this.snackBar.open(`Training model "${prediction.name}"...`, '', { duration: 2000 });
+    // Simulate starting model training
+    this.predictions.update(current =>
+      current.map(p => {
+        if (p.id === prediction.id) {
+          return {
+            ...p,
+            latestExecution: {
+              status: 'RUNNING' as const,
+              date: new Date().toISOString(),
+              sourceName: 'SynPUF-CDMV5',
+              auc: null,
+              calibration: null,
+            },
+          };
+        }
+        return p;
+      })
+    );
+    this.applyFilters();
+    this.snackBar.open(`Training model "${prediction.name}"...`, 'OK', { duration: 3000 });
+
+    // Simulate completion after 4 seconds
+    setTimeout(() => {
+      this.predictions.update(current =>
+        current.map(p => {
+          if (p.id === prediction.id && p.latestExecution?.status === 'RUNNING') {
+            return {
+              ...p,
+              executions: p.executions + 1,
+              latestExecution: {
+                status: 'COMPLETED' as const,
+                date: new Date().toISOString(),
+                sourceName: 'SynPUF-CDMV5',
+                auc: Math.round((0.7 + Math.random() * 0.2) * 100) / 100,
+                calibration: Math.round((0.9 + Math.random() * 0.1) * 100) / 100,
+              },
+            };
+          }
+          return p;
+        })
+      );
+      this.applyFilters();
+      this.snackBar.open(`Model training complete for "${prediction.name}"`, 'OK', { duration: 3000 });
+    }, 4000);
   }
 
   viewResults(prediction: Prediction): void {
@@ -304,11 +362,46 @@ export class PredictionComponent implements OnInit {
   }
 
   copyPrediction(prediction: Prediction): void {
-    this.snackBar.open(`Copying "${prediction.name}"...`, '', { duration: 2000 });
+    const copiedPrediction: Prediction = {
+      ...prediction,
+      id: Math.floor(Math.random() * 10000) + 100,
+      name: `${prediction.name} (Copy)`,
+      createdDate: new Date().toISOString(),
+      modifiedDate: new Date().toISOString(),
+      createdBy: 'demo',
+      modifiedBy: 'demo',
+      tags: [...(prediction.tags || [])],
+      executions: 0,
+      latestExecution: null,
+    };
+
+    this.predictions.update(current => [copiedPrediction, ...current]);
+    this.applyFilters();
+    this.snackBar.open(`Created copy "${copiedPrediction.name}"`, 'OK', { duration: 3000 });
   }
 
   exportPrediction(prediction: Prediction): void {
-    this.snackBar.open(`Exporting "${prediction.name}"...`, '', { duration: 2000 });
+    const exportData = {
+      name: prediction.name,
+      description: prediction.description,
+      modelType: prediction.modelType,
+      targetCohort: prediction.targetCohort,
+      outcomeCohort: prediction.outcomeCohort,
+      timeAtRisk: prediction.timeAtRisk,
+      tags: prediction.tags,
+      exportedAt: new Date().toISOString(),
+      exportedBy: 'demo',
+    };
+
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `prediction-${prediction.id}-${prediction.name.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.json`;
+    link.click();
+    window.URL.revokeObjectURL(url);
+
+    this.snackBar.open(`Exported "${prediction.name}"`, 'OK', { duration: 3000 });
   }
 
   deletePrediction(prediction: Prediction): void {

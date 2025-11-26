@@ -228,15 +228,65 @@ export class ProfilesComponent implements OnInit {
   }
 
   viewTimeline(profile: Profile): void {
-    this.snackBar.open(`Opening timeline for Person ${profile.personId}...`, '', {
-      duration: 2000,
+    // Open profile detail with timeline tab selected
+    this.dialog.open(ProfileDetailDialogComponent, {
+      data: { profile, activeTab: 'timeline' },
+      width: '900px',
+      maxHeight: '90vh',
     });
   }
 
   exportProfile(profile: Profile): void {
-    this.snackBar.open(`Exporting profile ${profile.personId}...`, '', {
-      duration: 2000,
-    });
+    const exportData = {
+      personId: profile.personId,
+      gender: profile.gender,
+      birthYear: profile.birthYear,
+      deathYear: profile.deathYear,
+      sourceName: profile.sourceName,
+      cohorts: profile.cohorts,
+      recordCounts: profile.recordCounts,
+      observationPeriod: profile.observationPeriod,
+      exportedAt: new Date().toISOString(),
+      exportedBy: 'demo',
+    };
+
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `profile-${profile.personId}.json`;
+    link.click();
+    window.URL.revokeObjectURL(url);
+
+    this.snackBar.open(`Exported profile for Person ${profile.personId}`, 'OK', { duration: 3000 });
+  }
+
+  exportAllProfiles(): void {
+    const exportData = {
+      profiles: this.filteredProfiles().map(profile => ({
+        personId: profile.personId,
+        gender: profile.gender,
+        birthYear: profile.birthYear,
+        deathYear: profile.deathYear,
+        sourceName: profile.sourceName,
+        cohorts: profile.cohorts,
+        recordCounts: profile.recordCounts,
+        observationPeriod: profile.observationPeriod,
+      })),
+      exportedAt: new Date().toISOString(),
+      exportedBy: 'demo',
+      totalCount: this.filteredProfiles().length,
+    };
+
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `profiles-export-${new Date().toISOString().split('T')[0]}.json`;
+    link.click();
+    window.URL.revokeObjectURL(url);
+
+    this.snackBar.open(`Exported ${this.filteredProfiles().length} profiles`, 'OK', { duration: 3000 });
   }
 
   getMaleCount(): number {

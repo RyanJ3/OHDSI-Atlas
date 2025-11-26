@@ -1,0 +1,162 @@
+<h2 mat-dialog-title>
+  <mat-icon>balance</mat-icon>
+  Edit Estimation Study
+</h2>
+
+<mat-dialog-content>
+  <mat-tab-group>
+    <!-- Definition Tab -->
+    <mat-tab label="Definition">
+      <form [formGroup]="form" class="edit-form">
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="id-field">
+            <mat-label>ID</mat-label>
+            <input matInput [value]="data.estimation.id" disabled />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="name-field">
+            <mat-label>Name</mat-label>
+            <input matInput formControlName="name" />
+            @if (form.get('name')?.hasError('required') && form.get('name')?.touched) {
+              <mat-error>Name is required</mat-error>
+            }
+          </mat-form-field>
+        </div>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Description</mat-label>
+          <textarea
+            matInput
+            formControlName="description"
+            rows="3"
+          ></textarea>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Study Type</mat-label>
+          <mat-select formControlName="type">
+            <mat-option value="Comparative Cohort Study">Comparative Cohort Study</mat-option>
+            <mat-option value="Self-Controlled Cohort">Self-Controlled Cohort</mat-option>
+            <mat-option value="Case-Control Study">Case-Control Study</mat-option>
+            <mat-option value="Case-Crossover">Case-Crossover</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <div class="tags-section">
+          <mat-label>Tags</mat-label>
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-chip-grid #chipGrid>
+              @for (tag of tags; track tag) {
+                <mat-chip-row (removed)="removeTag(tag)">
+                  {{ tag }}
+                  <button matChipRemove>
+                    <mat-icon>cancel</mat-icon>
+                  </button>
+                </mat-chip-row>
+              }
+            </mat-chip-grid>
+            <input
+              placeholder="Add tag..."
+              [matChipInputFor]="chipGrid"
+              [matChipInputSeparatorKeyCodes]="separatorKeyCodes"
+              (matChipInputTokenEnd)="addTag($event)"
+            />
+          </mat-form-field>
+        </div>
+      </form>
+    </mat-tab>
+
+    <!-- Comparisons Tab -->
+    <mat-tab label="Comparisons">
+      <div class="comparisons-tab">
+        @if (comparisons.length > 0) {
+          <table mat-table [dataSource]="comparisons" class="comparisons-table">
+            <ng-container matColumnDef="target">
+              <th mat-header-cell *matHeaderCellDef>Target</th>
+              <td mat-cell *matCellDef="let comp">{{ comp.targetCohort }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="comparator">
+              <th mat-header-cell *matHeaderCellDef>Comparator</th>
+              <td mat-cell *matCellDef="let comp">{{ comp.comparatorCohort }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="outcomes">
+              <th mat-header-cell *matHeaderCellDef>Outcomes</th>
+              <td mat-cell *matCellDef="let comp">{{ comp.outcomes.length }} outcomes</td>
+            </ng-container>
+
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef>Actions</th>
+              <td mat-cell *matCellDef="let comp; let i = index">
+                <button mat-icon-button color="warn" (click)="removeComparison(i)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="comparisonColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: comparisonColumns"></tr>
+          </table>
+        } @else {
+          <div class="empty-state">
+            <mat-icon>compare_arrows</mat-icon>
+            <p>No comparisons defined</p>
+            <p class="hint">Add comparisons to estimate treatment effects</p>
+          </div>
+        }
+        <div class="add-action">
+          <button mat-stroked-button color="primary" (click)="addComparison()">
+            <mat-icon>add</mat-icon>
+            Add Comparison
+          </button>
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- Metadata Tab -->
+    <mat-tab label="Metadata">
+      <div class="metadata-tab">
+        <div class="metadata-grid">
+          <div class="metadata-item">
+            <span class="label">Created By</span>
+            <span class="value">{{ data.estimation.createdBy || 'Unknown' }}</span>
+          </div>
+          <div class="metadata-item">
+            <span class="label">Created Date</span>
+            <span class="value">{{ formatDate(data.estimation.createdDate) }}</span>
+          </div>
+          <div class="metadata-item">
+            <span class="label">Modified By</span>
+            <span class="value">{{ data.estimation.modifiedBy || 'Unknown' }}</span>
+          </div>
+          <div class="metadata-item">
+            <span class="label">Last Modified</span>
+            <span class="value">{{ formatDate(data.estimation.modifiedDate) }}</span>
+          </div>
+          <div class="metadata-item">
+            <span class="label">Executions</span>
+            <span class="value">{{ data.estimation.executions }}</span>
+          </div>
+          <div class="metadata-item">
+            <span class="label">Latest Status</span>
+            <span class="value">{{ data.estimation.latestExecution?.status || 'Not executed' }}</span>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancel</button>
+  <button
+    mat-raised-button
+    color="primary"
+    [disabled]="!form.valid || !hasChanges()"
+    (click)="save()"
+  >
+    <mat-icon>save</mat-icon>
+    Save Changes
+  </button>
+</mat-dialog-actions>

@@ -1,0 +1,172 @@
+<h2 mat-dialog-title>
+  <mat-icon>psychology</mat-icon>
+  Edit Prediction Model
+</h2>
+
+<mat-dialog-content>
+  <mat-tab-group>
+    <!-- Definition Tab -->
+    <mat-tab label="Definition">
+      <form [formGroup]="form" class="edit-form">
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="id-field">
+            <mat-label>ID</mat-label>
+            <input matInput [value]="data.prediction.id" disabled />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="name-field">
+            <mat-label>Name</mat-label>
+            <input matInput formControlName="name" />
+            @if (form.get('name')?.hasError('required') && form.get('name')?.touched) {
+              <mat-error>Name is required</mat-error>
+            }
+          </mat-form-field>
+        </div>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Description</mat-label>
+          <textarea
+            matInput
+            formControlName="description"
+            rows="3"
+          ></textarea>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Model Type</mat-label>
+          <mat-select formControlName="modelType">
+            <mat-option value="Lasso Logistic Regression">LASSO Logistic Regression</mat-option>
+            <mat-option value="Gradient Boosting Machine">Gradient Boosting Machine</mat-option>
+            <mat-option value="Random Forest">Random Forest</mat-option>
+            <mat-option value="Decision Tree">Decision Tree</mat-option>
+            <mat-option value="Neural Network">Neural Network</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <div class="tags-section">
+          <mat-label>Tags</mat-label>
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-chip-grid #chipGrid>
+              @for (tag of tags; track tag) {
+                <mat-chip-row (removed)="removeTag(tag)">
+                  {{ tag }}
+                  <button matChipRemove>
+                    <mat-icon>cancel</mat-icon>
+                  </button>
+                </mat-chip-row>
+              }
+            </mat-chip-grid>
+            <input
+              placeholder="Add tag..."
+              [matChipInputFor]="chipGrid"
+              [matChipInputSeparatorKeyCodes]="separatorKeyCodes"
+              (matChipInputTokenEnd)="addTag($event)"
+            />
+          </mat-form-field>
+        </div>
+      </form>
+    </mat-tab>
+
+    <!-- Cohorts Tab -->
+    <mat-tab label="Cohorts">
+      <div class="cohorts-tab">
+        <div class="cohort-section">
+          <div class="section-label">Target Cohort</div>
+          <div class="cohort-display">
+            @if (targetCohort) {
+              <span class="cohort-name">{{ targetCohort }}</span>
+              <button mat-icon-button (click)="selectTargetCohort()">
+                <mat-icon>edit</mat-icon>
+              </button>
+            } @else {
+              <button mat-stroked-button color="primary" (click)="selectTargetCohort()">
+                <mat-icon>add</mat-icon>
+                Select Target Cohort
+              </button>
+            }
+          </div>
+        </div>
+
+        <div class="cohort-section">
+          <div class="section-label">Outcome Cohort</div>
+          <div class="cohort-display">
+            @if (outcomeCohort) {
+              <span class="cohort-name">{{ outcomeCohort }}</span>
+              <button mat-icon-button (click)="selectOutcomeCohort()">
+                <mat-icon>edit</mat-icon>
+              </button>
+            } @else {
+              <button mat-stroked-button color="primary" (click)="selectOutcomeCohort()">
+                <mat-icon>add</mat-icon>
+                Select Outcome Cohort
+              </button>
+            }
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- Settings Tab -->
+    <mat-tab label="Settings">
+      <form [formGroup]="form" class="settings-tab">
+        <div class="section-label">Time at Risk</div>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Time at Risk</mat-label>
+          <input matInput formControlName="timeAtRisk" />
+          <mat-hint>e.g., "1 - 365 days"</mat-hint>
+        </mat-form-field>
+
+        <div class="section-label">Model Parameters</div>
+        <div class="info-box">
+          <mat-icon>info</mat-icon>
+          <span>Additional model parameters such as regularization, learning rate, and cross-validation settings would be configured in the full implementation.</span>
+        </div>
+      </form>
+    </mat-tab>
+
+    <!-- Metadata Tab -->
+    <mat-tab label="Metadata">
+      <div class="metadata-tab">
+        <div class="metadata-grid">
+          <div class="metadata-item">
+            <span class="label">Created By</span>
+            <span class="value">{{ data.prediction.createdBy || 'Unknown' }}</span>
+          </div>
+          <div class="metadata-item">
+            <span class="label">Created Date</span>
+            <span class="value">{{ formatDate(data.prediction.createdDate) }}</span>
+          </div>
+          <div class="metadata-item">
+            <span class="label">Modified By</span>
+            <span class="value">{{ data.prediction.modifiedBy || 'Unknown' }}</span>
+          </div>
+          <div class="metadata-item">
+            <span class="label">Last Modified</span>
+            <span class="value">{{ formatDate(data.prediction.modifiedDate) }}</span>
+          </div>
+          <div class="metadata-item">
+            <span class="label">Executions</span>
+            <span class="value">{{ data.prediction.executions }}</span>
+          </div>
+          <div class="metadata-item">
+            <span class="label">Latest Status</span>
+            <span class="value">{{ data.prediction.latestExecution?.status || 'Not executed' }}</span>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancel</button>
+  <button
+    mat-raised-button
+    color="primary"
+    [disabled]="!form.valid || !hasChanges()"
+    (click)="save()"
+  >
+    <mat-icon>save</mat-icon>
+    Save Changes
+  </button>
+</mat-dialog-actions>
