@@ -95,6 +95,20 @@ mat-dialog-content {
   overflow-y: auto;
   border: 1px solid #e0e0e0;
   border-radius: 4px;
+
+  // Sticky header for Material table
+  ::ng-deep {
+    .mat-mdc-header-row {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: #fafafa;
+    }
+
+    .mat-mdc-header-cell {
+      background: #fafafa;
+    }
+  }
 }
 
 .patients-table {
@@ -104,9 +118,6 @@ mat-dialog-content {
     font-weight: 600;
     color: #333;
     background: #fafafa;
-    position: sticky;
-    top: 0;
-    z-index: 1;
   }
 }
 
