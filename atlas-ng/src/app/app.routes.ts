@@ -98,10 +98,9 @@ export const routes: Routes = [
       {
         path: 'prediction',
         loadComponent: () =>
-          import('./shared/components/placeholder-page/placeholder-page.component').then(
-            (m) => m.PlaceholderPageComponent
+          import('./features/prediction/prediction.component').then(
+            (m) => m.PredictionComponent
           ),
-        data: { title: 'Patient Level Prediction', icon: 'fa-heartbeat' },
       },
       {
         path: 'reusables',

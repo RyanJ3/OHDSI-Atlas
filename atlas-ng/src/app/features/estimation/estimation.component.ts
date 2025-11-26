@@ -16,6 +16,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatSortModule, Sort } from '@angular/material/sort';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatDividerModule } from '@angular/material/divider';
 
 // Import mock data
 import estimationsData from '../../core/mock-data/estimations.json';
@@ -68,6 +69,7 @@ interface Estimation {
     MatSortModule,
     MatSnackBarModule,
     MatDialogModule,
+    MatDividerModule,
   ],
   templateUrl: './estimation.component.html',
   styleUrl: './estimation.component.scss',
@@ -279,5 +281,17 @@ export class EstimationComponent implements OnInit {
 
   getOutcomeCount(estimation: Estimation): number {
     return estimation.comparisons.reduce((sum, c) => sum + c.outcomes.length, 0);
+  }
+
+  getCompletedCount(): number {
+    return this.estimations().filter((e) => e.latestExecution?.status === 'COMPLETED').length;
+  }
+
+  getRunningCount(): number {
+    return this.estimations().filter((e) => e.latestExecution?.status === 'RUNNING').length;
+  }
+
+  getNotExecutedCount(): number {
+    return this.estimations().filter((e) => !e.latestExecution).length;
   }
 }

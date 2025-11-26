@@ -1,13 +1,13 @@
-<div class="estimation-container">
+<div class="prediction-container">
   <div class="page-header">
     <div class="page-header__title">
-      <i class="fas fa-balance-scale"></i>
-      <h1>Population Level Estimation</h1>
+      <i class="fas fa-heartbeat"></i>
+      <h1>Patient Level Prediction</h1>
     </div>
     <div class="page-header__actions">
       <button mat-raised-button color="primary" (click)="createNew()">
         <i class="fas fa-plus"></i>
-        New Estimation
+        New Prediction
       </button>
     </div>
   </div>
@@ -16,11 +16,11 @@
   <div class="stats-row">
     <mat-card class="stat-card">
       <div class="stat-icon total">
-        <i class="fas fa-balance-scale"></i>
+        <i class="fas fa-brain"></i>
       </div>
       <div class="stat-content">
-        <span class="stat-value">{{ estimations().length }}</span>
-        <span class="stat-label">Total Studies</span>
+        <span class="stat-value">{{ predictions().length }}</span>
+        <span class="stat-label">Total Models</span>
       </div>
     </mat-card>
 
@@ -30,17 +30,17 @@
       </div>
       <div class="stat-content">
         <span class="stat-value">{{ getCompletedCount() }}</span>
-        <span class="stat-label">Completed</span>
+        <span class="stat-label">Trained</span>
       </div>
     </mat-card>
 
     <mat-card class="stat-card">
-      <div class="stat-icon running">
-        <i class="fas fa-spinner"></i>
+      <div class="stat-icon auc">
+        <i class="fas fa-chart-line"></i>
       </div>
       <div class="stat-content">
-        <span class="stat-value">{{ getRunningCount() }}</span>
-        <span class="stat-label">Running</span>
+        <span class="stat-value">{{ getAverageAuc() }}</span>
+        <span class="stat-label">Avg AUC</span>
       </div>
     </mat-card>
 
@@ -50,7 +50,7 @@
       </div>
       <div class="stat-content">
         <span class="stat-value">{{ getNotExecutedCount() }}</span>
-        <span class="stat-label">Not Executed</span>
+        <span class="stat-label">Pending</span>
       </div>
     </mat-card>
   </div>
@@ -60,12 +60,12 @@
     <mat-card-content>
       <div class="filter-row">
         <mat-form-field appearance="outline" class="search-field">
-          <mat-label>Search estimation studies</mat-label>
+          <mat-label>Search prediction models</mat-label>
           <input
             matInput
             [(ngModel)]="searchFilter"
             (ngModelChange)="applyFilters()"
-            placeholder="Search by name, description, type, or tags..."
+            placeholder="Search by name, cohort, or tags..."
           />
           <mat-icon matPrefix>search</mat-icon>
           @if (searchFilter) {
@@ -73,6 +73,15 @@
               <mat-icon>close</mat-icon>
             </button>
           }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="type-filter">
+          <mat-label>Model Type</mat-label>
+          <mat-select [(ngModel)]="modelTypeFilter" (ngModelChange)="applyFilters()">
+            @for (option of modelTypeOptions; track option.value) {
+              <mat-option [value]="option.value">{{ option.label }}</mat-option>
+            }
+          </mat-select>
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="status-filter">
@@ -91,42 +100,39 @@
   @if (loading()) {
     <div class="loading-container">
       <mat-spinner diameter="48"></mat-spinner>
-      <p>Loading estimation studies...</p>
+      <p>Loading prediction models...</p>
     </div>
-  } @else if (filteredEstimations().length > 0) {
+  } @else if (filteredPredictions().length > 0) {
     <mat-card class="results-card">
       <mat-card-content>
         <table
           mat-table
-          [dataSource]="getPaginatedEstimations()"
+          [dataSource]="getPaginatedPredictions()"
           matSort
           (matSortChange)="onSort($event)"
-          class="estimation-table"
+          class="prediction-table"
         >
           <!-- ID -->
           <ng-container matColumnDef="id">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>ID</th>
-            <td mat-cell *matCellDef="let e">
-              <span class="estimation-id">{{ e.id }}</span>
+            <td mat-cell *matCellDef="let p">
+              <span class="prediction-id">{{ p.id }}</span>
             </td>
           </ng-container>
 
           <!-- Name -->
           <ng-container matColumnDef="name">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
-            <td mat-cell *matCellDef="let e">
+            <td mat-cell *matCellDef="let p">
               <div class="name-cell">
-                <span class="estimation-name">{{ e.name }}</span>
-                @if (e.description) {
-                  <span class="estimation-description">{{ e.description }}</span>
+                <span class="prediction-name">{{ p.name }}</span>
+                @if (p.description) {
+                  <span class="prediction-description">{{ p.description }}</span>
                 }
-                @if (e.tags && e.tags.length > 0) {
+                @if (p.tags && p.tags.length > 0) {
                   <div class="tags">
-                    @for (tag of e.tags.slice(0, 3); track tag) {
+                    @for (tag of p.tags.slice(0, 3); track tag) {
                       <mat-chip class="tag-chip">{{ tag }}</mat-chip>
-                    }
-                    @if (e.tags.length > 3) {
-                      <span class="more-tags">+{{ e.tags.length - 3 }}</span>
                     }
                   </div>
                 }
@@ -134,41 +140,65 @@
             </td>
           </ng-container>
 
-          <!-- Type -->
-          <ng-container matColumnDef="type">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Type</th>
-            <td mat-cell *matCellDef="let e">
-              <span class="type-badge">{{ e.type }}</span>
+          <!-- Model Type -->
+          <ng-container matColumnDef="modelType">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Model</th>
+            <td mat-cell *matCellDef="let p">
+              <span class="model-type-badge">{{ p.modelType }}</span>
             </td>
           </ng-container>
 
-          <!-- Comparisons -->
-          <ng-container matColumnDef="comparisons">
-            <th mat-header-cell *matHeaderCellDef>Comparisons</th>
-            <td mat-cell *matCellDef="let e">
-              <div class="comparisons-cell">
-                <div class="comparison-summary" [matTooltip]="getComparisonSummary(e)">
+          <!-- Cohorts -->
+          <ng-container matColumnDef="cohorts">
+            <th mat-header-cell *matHeaderCellDef>Target / Outcome</th>
+            <td mat-cell *matCellDef="let p">
+              <div class="cohorts-cell">
+                <div class="cohort-item target">
                   <i class="fas fa-users"></i>
-                  <span>{{ e.comparisons.length }} comparison{{ e.comparisons.length !== 1 ? 's' : '' }}</span>
+                  <span>{{ p.targetCohort }}</span>
                 </div>
-                <div class="outcomes-count">
+                <div class="cohort-item outcome">
                   <i class="fas fa-crosshairs"></i>
-                  <span>{{ getOutcomeCount(e) }} outcome{{ getOutcomeCount(e) !== 1 ? 's' : '' }}</span>
+                  <span>{{ p.outcomeCohort }}</span>
+                </div>
+                <div class="time-at-risk">
+                  <i class="fas fa-clock"></i>
+                  <span>{{ p.timeAtRisk }}</span>
                 </div>
               </div>
+            </td>
+          </ng-container>
+
+          <!-- Performance -->
+          <ng-container matColumnDef="performance">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Performance</th>
+            <td mat-cell *matCellDef="let p">
+              @if (p.latestExecution?.auc) {
+                <div class="performance-cell">
+                  <div class="auc-value" [ngClass]="getAucClass(p.latestExecution.auc)">
+                    <span class="label">AUC</span>
+                    <span class="value">{{ formatAuc(p.latestExecution.auc) }}</span>
+                  </div>
+                  @if (p.latestExecution.calibration) {
+                    <div class="calibration-value">
+                      <span class="label">Cal</span>
+                      <span class="value">{{ p.latestExecution.calibration.toFixed(2) }}</span>
+                    </div>
+                  }
+                </div>
+              } @else {
+                <span class="no-performance">-</span>
+              }
             </td>
           </ng-container>
 
           <!-- Status -->
           <ng-container matColumnDef="status">
             <th mat-header-cell *matHeaderCellDef>Status</th>
-            <td mat-cell *matCellDef="let e">
-              <div class="status-cell" [ngClass]="getStatusClass(e)">
-                <i [class]="getStatusIcon(e)"></i>
-                <span class="status-label">{{ getStatusLabel(e) }}</span>
-                @if (e.latestExecution) {
-                  <span class="execution-count">({{ e.executions }}x)</span>
-                }
+            <td mat-cell *matCellDef="let p">
+              <div class="status-cell" [ngClass]="getStatusClass(p)">
+                <i [class]="getStatusIcon(p)"></i>
+                <span class="status-label">{{ getStatusLabel(p) }}</span>
               </div>
             </td>
           </ng-container>
@@ -176,10 +206,10 @@
           <!-- Modified Date -->
           <ng-container matColumnDef="modifiedDate">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Modified</th>
-            <td mat-cell *matCellDef="let e">
+            <td mat-cell *matCellDef="let p">
               <div class="date-cell">
-                <span class="date">{{ formatDate(e.modifiedDate) }}</span>
-                <span class="author">by {{ e.modifiedBy }}</span>
+                <span class="date">{{ formatDate(p.modifiedDate) }}</span>
+                <span class="author">by {{ p.modifiedBy }}</span>
               </div>
             </td>
           </ng-container>
@@ -187,24 +217,24 @@
           <!-- Actions -->
           <ng-container matColumnDef="actions">
             <th mat-header-cell *matHeaderCellDef>Actions</th>
-            <td mat-cell *matCellDef="let e">
+            <td mat-cell *matCellDef="let p">
               <div class="actions-cell">
-                <button mat-icon-button matTooltip="Edit" (click)="editEstimation(e)">
+                <button mat-icon-button matTooltip="Edit" (click)="editPrediction(p)">
                   <i class="fas fa-edit"></i>
                 </button>
                 <button
                   mat-icon-button
-                  matTooltip="Execute"
-                  (click)="executeEstimation(e)"
-                  [disabled]="e.latestExecution?.status === 'RUNNING'"
+                  matTooltip="Train Model"
+                  (click)="executePrediction(p)"
+                  [disabled]="p.latestExecution?.status === 'RUNNING'"
                 >
                   <i class="fas fa-play"></i>
                 </button>
                 <button
                   mat-icon-button
                   matTooltip="View Results"
-                  (click)="viewResults(e)"
-                  [disabled]="!e.latestExecution || e.latestExecution.status !== 'COMPLETED'"
+                  (click)="viewResults(p)"
+                  [disabled]="!p.latestExecution || p.latestExecution.status !== 'COMPLETED'"
                 >
                   <i class="fas fa-chart-bar"></i>
                 </button>
@@ -212,16 +242,16 @@
                   <i class="fas fa-ellipsis-v"></i>
                 </button>
                 <mat-menu #actionMenu="matMenu">
-                  <button mat-menu-item (click)="copyEstimation(e)">
+                  <button mat-menu-item (click)="copyPrediction(p)">
                     <i class="fas fa-copy fa-fw"></i>
                     <span>Copy</span>
                   </button>
-                  <button mat-menu-item (click)="exportEstimation(e)">
+                  <button mat-menu-item (click)="exportPrediction(p)">
                     <i class="fas fa-file-export fa-fw"></i>
                     <span>Export</span>
                   </button>
                   <mat-divider></mat-divider>
-                  <button mat-menu-item class="delete-action" (click)="deleteEstimation(e)">
+                  <button mat-menu-item class="delete-action" (click)="deletePrediction(p)">
                     <i class="fas fa-trash fa-fw"></i>
                     <span>Delete</span>
                   </button>
@@ -247,18 +277,18 @@
     </mat-card>
   } @else {
     <div class="empty-state">
-      <i class="fas fa-balance-scale"></i>
-      <h3>No Estimation Studies Found</h3>
-      @if (searchFilter || statusFilter !== 'all') {
-        <p>No studies match your search criteria.</p>
-        <button mat-button color="primary" (click)="searchFilter = ''; statusFilter = 'all'; applyFilters()">
+      <i class="fas fa-brain"></i>
+      <h3>No Prediction Models Found</h3>
+      @if (searchFilter || statusFilter !== 'all' || modelTypeFilter !== 'all') {
+        <p>No models match your search criteria.</p>
+        <button mat-button color="primary" (click)="searchFilter = ''; statusFilter = 'all'; modelTypeFilter = 'all'; applyFilters()">
           Clear Filters
         </button>
       } @else {
-        <p>Create your first population level estimation study to compare treatment effects.</p>
+        <p>Create your first patient level prediction model to predict outcomes.</p>
         <button mat-raised-button color="primary" (click)="createNew()">
           <i class="fas fa-plus"></i>
-          Create Estimation Study
+          Create Prediction Model
         </button>
       }
     </div>
