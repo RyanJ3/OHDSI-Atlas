@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -10,7 +10,8 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatDialogModule } from '@angular/material/dialog';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { ConfirmDialogComponent, ConfirmDialogData } from '../../shared/confirm-dialog/confirm-dialog.component';
 
 interface Tag {
   id: number;
@@ -59,7 +60,8 @@ export class TaggingComponent implements OnInit {
     { id: 10, name: 'archived', color: '#9e9e9e', usageCount: 5, createdBy: 'admin' },
   ];
 
-  constructor(private snackBar: MatSnackBar) {}
+  private snackBar = inject(MatSnackBar);
+  private dialog = inject(MatDialog);
 
   ngOnInit(): void {
     setTimeout(() => {
@@ -92,10 +94,22 @@ export class TaggingComponent implements OnInit {
   }
 
   deleteTag(tag: Tag): void {
-    if (confirm(`Delete tag "${tag.name}"? This will remove it from all items.`)) {
-      this.tags.set(this.tags().filter((t) => t.id !== tag.id));
-      this.snackBar.open(`Tag "${tag.name}" deleted`, '', { duration: 2000 });
-    }
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        title: 'Delete Tag',
+        message: `Delete tag "${tag.name}"? This will remove it from all items.`,
+        confirmText: 'Delete',
+        cancelText: 'Cancel',
+        type: 'danger',
+      } as ConfirmDialogData,
+    });
+
+    dialogRef.afterClosed().subscribe(confirmed => {
+      if (confirmed) {
+        this.tags.set(this.tags().filter((t) => t.id !== tag.id));
+        this.snackBar.open(`Tag "${tag.name}" deleted`, 'OK', { duration: 2000 });
+      }
+    });
   }
 
   editTag(tag: Tag): void {

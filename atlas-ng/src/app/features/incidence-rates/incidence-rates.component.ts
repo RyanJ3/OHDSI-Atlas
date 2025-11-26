@@ -22,6 +22,8 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import incidenceRatesData from '../../core/mock-data/incidence-rates.json';
 import { IrResultsDialogComponent } from './ir-results-dialog/ir-results-dialog.component';
 import { CreateIrDialogComponent } from './create-ir-dialog/create-ir-dialog.component';
+import { EditIrDialogComponent } from './edit-ir-dialog/edit-ir-dialog.component';
+import { ConfirmDialogComponent, ConfirmDialogData } from '../../shared/confirm-dialog/confirm-dialog.component';
 
 interface Cohort {
   id: number;
@@ -214,21 +216,113 @@ export class IncidenceRatesComponent implements OnInit {
   }
 
   editAnalysis(analysis: IncidenceRateAnalysis): void {
-    this.snackBar.open(`Opening "${analysis.name}" for editing...`, '', { duration: 2000 });
+    const dialogRef = this.dialog.open(EditIrDialogComponent, {
+      width: '800px',
+      maxHeight: '90vh',
+      data: { analysis: { ...analysis, targetCohorts: [...analysis.targetCohorts], outcomeCohorts: [...analysis.outcomeCohorts] } },
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.analyses.update(current =>
+          current.map(a => a.id === result.id ? result : a)
+        );
+        this.applyFilter();
+        this.snackBar.open(`Updated "${result.name}"`, 'OK', { duration: 3000 });
+      }
+    });
   }
 
   copyAnalysis(analysis: IncidenceRateAnalysis): void {
-    this.snackBar.open(`Copying "${analysis.name}"...`, '', { duration: 2000 });
+    const copiedAnalysis: IncidenceRateAnalysis = {
+      ...analysis,
+      id: Math.floor(Math.random() * 10000) + 100,
+      name: `${analysis.name} (Copy)`,
+      createdDate: new Date().toISOString(),
+      modifiedDate: new Date().toISOString(),
+      createdBy: 'demo',
+      modifiedBy: 'demo',
+      targetCohorts: [...analysis.targetCohorts],
+      outcomeCohorts: [...analysis.outcomeCohorts],
+      executions: [],
+    };
+
+    this.analyses.update(current => [copiedAnalysis, ...current]);
+    this.applyFilter();
+    this.snackBar.open(`Created copy "${copiedAnalysis.name}"`, 'OK', { duration: 3000 });
   }
 
   deleteAnalysis(analysis: IncidenceRateAnalysis): void {
-    if (confirm(`Are you sure you want to delete "${analysis.name}"?`)) {
-      this.snackBar.open(`Deleted "${analysis.name}"`, '', { duration: 2000 });
-    }
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        title: 'Delete Analysis',
+        message: `Are you sure you want to delete "${analysis.name}"?`,
+        confirmText: 'Delete',
+        cancelText: 'Cancel',
+        type: 'danger',
+      } as ConfirmDialogData,
+    });
+
+    dialogRef.afterClosed().subscribe(confirmed => {
+      if (confirmed) {
+        this.analyses.update(current => current.filter(a => a.id !== analysis.id));
+        this.applyFilter();
+        this.snackBar.open(`Deleted "${analysis.name}"`, 'OK', { duration: 2000 });
+      }
+    });
   }
 
   generateAnalysis(analysis: IncidenceRateAnalysis): void {
-    this.snackBar.open(`Generating analysis "${analysis.name}"...`, '', { duration: 2000 });
+    const newExecution: Execution = {
+      sourceKey: 'SynPUF-CDMV5',
+      sourceName: 'Synthetic Claims Data',
+      status: 'RUNNING',
+      startTime: new Date().toISOString(),
+      endTime: null,
+      results: null,
+    };
+
+    this.analyses.update(current =>
+      current.map(a => {
+        if (a.id === analysis.id) {
+          return { ...a, executions: [...a.executions, newExecution] };
+        }
+        return a;
+      })
+    );
+    this.applyFilter();
+    this.snackBar.open(`Started IR analysis for "${analysis.name}"`, 'OK', { duration: 3000 });
+
+    // Simulate completion after 3 seconds
+    setTimeout(() => {
+      this.analyses.update(current =>
+        current.map(a => {
+          if (a.id === analysis.id) {
+            const updatedExecutions = a.executions.map(e => {
+              if (e.status === 'RUNNING' && e.sourceKey === newExecution.sourceKey) {
+                return {
+                  ...e,
+                  status: 'COMPLETE' as const,
+                  endTime: new Date().toISOString(),
+                  results: {
+                    totalPersons: Math.floor(Math.random() * 50000) + 10000,
+                    cases: Math.floor(Math.random() * 500) + 50,
+                    timeAtRisk: Math.floor(Math.random() * 100000) + 50000,
+                    incidenceRate: Math.round((Math.random() * 50 + 5) * 100) / 100,
+                    incidenceProportion: Math.round((Math.random() * 0.05) * 10000) / 10000,
+                  },
+                };
+              }
+              return e;
+            });
+            return { ...a, executions: updatedExecutions };
+          }
+          return a;
+        })
+      );
+      this.applyFilter();
+      this.snackBar.open(`IR analysis complete for "${analysis.name}"`, 'OK', { duration: 3000 });
+    }, 3000);
   }
 
   viewResults(analysis: IncidenceRateAnalysis): void {
@@ -245,7 +339,25 @@ export class IncidenceRatesComponent implements OnInit {
   }
 
   exportAnalysis(analysis: IncidenceRateAnalysis): void {
-    this.snackBar.open(`Exporting "${analysis.name}"...`, '', { duration: 2000 });
+    const exportData = {
+      name: analysis.name,
+      description: analysis.description,
+      targetCohorts: analysis.targetCohorts,
+      outcomeCohorts: analysis.outcomeCohorts,
+      timeAtRisk: analysis.timeAtRisk,
+      exportedAt: new Date().toISOString(),
+      exportedBy: 'demo',
+    };
+
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `ir-analysis-${analysis.id}-${analysis.name.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.json`;
+    link.click();
+    window.URL.revokeObjectURL(url);
+
+    this.snackBar.open(`Exported "${analysis.name}"`, 'OK', { duration: 3000 });
   }
 
   formatDate(dateStr: string | undefined): string {

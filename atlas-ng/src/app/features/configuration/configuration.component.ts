@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -14,6 +14,9 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatExpansionModule } from '@angular/material/expansion';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { ConfirmDialogComponent, ConfirmDialogData } from '../../shared/confirm-dialog/confirm-dialog.component';
 
 interface ConfigSection {
   name: string;
@@ -49,12 +52,18 @@ interface ConfigSetting {
     MatChipsModule,
     MatProgressSpinnerModule,
     MatExpansionModule,
+    MatSnackBarModule,
+    MatDialogModule,
   ],
   templateUrl: './configuration.component.html',
   styleUrl: './configuration.component.scss',
 })
 export class ConfigurationComponent implements OnInit {
+  private snackBar = inject(MatSnackBar);
+  private dialog = inject(MatDialog);
+
   loading = signal(true);
+  testing = signal(false);
   selectedTab = 0;
 
   configSections: ConfigSection[] = [
@@ -224,23 +233,110 @@ export class ConfigurationComponent implements OnInit {
   saveSettings(): void {
     // In a real app, this would call an API
     console.log('Saving settings...', this.configSections);
-    alert('Settings saved successfully!');
+
+    // Simulate saving with localStorage
+    const settingsToSave: Record<string, any> = {};
+    this.configSections.forEach(section => {
+      section.settings.forEach(setting => {
+        settingsToSave[setting.key] = setting.value;
+      });
+    });
+    localStorage.setItem('atlas-settings', JSON.stringify(settingsToSave));
+
+    this.snackBar.open('Settings saved successfully', 'OK', { duration: 3000 });
   }
 
   resetSettings(): void {
-    if (confirm('Are you sure you want to reset all settings to defaults?')) {
-      // Reset logic would go here
-      alert('Settings reset to defaults');
-    }
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        title: 'Reset Settings',
+        message: 'Are you sure you want to reset all settings to defaults? This cannot be undone.',
+        confirmText: 'Reset',
+        cancelText: 'Cancel',
+        type: 'warning',
+      } as ConfirmDialogData,
+    });
+
+    dialogRef.afterClosed().subscribe(confirmed => {
+      if (confirmed) {
+        // Reset to default values
+        this.configSections.forEach(section => {
+          section.settings.forEach(setting => {
+            if (setting.key === 'defaultLocale') setting.value = 'en';
+            else if (setting.key === 'defaultPaginationSize') setting.value = 25;
+            else if (setting.key === 'enableTutorial') setting.value = true;
+            else if (setting.key === 'webApiUrl') setting.value = 'http://localhost:8080/WebAPI/';
+            else if (setting.key === 'defaultSourceKey') setting.value = 'cdm';
+            else if (setting.key === 'cacheEnabled') setting.value = true;
+            else if (setting.key === 'authenticationMethod') setting.value = 'db';
+            else if (setting.key === 'sessionTimeout') setting.value = 30;
+            else if (setting.key === 'enforceSecureConnection') setting.value = false;
+            else if (setting.key === 'maxConcurrentJobs') setting.value = 5;
+            else if (setting.key === 'jobQueueTimeout') setting.value = 24;
+            else if (setting.key === 'enableJobNotifications') setting.value = true;
+            else if (setting.key === 'evidenceServiceUrl') setting.value = 'http://localhost:8081/evidence/';
+            else if (setting.key === 'pubMedApiKey') setting.value = '';
+          });
+        });
+
+        localStorage.removeItem('atlas-settings');
+        this.snackBar.open('Settings reset to defaults', 'OK', { duration: 3000 });
+      }
+    });
   }
 
   clearCache(): void {
-    if (confirm('Are you sure you want to clear the application cache?')) {
-      alert('Cache cleared successfully');
-    }
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        title: 'Clear Cache',
+        message: 'Are you sure you want to clear the application cache? This may temporarily slow down performance.',
+        confirmText: 'Clear Cache',
+        cancelText: 'Cancel',
+        type: 'warning',
+      } as ConfirmDialogData,
+    });
+
+    dialogRef.afterClosed().subscribe(confirmed => {
+      if (confirmed) {
+        // Clear localStorage cache entries
+        const keysToRemove = Object.keys(localStorage).filter(
+          key => key.startsWith('atlas-cache-')
+        );
+        keysToRemove.forEach(key => localStorage.removeItem(key));
+
+        this.snackBar.open('Cache cleared successfully', 'OK', { duration: 3000 });
+      }
+    });
   }
 
   testConnection(): void {
-    alert('Testing connection to WebAPI...\n\nConnection successful!');
+    this.testing.set(true);
+    this.snackBar.open('Testing connection to WebAPI...', '', { duration: 2000 });
+
+    // Simulate connection test
+    setTimeout(() => {
+      this.testing.set(false);
+      // Simulate successful connection
+      this.snackBar.open('Connection successful! WebAPI is responding.', 'OK', { duration: 4000 });
+    }, 2000);
+  }
+
+  exportSettings(): void {
+    const settingsToExport: Record<string, any> = {};
+    this.configSections.forEach(section => {
+      section.settings.forEach(setting => {
+        settingsToExport[setting.key] = setting.value;
+      });
+    });
+
+    const blob = new Blob([JSON.stringify(settingsToExport, null, 2)], { type: 'application/json' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `atlas-settings-${new Date().toISOString().split('T')[0]}.json`;
+    link.click();
+    window.URL.revokeObjectURL(url);
+
+    this.snackBar.open('Settings exported', 'OK', { duration: 3000 });
   }
 }

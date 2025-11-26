@@ -1,0 +1,202 @@
+<h2 mat-dialog-title>
+  <mat-icon>trending_up</mat-icon>
+  Edit Incidence Rate Analysis
+</h2>
+
+<mat-dialog-content>
+  <mat-tab-group>
+    <!-- Definition Tab -->
+    <mat-tab label="Definition">
+      <form [formGroup]="form" class="edit-form">
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="id-field">
+            <mat-label>ID</mat-label>
+            <input matInput [value]="data.analysis.id" disabled />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="name-field">
+            <mat-label>Name</mat-label>
+            <input matInput formControlName="name" />
+            @if (form.get('name')?.hasError('required') && form.get('name')?.touched) {
+              <mat-error>Name is required</mat-error>
+            }
+          </mat-form-field>
+        </div>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Description</mat-label>
+          <textarea
+            matInput
+            formControlName="description"
+            rows="3"
+          ></textarea>
+        </mat-form-field>
+      </form>
+    </mat-tab>
+
+    <!-- Target Cohorts Tab -->
+    <mat-tab label="Target Cohorts">
+      <div class="cohorts-tab">
+        <p class="tab-description">Target cohorts define the population at risk for the outcome.</p>
+        @if (targetCohorts.length > 0) {
+          <table mat-table [dataSource]="targetCohorts" class="cohorts-table">
+            <ng-container matColumnDef="id">
+              <th mat-header-cell *matHeaderCellDef>ID</th>
+              <td mat-cell *matCellDef="let cohort">{{ cohort.id }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef>Name</th>
+              <td mat-cell *matCellDef="let cohort">{{ cohort.name }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef>Actions</th>
+              <td mat-cell *matCellDef="let cohort">
+                <button mat-icon-button color="warn" (click)="removeTargetCohort(cohort)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="cohortColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: cohortColumns"></tr>
+          </table>
+        } @else {
+          <div class="empty-state">
+            <mat-icon>groups</mat-icon>
+            <p>No target cohorts defined</p>
+          </div>
+        }
+        <div class="add-action">
+          <button mat-stroked-button color="primary" (click)="addTargetCohort()">
+            <mat-icon>add</mat-icon>
+            Add Target Cohort
+          </button>
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- Outcome Cohorts Tab -->
+    <mat-tab label="Outcome Cohorts">
+      <div class="cohorts-tab">
+        <p class="tab-description">Outcome cohorts define the events to calculate incidence for.</p>
+        @if (outcomeCohorts.length > 0) {
+          <table mat-table [dataSource]="outcomeCohorts" class="cohorts-table">
+            <ng-container matColumnDef="id">
+              <th mat-header-cell *matHeaderCellDef>ID</th>
+              <td mat-cell *matCellDef="let cohort">{{ cohort.id }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef>Name</th>
+              <td mat-cell *matCellDef="let cohort">{{ cohort.name }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef>Actions</th>
+              <td mat-cell *matCellDef="let cohort">
+                <button mat-icon-button color="warn" (click)="removeOutcomeCohort(cohort)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="cohortColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: cohortColumns"></tr>
+          </table>
+        } @else {
+          <div class="empty-state">
+            <mat-icon>flag</mat-icon>
+            <p>No outcome cohorts defined</p>
+          </div>
+        }
+        <div class="add-action">
+          <button mat-stroked-button color="primary" (click)="addOutcomeCohort()">
+            <mat-icon>add</mat-icon>
+            Add Outcome Cohort
+          </button>
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- Time at Risk Tab -->
+    <mat-tab label="Time at Risk">
+      <form [formGroup]="form" class="tar-tab">
+        <div class="tar-grid">
+          <div class="tar-row">
+            <span class="tar-label">Start:</span>
+            <mat-form-field appearance="outline" class="tar-field">
+              <input matInput type="number" formControlName="tarStartOffset" />
+            </mat-form-field>
+            <span class="tar-text">days</span>
+            <mat-form-field appearance="outline" class="tar-anchor-field">
+              <mat-select formControlName="tarStartAnchor">
+                <mat-option value="cohort start">after cohort start</mat-option>
+                <mat-option value="cohort end">after cohort end</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="tar-row">
+            <span class="tar-label">End:</span>
+            <mat-form-field appearance="outline" class="tar-field">
+              <input matInput type="number" formControlName="tarEndOffset" />
+            </mat-form-field>
+            <span class="tar-text">days</span>
+            <mat-form-field appearance="outline" class="tar-anchor-field">
+              <mat-select formControlName="tarEndAnchor">
+                <mat-option value="cohort start">after cohort start</mat-option>
+                <mat-option value="cohort end">after cohort end</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </div>
+      </form>
+    </mat-tab>
+
+    <!-- Metadata Tab -->
+    <mat-tab label="Metadata">
+      <div class="metadata-tab">
+        <div class="metadata-grid">
+          <div class="metadata-item">
+            <span class="label">Created By</span>
+            <span class="value">{{ data.analysis.createdBy || 'Unknown' }}</span>
+          </div>
+          <div class="metadata-item">
+            <span class="label">Created Date</span>
+            <span class="value">{{ formatDate(data.analysis.createdDate) }}</span>
+          </div>
+          <div class="metadata-item">
+            <span class="label">Modified By</span>
+            <span class="value">{{ data.analysis.modifiedBy || 'Unknown' }}</span>
+          </div>
+          <div class="metadata-item">
+            <span class="label">Last Modified</span>
+            <span class="value">{{ formatDate(data.analysis.modifiedDate) }}</span>
+          </div>
+          <div class="metadata-item">
+            <span class="label">Total Executions</span>
+            <span class="value">{{ data.analysis.executions?.length || 0 }}</span>
+          </div>
+          <div class="metadata-item">
+            <span class="label">Target Cohorts</span>
+            <span class="value">{{ targetCohorts.length }}</span>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancel</button>
+  <button
+    mat-raised-button
+    color="primary"
+    [disabled]="!form.valid || !hasChanges()"
+    (click)="save()"
+  >
+    <mat-icon>save</mat-icon>
+    Save Changes
+  </button>
+</mat-dialog-actions>

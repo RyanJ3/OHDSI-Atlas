@@ -1,0 +1,144 @@
+<h2 mat-dialog-title>
+  <mat-icon>person</mat-icon>
+  Patient Profile: {{ data.profile.personId }}
+</h2>
+
+<mat-dialog-content>
+  <!-- Demographics Section -->
+  <div class="demographics-section">
+    <div class="demo-grid">
+      <mat-card class="demo-card">
+        <div class="demo-icon gender-icon">
+          <mat-icon>{{ data.profile.gender === 'Male' ? 'male' : 'female' }}</mat-icon>
+        </div>
+        <div class="demo-label">Gender</div>
+        <div class="demo-value">{{ data.profile.gender }}</div>
+      </mat-card>
+
+      <mat-card class="demo-card">
+        <div class="demo-icon age-icon">
+          <mat-icon>cake</mat-icon>
+        </div>
+        <div class="demo-label">Age</div>
+        <div class="demo-value">{{ calculateAge() }} years</div>
+        <div class="demo-sublabel">Born {{ data.profile.birthYear }}</div>
+      </mat-card>
+
+      <mat-card class="demo-card">
+        <div class="demo-icon source-icon">
+          <mat-icon>storage</mat-icon>
+        </div>
+        <div class="demo-label">Data Source</div>
+        <div class="demo-value">{{ data.profile.sourceName }}</div>
+      </mat-card>
+
+      <mat-card class="demo-card">
+        <div class="demo-icon obs-icon">
+          <mat-icon>date_range</mat-icon>
+        </div>
+        <div class="demo-label">Observation Period</div>
+        <div class="demo-value">{{ getObservationYears() }} years</div>
+        <div class="demo-sublabel">{{ formatDate(data.profile.observationPeriod.start) }} - {{ formatDate(data.profile.observationPeriod.end) }}</div>
+      </mat-card>
+    </div>
+
+    @if (data.profile.deathYear) {
+      <div class="deceased-banner">
+        <mat-icon>warning</mat-icon>
+        Deceased in {{ data.profile.deathYear }}
+      </div>
+    }
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <!-- Cohort Memberships -->
+  <div class="cohorts-section">
+    <h4>Cohort Memberships</h4>
+    <div class="cohort-chips">
+      @for (cohort of data.profile.cohorts; track cohort) {
+        <mat-chip>{{ cohort }}</mat-chip>
+      }
+      @if (data.profile.cohorts.length === 0) {
+        <span class="no-cohorts">No cohort memberships</span>
+      }
+    </div>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <!-- Record Counts -->
+  <div class="records-section">
+    <h4>Clinical Records Summary</h4>
+    <div class="records-grid">
+      <div class="record-card" [class.has-records]="data.profile.recordCounts.conditions > 0">
+        <mat-icon>healing</mat-icon>
+        <span class="record-count">{{ data.profile.recordCounts.conditions | number }}</span>
+        <span class="record-label">Conditions</span>
+      </div>
+      <div class="record-card" [class.has-records]="data.profile.recordCounts.drugs > 0">
+        <mat-icon>medication</mat-icon>
+        <span class="record-count">{{ data.profile.recordCounts.drugs | number }}</span>
+        <span class="record-label">Drug Exposures</span>
+      </div>
+      <div class="record-card" [class.has-records]="data.profile.recordCounts.procedures > 0">
+        <mat-icon>medical_services</mat-icon>
+        <span class="record-count">{{ data.profile.recordCounts.procedures | number }}</span>
+        <span class="record-label">Procedures</span>
+      </div>
+      <div class="record-card" [class.has-records]="data.profile.recordCounts.measurements > 0">
+        <mat-icon>science</mat-icon>
+        <span class="record-count">{{ data.profile.recordCounts.measurements | number }}</span>
+        <span class="record-label">Measurements</span>
+      </div>
+      <div class="record-card" [class.has-records]="data.profile.recordCounts.observations > 0">
+        <mat-icon>visibility</mat-icon>
+        <span class="record-count">{{ data.profile.recordCounts.observations | number }}</span>
+        <span class="record-label">Observations</span>
+      </div>
+      <div class="record-card" [class.has-records]="data.profile.recordCounts.visits > 0">
+        <mat-icon>local_hospital</mat-icon>
+        <span class="record-count">{{ data.profile.recordCounts.visits | number }}</span>
+        <span class="record-label">Visits</span>
+      </div>
+    </div>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <!-- Timeline -->
+  <div class="timeline-section">
+    <h4>Clinical Timeline (Sample Events)</h4>
+    <div class="timeline">
+      @for (event of timelineEvents; track event.date + event.concept) {
+        <div class="timeline-event">
+          <div class="event-marker" [class]="event.type"></div>
+          <div class="event-content">
+            <div class="event-date">{{ formatDate(event.date) }}</div>
+            <div class="event-domain">
+              <mat-chip class="domain-chip" [class]="event.type">{{ event.domain }}</mat-chip>
+            </div>
+            <div class="event-concept">{{ event.concept }}</div>
+            @if (event.value) {
+              <div class="event-value">Value: {{ event.value }}</div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="exportProfile()">
+    <mat-icon>download</mat-icon>
+    Export
+  </button>
+  <button mat-button (click)="viewFullTimeline()">
+    <mat-icon>timeline</mat-icon>
+    Full Timeline
+  </button>
+  <button mat-raised-button color="primary" mat-dialog-close>
+    Close
+  </button>
+</mat-dialog-actions>

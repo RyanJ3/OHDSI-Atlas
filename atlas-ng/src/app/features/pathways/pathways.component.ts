@@ -20,6 +20,8 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import pathwaysData from '../../core/mock-data/pathways.json';
 import { PathwayResultsDialogComponent } from './pathway-results-dialog/pathway-results-dialog.component';
 import { CreatePathwayDialogComponent } from './create-pathway-dialog/create-pathway-dialog.component';
+import { EditPathwayDialogComponent } from './edit-pathway-dialog/edit-pathway-dialog.component';
+import { ConfirmDialogComponent, ConfirmDialogData } from '../../shared/confirm-dialog/confirm-dialog.component';
 
 interface Cohort {
   id: number;
@@ -206,21 +208,115 @@ export class PathwaysComponent implements OnInit {
   }
 
   editAnalysis(analysis: PathwayAnalysis): void {
-    this.snackBar.open(`Opening "${analysis.name}" for editing...`, '', { duration: 2000 });
+    const dialogRef = this.dialog.open(EditPathwayDialogComponent, {
+      width: '800px',
+      maxHeight: '90vh',
+      data: { analysis: { ...analysis, targetCohorts: [...analysis.targetCohorts], eventCohorts: [...analysis.eventCohorts] } },
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.analyses.update(current =>
+          current.map(a => a.id === result.id ? result : a)
+        );
+        this.applyFilter();
+        this.snackBar.open(`Updated "${result.name}"`, 'OK', { duration: 3000 });
+      }
+    });
   }
 
   copyAnalysis(analysis: PathwayAnalysis): void {
-    this.snackBar.open(`Copying "${analysis.name}"...`, '', { duration: 2000 });
+    const copiedAnalysis: PathwayAnalysis = {
+      ...analysis,
+      id: Math.floor(Math.random() * 10000) + 100,
+      name: `${analysis.name} (Copy)`,
+      createdDate: new Date().toISOString(),
+      modifiedDate: new Date().toISOString(),
+      createdBy: 'demo',
+      modifiedBy: 'demo',
+      targetCohorts: [...analysis.targetCohorts],
+      eventCohorts: [...analysis.eventCohorts],
+      executions: [],
+    };
+
+    this.analyses.update(current => [copiedAnalysis, ...current]);
+    this.applyFilter();
+    this.snackBar.open(`Created copy "${copiedAnalysis.name}"`, 'OK', { duration: 3000 });
   }
 
   deleteAnalysis(analysis: PathwayAnalysis): void {
-    if (confirm(`Are you sure you want to delete "${analysis.name}"?`)) {
-      this.snackBar.open(`Deleted "${analysis.name}"`, '', { duration: 2000 });
-    }
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        title: 'Delete Analysis',
+        message: `Are you sure you want to delete "${analysis.name}"?`,
+        confirmText: 'Delete',
+        cancelText: 'Cancel',
+        type: 'danger',
+      } as ConfirmDialogData,
+    });
+
+    dialogRef.afterClosed().subscribe(confirmed => {
+      if (confirmed) {
+        this.analyses.update(current => current.filter(a => a.id !== analysis.id));
+        this.applyFilter();
+        this.snackBar.open(`Deleted "${analysis.name}"`, 'OK', { duration: 2000 });
+      }
+    });
   }
 
   generateAnalysis(analysis: PathwayAnalysis): void {
-    this.snackBar.open(`Generating pathway analysis "${analysis.name}"...`, '', { duration: 2000 });
+    const newExecution: Execution = {
+      sourceKey: 'SynPUF-CDMV5',
+      sourceName: 'Synthetic Claims Data',
+      status: 'RUNNING',
+      startTime: new Date().toISOString(),
+      endTime: null,
+      results: null,
+    };
+
+    this.analyses.update(current =>
+      current.map(a => {
+        if (a.id === analysis.id) {
+          return { ...a, executions: [...a.executions, newExecution] };
+        }
+        return a;
+      })
+    );
+    this.applyFilter();
+    this.snackBar.open(`Started pathway analysis for "${analysis.name}"`, 'OK', { duration: 3000 });
+
+    // Simulate completion after 3 seconds
+    setTimeout(() => {
+      this.analyses.update(current =>
+        current.map(a => {
+          if (a.id === analysis.id) {
+            const updatedExecutions = a.executions.map(e => {
+              if (e.status === 'RUNNING' && e.sourceKey === newExecution.sourceKey) {
+                return {
+                  ...e,
+                  status: 'COMPLETE' as const,
+                  endTime: new Date().toISOString(),
+                  results: {
+                    totalPatients: Math.floor(Math.random() * 10000) + 1000,
+                    pathwaysFound: Math.floor(Math.random() * 500) + 50,
+                    topPathways: [
+                      { path: ['Drug A', 'Drug B'], count: 1234, pct: 25.5 },
+                      { path: ['Drug A', 'Drug C'], count: 987, pct: 20.4 },
+                      { path: ['Drug B', 'Drug A'], count: 654, pct: 13.5 },
+                    ],
+                  },
+                };
+              }
+              return e;
+            });
+            return { ...a, executions: updatedExecutions };
+          }
+          return a;
+        })
+      );
+      this.applyFilter();
+      this.snackBar.open(`Pathway analysis complete for "${analysis.name}"`, 'OK', { duration: 3000 });
+    }, 3000);
   }
 
   viewResults(analysis: PathwayAnalysis): void {
@@ -232,7 +328,28 @@ export class PathwaysComponent implements OnInit {
   }
 
   exportAnalysis(analysis: PathwayAnalysis): void {
-    this.snackBar.open(`Exporting "${analysis.name}"...`, '', { duration: 2000 });
+    const exportData = {
+      name: analysis.name,
+      description: analysis.description,
+      targetCohorts: analysis.targetCohorts,
+      eventCohorts: analysis.eventCohorts,
+      combinationWindow: analysis.combinationWindow,
+      minCellCount: analysis.minCellCount,
+      maxDepth: analysis.maxDepth,
+      allowRepeats: analysis.allowRepeats,
+      exportedAt: new Date().toISOString(),
+      exportedBy: 'demo',
+    };
+
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `pathway-${analysis.id}-${analysis.name.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.json`;
+    link.click();
+    window.URL.revokeObjectURL(url);
+
+    this.snackBar.open(`Exported "${analysis.name}"`, 'OK', { duration: 3000 });
   }
 
   formatDate(dateStr: string | undefined): string {

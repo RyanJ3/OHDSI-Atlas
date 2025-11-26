@@ -22,6 +22,8 @@ import { MatDividerModule } from '@angular/material/divider';
 import estimationsData from '../../core/mock-data/estimations.json';
 import { EstimationResultsDialogComponent } from './estimation-results-dialog/estimation-results-dialog.component';
 import { CreateEstimationDialogComponent } from './create-estimation-dialog/create-estimation-dialog.component';
+import { EditEstimationDialogComponent } from './edit-estimation-dialog/edit-estimation-dialog.component';
+import { ConfirmDialogComponent, ConfirmDialogData } from '../../shared/confirm-dialog/confirm-dialog.component';
 
 interface Comparison {
   targetCohort: string;
@@ -252,11 +254,64 @@ export class EstimationComponent implements OnInit {
   }
 
   editEstimation(estimation: Estimation): void {
-    this.snackBar.open(`Opening "${estimation.name}"...`, '', { duration: 1500 });
+    const dialogRef = this.dialog.open(EditEstimationDialogComponent, {
+      width: '800px',
+      maxHeight: '90vh',
+      data: { estimation: { ...estimation, tags: [...(estimation.tags || [])], comparisons: [...(estimation.comparisons || [])] } },
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.estimations.update(current =>
+          current.map(e => e.id === result.id ? result : e)
+        );
+        this.applyFilters();
+        this.snackBar.open(`Updated "${result.name}"`, 'OK', { duration: 3000 });
+      }
+    });
   }
 
   executeEstimation(estimation: Estimation): void {
-    this.snackBar.open(`Executing "${estimation.name}"...`, '', { duration: 2000 });
+    // Simulate starting execution
+    this.estimations.update(current =>
+      current.map(e => {
+        if (e.id === estimation.id) {
+          return {
+            ...e,
+            latestExecution: {
+              status: 'RUNNING' as const,
+              date: new Date().toISOString(),
+              sourceName: 'SynPUF-CDMV5',
+            },
+          };
+        }
+        return e;
+      })
+    );
+    this.applyFilters();
+    this.snackBar.open(`Executing "${estimation.name}"...`, 'OK', { duration: 3000 });
+
+    // Simulate completion after 4 seconds
+    setTimeout(() => {
+      this.estimations.update(current =>
+        current.map(e => {
+          if (e.id === estimation.id && e.latestExecution?.status === 'RUNNING') {
+            return {
+              ...e,
+              executions: e.executions + 1,
+              latestExecution: {
+                status: 'COMPLETED' as const,
+                date: new Date().toISOString(),
+                sourceName: 'SynPUF-CDMV5',
+              },
+            };
+          }
+          return e;
+        })
+      );
+      this.applyFilters();
+      this.snackBar.open(`Estimation complete for "${estimation.name}"`, 'OK', { duration: 3000 });
+    }, 4000);
   }
 
   viewResults(estimation: Estimation): void {
@@ -272,19 +327,65 @@ export class EstimationComponent implements OnInit {
   }
 
   copyEstimation(estimation: Estimation): void {
-    this.snackBar.open(`Copying "${estimation.name}"...`, '', { duration: 2000 });
+    const copiedEstimation: Estimation = {
+      ...estimation,
+      id: Math.floor(Math.random() * 10000) + 100,
+      name: `${estimation.name} (Copy)`,
+      createdDate: new Date().toISOString(),
+      modifiedDate: new Date().toISOString(),
+      createdBy: 'demo',
+      modifiedBy: 'demo',
+      tags: [...(estimation.tags || [])],
+      comparisons: [...(estimation.comparisons || [])],
+      executions: 0,
+      latestExecution: null,
+    };
+
+    this.estimations.update(current => [copiedEstimation, ...current]);
+    this.applyFilters();
+    this.snackBar.open(`Created copy "${copiedEstimation.name}"`, 'OK', { duration: 3000 });
   }
 
   exportEstimation(estimation: Estimation): void {
-    this.snackBar.open(`Exporting "${estimation.name}"...`, '', { duration: 2000 });
+    const exportData = {
+      name: estimation.name,
+      description: estimation.description,
+      type: estimation.type,
+      comparisons: estimation.comparisons,
+      tags: estimation.tags,
+      exportedAt: new Date().toISOString(),
+      exportedBy: 'demo',
+    };
+
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `estimation-${estimation.id}-${estimation.name.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.json`;
+    link.click();
+    window.URL.revokeObjectURL(url);
+
+    this.snackBar.open(`Exported "${estimation.name}"`, 'OK', { duration: 3000 });
   }
 
   deleteEstimation(estimation: Estimation): void {
-    if (confirm(`Are you sure you want to delete "${estimation.name}"?`)) {
-      this.snackBar.open(`Deleted "${estimation.name}"`, '', { duration: 2000 });
-      this.estimations.set(this.estimations().filter((e) => e.id !== estimation.id));
-      this.applyFilters();
-    }
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        title: 'Delete Estimation',
+        message: `Are you sure you want to delete "${estimation.name}"?`,
+        confirmText: 'Delete',
+        cancelText: 'Cancel',
+        type: 'danger',
+      } as ConfirmDialogData,
+    });
+
+    dialogRef.afterClosed().subscribe(confirmed => {
+      if (confirmed) {
+        this.estimations.set(this.estimations().filter((e) => e.id !== estimation.id));
+        this.applyFilters();
+        this.snackBar.open(`Deleted "${estimation.name}"`, 'OK', { duration: 2000 });
+      }
+    });
   }
 
   getComparisonSummary(estimation: Estimation): string {

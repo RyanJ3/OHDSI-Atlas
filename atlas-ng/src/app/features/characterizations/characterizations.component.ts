@@ -20,6 +20,8 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import characterizationsData from '../../core/mock-data/characterizations.json';
 import { CharacterizationResultsDialogComponent } from './characterization-results-dialog/characterization-results-dialog.component';
 import { CreateCharacterizationDialogComponent } from './create-characterization-dialog/create-characterization-dialog.component';
+import { EditCharacterizationDialogComponent } from './edit-characterization-dialog/edit-characterization-dialog.component';
+import { ConfirmDialogComponent, ConfirmDialogData } from '../../shared/confirm-dialog/confirm-dialog.component';
 
 interface Cohort {
   id: number;
@@ -208,21 +210,116 @@ export class CharacterizationsComponent implements OnInit {
   }
 
   editCharacterization(char: Characterization): void {
-    this.snackBar.open(`Opening "${char.name}" for editing...`, '', { duration: 2000 });
+    const dialogRef = this.dialog.open(EditCharacterizationDialogComponent, {
+      width: '800px',
+      maxHeight: '90vh',
+      data: { characterization: { ...char, cohorts: [...char.cohorts], featureAnalyses: [...char.featureAnalyses], stratas: [...char.stratas] } },
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.characterizations.update(current =>
+          current.map(c => c.id === result.id ? result : c)
+        );
+        this.applyFilter();
+        this.snackBar.open(`Updated "${result.name}"`, 'OK', { duration: 3000 });
+      }
+    });
   }
 
   copyCharacterization(char: Characterization): void {
-    this.snackBar.open(`Copying "${char.name}"...`, '', { duration: 2000 });
+    const copiedChar: Characterization = {
+      ...char,
+      id: Math.floor(Math.random() * 10000) + 100,
+      name: `${char.name} (Copy)`,
+      createdDate: new Date().toISOString(),
+      modifiedDate: new Date().toISOString(),
+      createdBy: 'demo',
+      modifiedBy: 'demo',
+      cohorts: [...char.cohorts],
+      featureAnalyses: [...char.featureAnalyses],
+      stratas: [...char.stratas],
+      executions: [], // Reset executions for the copy
+    };
+
+    this.characterizations.update(current => [copiedChar, ...current]);
+    this.applyFilter();
+    this.snackBar.open(`Created copy "${copiedChar.name}"`, 'OK', { duration: 3000 });
   }
 
   deleteCharacterization(char: Characterization): void {
-    if (confirm(`Are you sure you want to delete "${char.name}"?`)) {
-      this.snackBar.open(`Deleted "${char.name}"`, '', { duration: 2000 });
-    }
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        title: 'Delete Characterization',
+        message: `Are you sure you want to delete "${char.name}"?`,
+        confirmText: 'Delete',
+        cancelText: 'Cancel',
+        type: 'danger',
+      } as ConfirmDialogData,
+    });
+
+    dialogRef.afterClosed().subscribe(confirmed => {
+      if (confirmed) {
+        this.characterizations.update(current => current.filter(c => c.id !== char.id));
+        this.applyFilter();
+        this.snackBar.open(`Deleted "${char.name}"`, 'OK', { duration: 2000 });
+      }
+    });
   }
 
   generateCharacterization(char: Characterization): void {
-    this.snackBar.open(`Generating characterization "${char.name}"...`, '', { duration: 2000 });
+    // Simulate starting a generation job
+    const newExecution = {
+      sourceKey: 'SynPUF-CDMV5',
+      sourceName: 'Synthetic Claims Data',
+      status: 'RUNNING' as const,
+      startTime: new Date().toISOString(),
+      endTime: null,
+      results: null,
+    };
+
+    this.characterizations.update(current =>
+      current.map(c => {
+        if (c.id === char.id) {
+          return {
+            ...c,
+            executions: [...c.executions, newExecution],
+          };
+        }
+        return c;
+      })
+    );
+    this.applyFilter();
+    this.snackBar.open(`Started generation for "${char.name}"`, 'OK', { duration: 3000 });
+
+    // Simulate completion after 3 seconds
+    setTimeout(() => {
+      this.characterizations.update(current =>
+        current.map(c => {
+          if (c.id === char.id) {
+            const updatedExecutions = c.executions.map(e => {
+              if (e.status === 'RUNNING' && e.sourceKey === newExecution.sourceKey) {
+                return {
+                  ...e,
+                  status: 'COMPLETE' as const,
+                  endTime: new Date().toISOString(),
+                  results: {
+                    cohortCount: char.cohorts.length,
+                    featuresAnalyzed: char.featureAnalyses.length * 10,
+                    covariatesFound: Math.floor(Math.random() * 5000) + 1000,
+                  },
+                };
+              }
+              return e;
+            });
+            return { ...c, executions: updatedExecutions };
+          }
+          return c;
+        })
+      );
+      this.applyFilter();
+      this.snackBar.open(`Generation complete for "${char.name}"`, 'OK', { duration: 3000 });
+    }, 3000);
   }
 
   viewResults(char: Characterization): void {
@@ -239,7 +336,27 @@ export class CharacterizationsComponent implements OnInit {
   }
 
   exportCharacterization(char: Characterization): void {
-    this.snackBar.open(`Exporting "${char.name}"...`, '', { duration: 2000 });
+    // Create export JSON
+    const exportData = {
+      name: char.name,
+      description: char.description,
+      cohorts: char.cohorts,
+      featureAnalyses: char.featureAnalyses,
+      stratas: char.stratas,
+      exportedAt: new Date().toISOString(),
+      exportedBy: 'demo',
+    };
+
+    // Create and download file
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `characterization-${char.id}-${char.name.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.json`;
+    link.click();
+    window.URL.revokeObjectURL(url);
+
+    this.snackBar.open(`Exported "${char.name}"`, 'OK', { duration: 3000 });
   }
 
   formatDate(dateStr: string | undefined): string {
