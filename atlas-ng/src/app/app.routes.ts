@@ -62,10 +62,9 @@ export const routes: Routes = [
       {
         path: 'characterizations',
         loadComponent: () =>
-          import('./shared/components/placeholder-page/placeholder-page.component').then(
-            (m) => m.PlaceholderPageComponent
+          import('./features/characterizations/characterizations.component').then(
+            (m) => m.CharacterizationsComponent
           ),
-        data: { title: 'Characterizations', icon: 'fa-chart-line' },
       },
       {
         path: 'pathways',
