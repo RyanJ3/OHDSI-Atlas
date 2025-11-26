@@ -126,30 +126,38 @@ mat-dialog-content {
       flex: 1;
       min-width: 100px;
 
+      // Person ID
       &:first-child {
-        flex: 0 0 100px;
+        flex: 0 0 90px;
       }
 
+      // Gender - wider to fit badge without ellipsis
       &:nth-child(2) {
-        flex: 0 0 110px;
+        flex: 0 0 120px;
       }
 
+      // Age
       &:nth-child(3) {
         flex: 0 0 60px;
       }
 
+      // Race
       &:nth-child(4) {
         flex: 1 1 180px;
       }
 
+      // Cohort Start, Cohort End
       &:nth-child(5),
       &:nth-child(6) {
-        flex: 0 0 120px;
+        flex: 0 0 110px;
       }
     }
 
     .mat-mdc-header-cell {
       background: #fafafa;
+      padding-top: 14px;
+      padding-bottom: 14px;
+      font-weight: 600;
     }
   }
 }
@@ -199,11 +207,6 @@ mat-dialog-content {
   i {
     font-size: 12px;
   }
-}
-
-.race-text {
-  cursor: help;
-  font-size: 13px;
 }
 
 mat-paginator {
