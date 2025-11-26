@@ -21,6 +21,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 // Import mock data
 import incidenceRatesData from '../../core/mock-data/incidence-rates.json';
 import { IrResultsDialogComponent } from './ir-results-dialog/ir-results-dialog.component';
+import { CreateIrDialogComponent } from './create-ir-dialog/create-ir-dialog.component';
 
 interface Cohort {
   id: number;
@@ -199,7 +200,17 @@ export class IncidenceRatesComponent implements OnInit {
   }
 
   createNew(): void {
-    this.snackBar.open('Create new IR analysis (not implemented)', '', { duration: 2000 });
+    const dialogRef = this.dialog.open(CreateIrDialogComponent, {
+      width: '650px',
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.analyses.update(current => [result, ...current]);
+        this.applyFilter();
+        this.snackBar.open(`Created IR analysis "${result.name}"`, 'OK', { duration: 3000 });
+      }
+    });
   }
 
   editAnalysis(analysis: IncidenceRateAnalysis): void {

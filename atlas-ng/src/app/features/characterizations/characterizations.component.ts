@@ -19,6 +19,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 import characterizationsData from '../../core/mock-data/characterizations.json';
 import { CharacterizationResultsDialogComponent } from './characterization-results-dialog/characterization-results-dialog.component';
+import { CreateCharacterizationDialogComponent } from './create-characterization-dialog/create-characterization-dialog.component';
 
 interface Cohort {
   id: number;
@@ -193,7 +194,17 @@ export class CharacterizationsComponent implements OnInit {
   }
 
   createNew(): void {
-    this.snackBar.open('Create new characterization (not implemented)', '', { duration: 2000 });
+    const dialogRef = this.dialog.open(CreateCharacterizationDialogComponent, {
+      width: '650px',
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.characterizations.update(current => [result, ...current]);
+        this.applyFilter();
+        this.snackBar.open(`Created characterization "${result.name}"`, 'OK', { duration: 3000 });
+      }
+    });
   }
 
   editCharacterization(char: Characterization): void {

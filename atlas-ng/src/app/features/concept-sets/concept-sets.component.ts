@@ -16,8 +16,10 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatSortModule, Sort } from '@angular/material/sort';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ConfigService } from '../../core/config';
 import { catchError, of } from 'rxjs';
+import { CreateConceptSetDialogComponent } from './create-concept-set-dialog/create-concept-set-dialog.component';
 
 // Import mock data for fallback
 import conceptSetsData from '../../core/mock-data/concept-sets.json';
@@ -53,6 +55,7 @@ interface ConceptSet {
     MatDividerModule,
     MatSortModule,
     MatSnackBarModule,
+    MatDialogModule,
   ],
   templateUrl: './concept-sets.component.html',
   styleUrl: './concept-sets.component.scss',
@@ -61,6 +64,7 @@ export class ConceptSetsComponent implements OnInit {
   private http = inject(HttpClient);
   private config = inject(ConfigService);
   private snackBar = inject(MatSnackBar);
+  private dialog = inject(MatDialog);
 
   loading = signal(true);
   conceptSets = signal<ConceptSet[]>([]);
@@ -159,8 +163,16 @@ export class ConceptSetsComponent implements OnInit {
   }
 
   createNew(): void {
-    this.snackBar.open('Create new concept set (not implemented)', 'OK', {
-      duration: 2000,
+    const dialogRef = this.dialog.open(CreateConceptSetDialogComponent, {
+      width: '600px',
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.conceptSets.update(current => [result, ...current]);
+        this.applyFilter();
+        this.snackBar.open(`Created concept set "${result.name}"`, 'OK', { duration: 3000 });
+      }
     });
   }
 

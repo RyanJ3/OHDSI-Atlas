@@ -19,6 +19,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { GenerateDialogComponent } from './generate-dialog/generate-dialog.component';
 import { ReportsDialogComponent } from './reports-dialog/reports-dialog.component';
+import { CreateCohortDialogComponent } from './create-cohort-dialog/create-cohort-dialog.component';
 
 // Import mock data
 import cohortDefinitionsData from '../../core/mock-data/cohort-definitions.json';
@@ -161,7 +162,17 @@ export class CohortDefinitionsComponent implements OnInit {
   }
 
   createNew(): void {
-    this.snackBar.open('Create new cohort - feature coming soon', 'OK', { duration: 2000 });
+    const dialogRef = this.dialog.open(CreateCohortDialogComponent, {
+      width: '600px',
+    });
+
+    dialogRef.afterClosed().subscribe((result: CohortDefinition | undefined) => {
+      if (result) {
+        this.cohorts.update(current => [result, ...current]);
+        this.applyFilter();
+        this.snackBar.open(`Created cohort "${result.name}"`, 'OK', { duration: 3000 });
+      }
+    });
   }
 
   editCohort(cohort: CohortDefinition): void {
