@@ -1,0 +1,190 @@
+[
+  {
+    "id": 1,
+    "name": "ACE Inhibitors vs ARBs for Hypertension Outcomes",
+    "description": "Comparative effectiveness of ACE inhibitors versus ARBs for cardiovascular outcomes in hypertensive patients",
+    "createdBy": "admin",
+    "createdDate": "2024-01-15T10:30:00Z",
+    "modifiedBy": "demo",
+    "modifiedDate": "2024-09-20T14:45:00Z",
+    "type": "Comparative Cohort Analysis",
+    "comparisons": [
+      {
+        "targetCohort": "ACE Inhibitor New Users",
+        "comparatorCohort": "ARB New Users",
+        "outcomes": ["Acute MI", "Stroke", "Heart Failure Hospitalization"]
+      }
+    ],
+    "tags": ["cardiovascular", "hypertension"],
+    "executions": 3,
+    "latestExecution": {
+      "status": "COMPLETED",
+      "date": "2024-09-15T08:00:00Z",
+      "sourceName": "SYNPUF 5%"
+    }
+  },
+  {
+    "id": 2,
+    "name": "SGLT2 Inhibitors vs DPP-4 Inhibitors in T2DM",
+    "description": "Comparative safety and effectiveness of SGLT2 inhibitors vs DPP-4 inhibitors in type 2 diabetes patients",
+    "createdBy": "researcher1",
+    "createdDate": "2024-02-20T09:15:00Z",
+    "modifiedBy": "researcher1",
+    "modifiedDate": "2024-10-10T11:30:00Z",
+    "type": "Comparative Cohort Analysis",
+    "comparisons": [
+      {
+        "targetCohort": "SGLT2i New Users",
+        "comparatorCohort": "DPP-4i New Users",
+        "outcomes": ["HbA1c Reduction", "Cardiovascular Events", "Diabetic Ketoacidosis", "UTI"]
+      }
+    ],
+    "tags": ["diabetes", "cardiovascular"],
+    "executions": 5,
+    "latestExecution": {
+      "status": "COMPLETED",
+      "date": "2024-10-05T10:00:00Z",
+      "sourceName": "CDM Database"
+    }
+  },
+  {
+    "id": 3,
+    "name": "Statin Intensity Comparison Study",
+    "description": "High-intensity vs moderate-intensity statin therapy for ASCVD prevention",
+    "createdBy": "demo",
+    "createdDate": "2024-03-10T14:00:00Z",
+    "modifiedBy": "demo",
+    "modifiedDate": "2024-08-25T16:20:00Z",
+    "type": "Comparative Cohort Analysis",
+    "comparisons": [
+      {
+        "targetCohort": "High-Intensity Statin Users",
+        "comparatorCohort": "Moderate-Intensity Statin Users",
+        "outcomes": ["MACE", "Myopathy", "Liver Toxicity"]
+      }
+    ],
+    "tags": ["cardiovascular", "lipids"],
+    "executions": 2,
+    "latestExecution": {
+      "status": "FAILED",
+      "date": "2024-08-20T09:00:00Z",
+      "sourceName": "SYNPUF 5%"
+    }
+  },
+  {
+    "id": 4,
+    "name": "DOAC vs Warfarin in Atrial Fibrillation",
+    "description": "Direct oral anticoagulants versus warfarin for stroke prevention in non-valvular AF",
+    "createdBy": "admin",
+    "createdDate": "2024-04-05T11:30:00Z",
+    "modifiedBy": "researcher1",
+    "modifiedDate": "2024-11-01T10:00:00Z",
+    "type": "Comparative Cohort Analysis",
+    "comparisons": [
+      {
+        "targetCohort": "DOAC New Users (AF)",
+        "comparatorCohort": "Warfarin New Users (AF)",
+        "outcomes": ["Ischemic Stroke", "Major Bleeding", "GI Bleeding", "Intracranial Hemorrhage"]
+      }
+    ],
+    "tags": ["anticoagulation", "atrial fibrillation"],
+    "executions": 4,
+    "latestExecution": {
+      "status": "COMPLETED",
+      "date": "2024-10-28T14:30:00Z",
+      "sourceName": "CDM Database"
+    }
+  },
+  {
+    "id": 5,
+    "name": "PPI Safety in Long-term Users",
+    "description": "Proton pump inhibitors vs H2 blockers long-term safety comparison",
+    "createdBy": "researcher1",
+    "createdDate": "2024-05-15T08:45:00Z",
+    "modifiedBy": "demo",
+    "modifiedDate": "2024-09-30T13:15:00Z",
+    "type": "Comparative Cohort Analysis",
+    "comparisons": [
+      {
+        "targetCohort": "PPI Long-term Users",
+        "comparatorCohort": "H2 Blocker Long-term Users",
+        "outcomes": ["C. difficile Infection", "Osteoporotic Fracture", "CKD Progression", "Pneumonia"]
+      }
+    ],
+    "tags": ["GI", "safety"],
+    "executions": 1,
+    "latestExecution": {
+      "status": "RUNNING",
+      "date": "2024-11-20T06:00:00Z",
+      "sourceName": "SYNPUF 5%"
+    }
+  },
+  {
+    "id": 6,
+    "name": "Biologic DMARDs in Rheumatoid Arthritis",
+    "description": "TNF inhibitors vs IL-6 inhibitors comparative effectiveness in RA patients",
+    "createdBy": "demo",
+    "createdDate": "2024-06-20T10:00:00Z",
+    "modifiedBy": "admin",
+    "modifiedDate": "2024-07-15T09:45:00Z",
+    "type": "Comparative Cohort Analysis",
+    "comparisons": [
+      {
+        "targetCohort": "TNF Inhibitor New Users (RA)",
+        "comparatorCohort": "IL-6 Inhibitor New Users (RA)",
+        "outcomes": ["Treatment Response", "Serious Infections", "Malignancy"]
+      }
+    ],
+    "tags": ["rheumatology", "biologics"],
+    "executions": 0,
+    "latestExecution": null
+  },
+  {
+    "id": 7,
+    "name": "GLP-1 Agonists Cardiovascular Benefit",
+    "description": "GLP-1 receptor agonists vs placebo for cardiovascular outcomes in diabetic patients",
+    "createdBy": "admin",
+    "createdDate": "2024-07-10T15:30:00Z",
+    "modifiedBy": "researcher1",
+    "modifiedDate": "2024-11-05T11:00:00Z",
+    "type": "Self-Controlled Case Series",
+    "comparisons": [
+      {
+        "targetCohort": "GLP-1 RA New Users",
+        "comparatorCohort": "Other Diabetes Medications",
+        "outcomes": ["MACE", "Heart Failure Hospitalization", "All-cause Mortality"]
+      }
+    ],
+    "tags": ["diabetes", "cardiovascular"],
+    "executions": 2,
+    "latestExecution": {
+      "status": "COMPLETED",
+      "date": "2024-11-01T09:00:00Z",
+      "sourceName": "CDM Database"
+    }
+  },
+  {
+    "id": 8,
+    "name": "Beta Blocker Selection in Heart Failure",
+    "description": "Carvedilol vs Metoprolol succinate in heart failure with reduced ejection fraction",
+    "createdBy": "researcher1",
+    "createdDate": "2024-08-25T13:00:00Z",
+    "modifiedBy": "researcher1",
+    "modifiedDate": "2024-10-20T16:30:00Z",
+    "type": "Comparative Cohort Analysis",
+    "comparisons": [
+      {
+        "targetCohort": "Carvedilol New Users (HFrEF)",
+        "comparatorCohort": "Metoprolol Succinate New Users (HFrEF)",
+        "outcomes": ["All-cause Mortality", "HF Hospitalization", "Bradycardia"]
+      }
+    ],
+    "tags": ["heart failure", "cardiovascular"],
+    "executions": 1,
+    "latestExecution": {
+      "status": "STOPPED",
+      "date": "2024-10-15T11:30:00Z",
+      "sourceName": "SYNPUF 5%"
+    }
+  }
+]

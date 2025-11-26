@@ -91,10 +91,9 @@ export const routes: Routes = [
       {
         path: 'estimation',
         loadComponent: () =>
-          import('./shared/components/placeholder-page/placeholder-page.component').then(
-            (m) => m.PlaceholderPageComponent
+          import('./features/estimation/estimation.component').then(
+            (m) => m.EstimationComponent
           ),
-        data: { title: 'Population Level Estimation', icon: 'fa-balance-scale' },
       },
       {
         path: 'prediction',
