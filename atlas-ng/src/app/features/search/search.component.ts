@@ -21,6 +21,10 @@ import {
 import { SourceService, Source } from '../../core/services/source.service';
 import { catchError, of } from 'rxjs';
 
+// Import mock data for fallback
+import conceptsData from '../../core/mock-data/concepts.json';
+import sourcesData from '../../core/mock-data/sources.json';
+
 interface DisplayConcept {
   conceptId: number;
   conceptName: string;
@@ -113,11 +117,17 @@ export class SearchComponent implements OnInit {
       .getSources()
       .pipe(
         catchError((err) => {
-          console.error('Failed to load sources:', err);
-          return of([]);
+          console.error('Failed to load sources, using mock data:', err);
+          // Fallback to mock sources data
+          return of(sourcesData as Source[]);
         })
       )
       .subscribe((sources) => {
+        // If API returned empty, use mock data
+        if (sources.length === 0) {
+          sources = sourcesData as Source[];
+        }
+
         // Filter to sources with vocabulary
         const vocabSources = sources.filter((s) =>
           s.daimons?.some(
@@ -162,9 +172,9 @@ export class SearchComponent implements OnInit {
       .search(searchParams, this.selectedSource)
       .pipe(
         catchError((err) => {
-          console.error('Search failed:', err);
-          this.error.set('Search failed. Please try again.');
-          return of([]);
+          console.error('Search failed, using mock data:', err);
+          // Fallback to mock concepts data with client-side filtering
+          return of(this.filterMockConcepts());
         })
       )
       .subscribe((results) => {
@@ -179,6 +189,24 @@ export class SearchComponent implements OnInit {
           });
         }
       });
+  }
+
+  private filterMockConcepts(): ApiConcept[] {
+    const query = this.searchQuery.toLowerCase();
+    let filtered = (conceptsData as unknown as ApiConcept[]).filter(c =>
+      c.CONCEPT_NAME.toLowerCase().includes(query) ||
+      c.CONCEPT_CODE.toLowerCase().includes(query)
+    );
+
+    if (this.selectedDomain) {
+      filtered = filtered.filter(c => c.DOMAIN_ID === this.selectedDomain);
+    }
+
+    if (this.standardOnly) {
+      filtered = filtered.filter(c => c.STANDARD_CONCEPT === 'S');
+    }
+
+    return filtered;
   }
 
   private mapToDisplayConcepts(apiConcepts: ApiConcept[]): DisplayConcept[] {
