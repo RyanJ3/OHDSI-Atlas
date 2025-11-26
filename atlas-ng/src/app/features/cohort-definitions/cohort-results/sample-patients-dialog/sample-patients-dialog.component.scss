@@ -108,6 +108,11 @@ mat-dialog-content {
       align-items: center;
     }
 
+    .mat-mdc-cell {
+      padding-top: 12px;
+      padding-bottom: 12px;
+    }
+
     // Scrollable body container
     .mat-mdc-table {
       display: flex;
