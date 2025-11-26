@@ -9,6 +9,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatMenuModule } from '@angular/material/menu';
 
 interface FeatureImportance {
   name: string;
@@ -56,6 +57,7 @@ interface PredictionResult {
     MatTooltipModule,
     MatDividerModule,
     MatProgressBarModule,
+    MatMenuModule,
   ],
   template: `
     <h2 mat-dialog-title>
@@ -217,10 +219,21 @@ interface PredictionResult {
     </mat-dialog-content>
 
     <mat-dialog-actions align="end">
-      <button mat-button (click)="exportResults()">
+      <button mat-button [matMenuTriggerFor]="exportMenu">
         <i class="fas fa-download"></i>
         Export
+        <i class="fas fa-caret-down" style="margin-left: 4px;"></i>
       </button>
+      <mat-menu #exportMenu="matMenu">
+        <button mat-menu-item (click)="exportResults()">
+          <i class="fas fa-file-csv"></i>
+          Export as CSV
+        </button>
+        <button mat-menu-item (click)="exportJSON()">
+          <i class="fas fa-file-code"></i>
+          Export as JSON
+        </button>
+      </mat-menu>
       <button mat-raised-button color="primary" mat-dialog-close>
         Close
       </button>
@@ -567,6 +580,77 @@ export class PredictionResultsDialogComponent {
   }
 
   exportResults(): void {
-    alert('Exporting results... (feature simulation)');
+    // Build CSV content for performance metrics and features
+    const metricsHeaders = ['Metric', 'Value'];
+    const metricsRows = [
+      ['AUC-ROC', this.result.auc.toFixed(3)],
+      ['AUC Lower CI', this.result.aucLower.toFixed(3)],
+      ['AUC Upper CI', this.result.aucUpper.toFixed(3)],
+      ['Calibration Slope', this.result.calibrationSlope.toFixed(3)],
+      ['Calibration Intercept', this.result.calibrationIntercept.toFixed(3)],
+      ['Brier Score', this.result.brierScore.toFixed(4)],
+      ['Sensitivity', (this.result.sensitivity * 100).toFixed(1) + '%'],
+      ['Specificity', (this.result.specificity * 100).toFixed(1) + '%'],
+      ['PPV', (this.result.ppv * 100).toFixed(1) + '%'],
+      ['NPV', (this.result.npv * 100).toFixed(1) + '%'],
+    ];
+
+    const featureHeaders = ['Feature', 'Coefficient', 'Importance'];
+    const featureRows = this.result.topFeatures.map(f => [
+      f.name,
+      f.coefficient.toFixed(3),
+      f.importance.toFixed(3),
+    ]);
+
+    const csvContent = [
+      '# Performance Metrics',
+      metricsHeaders.join(','),
+      ...metricsRows.map(row => row.join(',')),
+      '',
+      '# Top Features',
+      featureHeaders.join(','),
+      ...featureRows.map(row => row.map(cell => `"${cell}"`).join(',')),
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `prediction_${this.data.prediction.id}_results.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  }
+
+  exportJSON(): void {
+    const exportData = {
+      prediction: {
+        id: this.data.prediction.id,
+        name: this.data.prediction.name,
+        description: this.data.prediction.description,
+        modelType: this.data.prediction.modelType,
+        timeAtRisk: this.data.prediction.timeAtRisk,
+      },
+      performance: {
+        auc: this.result.auc,
+        aucCI: [this.result.aucLower, this.result.aucUpper],
+        calibrationSlope: this.result.calibrationSlope,
+        calibrationIntercept: this.result.calibrationIntercept,
+        brierScore: this.result.brierScore,
+        sensitivity: this.result.sensitivity,
+        specificity: this.result.specificity,
+        ppv: this.result.ppv,
+        npv: this.result.npv,
+      },
+      confusionMatrix: this.result.confusionMatrix,
+      topFeatures: this.result.topFeatures,
+    };
+
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `prediction_${this.data.prediction.id}_results.json`;
+    link.click();
+    URL.revokeObjectURL(url);
   }
 }

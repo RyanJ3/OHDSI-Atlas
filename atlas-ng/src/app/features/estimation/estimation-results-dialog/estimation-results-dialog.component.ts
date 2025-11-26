@@ -8,6 +8,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatMenuModule } from '@angular/material/menu';
 
 interface OutcomeResult {
   outcome: string;
@@ -42,6 +43,7 @@ interface EstimationResult {
     MatChipsModule,
     MatTooltipModule,
     MatDividerModule,
+    MatMenuModule,
   ],
   template: `
     <h2 mat-dialog-title>
@@ -176,10 +178,21 @@ interface EstimationResult {
     </mat-dialog-content>
 
     <mat-dialog-actions align="end">
-      <button mat-button (click)="exportResults()">
+      <button mat-button [matMenuTriggerFor]="exportMenu">
         <i class="fas fa-download"></i>
         Export
+        <i class="fas fa-caret-down" style="margin-left: 4px;"></i>
       </button>
+      <mat-menu #exportMenu="matMenu">
+        <button mat-menu-item (click)="exportResults()">
+          <i class="fas fa-file-csv"></i>
+          Export as CSV
+        </button>
+        <button mat-menu-item (click)="exportJSON()">
+          <i class="fas fa-file-code"></i>
+          Export as JSON
+        </button>
+      </mat-menu>
       <button mat-raised-button color="primary" mat-dialog-close>
         Close
       </button>
@@ -470,6 +483,58 @@ export class EstimationResultsDialogComponent {
   }
 
   exportResults(): void {
-    alert('Exporting results... (feature simulation)');
+    // Build CSV content
+    const headers = ['Outcome', 'Target Events', 'Target Subjects', 'Comparator Events', 'Comparator Subjects', 'Hazard Ratio', 'CI Lower', 'CI Upper', 'P-value'];
+    const rows = this.result.outcomes.map(o => [
+      o.outcome,
+      o.targetOutcomes.toString(),
+      o.targetSubjects.toString(),
+      o.comparatorOutcomes.toString(),
+      o.comparatorSubjects.toString(),
+      o.hazardRatio.toFixed(2),
+      o.ciLower.toFixed(2),
+      o.ciUpper.toFixed(2),
+      o.pValue < 0.001 ? '< 0.001' : o.pValue.toFixed(3),
+    ]);
+
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.map(cell => `"${cell}"`).join(',')),
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `estimation_${this.data.estimation.id}_results.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  }
+
+  exportJSON(): void {
+    const exportData = {
+      estimation: {
+        id: this.data.estimation.id,
+        name: this.data.estimation.name,
+        description: this.data.estimation.description,
+        targetCohort: this.data.estimation.comparisons[0]?.targetCohort,
+        comparatorCohort: this.data.estimation.comparisons[0]?.comparatorCohort,
+      },
+      execution: {
+        sourceName: this.result.sourceName,
+        executionDate: this.result.executionDate,
+        targetCohortCount: this.result.targetCohortCount,
+        comparatorCohortCount: this.result.comparatorCohortCount,
+      },
+      outcomes: this.result.outcomes,
+    };
+
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `estimation_${this.data.estimation.id}_results.json`;
+    link.click();
+    URL.revokeObjectURL(url);
   }
 }

@@ -9,6 +9,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSortModule, Sort } from '@angular/material/sort';
+import { MatMenuModule } from '@angular/material/menu';
 
 interface CovariateResult {
   name: string;
@@ -34,6 +35,7 @@ interface CovariateResult {
     MatDividerModule,
     MatProgressBarModule,
     MatSortModule,
+    MatMenuModule,
   ],
   template: `
     <h2 mat-dialog-title>
@@ -181,10 +183,21 @@ interface CovariateResult {
     </mat-dialog-content>
 
     <mat-dialog-actions align="end">
-      <button mat-button (click)="exportResults()">
+      <button mat-button [matMenuTriggerFor]="exportMenu">
         <i class="fas fa-download"></i>
         Export
+        <i class="fas fa-caret-down" style="margin-left: 4px;"></i>
       </button>
+      <mat-menu #exportMenu="matMenu">
+        <button mat-menu-item (click)="exportResults()">
+          <i class="fas fa-file-csv"></i>
+          Export as CSV
+        </button>
+        <button mat-menu-item (click)="exportJSON()">
+          <i class="fas fa-file-code"></i>
+          Export as JSON
+        </button>
+      </mat-menu>
       <button mat-raised-button color="primary" mat-dialog-close>
         Close
       </button>
@@ -324,6 +337,56 @@ export class CharacterizationResultsDialogComponent {
   }
 
   exportResults(): void {
-    alert('Exporting results... (feature simulation)');
+    // Build CSV content
+    const headers = ['Category', 'Covariate', 'Count', 'Prevalence (%)'];
+    const rows = this.covariates.map(c => [
+      c.category,
+      c.name,
+      c.targetCount.toString(),
+      c.targetPercent.toFixed(2),
+    ]);
+
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.map(cell => `"${cell}"`).join(',')),
+    ].join('\n');
+
+    // Create and download file
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `characterization_${this.data.characterization.id}_results.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  }
+
+  exportJSON(): void {
+    const exportData = {
+      characterization: {
+        id: this.data.characterization.id,
+        name: this.data.characterization.name,
+        description: this.data.characterization.description,
+      },
+      execution: this.latestExecution,
+      summary: {
+        totalSubjects: this.totalSubjects,
+        covariateCount: this.covariates.length,
+        categories: this.categories,
+      },
+      results: {
+        demographics: this.getDemographicsCovariates(),
+        conditions: this.getConditionsCovariates(),
+        drugs: this.getDrugsCovariates(),
+      },
+    };
+
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `characterization_${this.data.characterization.id}_results.json`;
+    link.click();
+    URL.revokeObjectURL(url);
   }
 }

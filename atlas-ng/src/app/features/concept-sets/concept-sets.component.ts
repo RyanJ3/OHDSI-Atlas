@@ -20,6 +20,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ConfigService } from '../../core/config';
 import { catchError, of } from 'rxjs';
 import { CreateConceptSetDialogComponent } from './create-concept-set-dialog/create-concept-set-dialog.component';
+import { EditConceptSetDialogComponent } from './edit-concept-set-dialog/edit-concept-set-dialog.component';
 
 // Import mock data for fallback
 import conceptSetsData from '../../core/mock-data/concept-sets.json';
@@ -177,36 +178,52 @@ export class ConceptSetsComponent implements OnInit {
   }
 
   editConceptSet(conceptSet: ConceptSet): void {
-    window.open(`#/conceptset/${conceptSet.id}/details`, '_blank');
+    const dialogRef = this.dialog.open(EditConceptSetDialogComponent, {
+      width: '750px',
+      data: { conceptSet },
+    });
+
+    dialogRef.afterClosed().subscribe((result: ConceptSet | undefined) => {
+      if (result) {
+        this.conceptSets.update(current =>
+          current.map(cs => cs.id === result.id ? result : cs)
+        );
+        this.applyFilter();
+        this.snackBar.open(`Updated "${result.name}"`, 'OK', { duration: 3000 });
+      }
+    });
   }
 
   copyConceptSet(conceptSet: ConceptSet): void {
-    this.snackBar.open(`Copying "${conceptSet.name}"...`, '', { duration: 2000 });
-    // Would call API to copy
+    const copiedSet: ConceptSet = {
+      ...conceptSet,
+      id: Math.floor(Math.random() * 10000) + 1000,
+      name: `${conceptSet.name} (Copy)`,
+      createdDate: new Date().toISOString(),
+      modifiedDate: new Date().toISOString(),
+      createdBy: 'demo',
+      modifiedBy: 'demo',
+    };
+    this.conceptSets.update(current => [copiedSet, ...current]);
+    this.applyFilter();
+    this.snackBar.open(`Created copy of "${conceptSet.name}"`, 'Edit', { duration: 3000 })
+      .onAction().subscribe(() => {
+        this.editConceptSet(copiedSet);
+      });
   }
 
   deleteConceptSet(conceptSet: ConceptSet): void {
-    if (confirm(`Are you sure you want to delete "${conceptSet.name}"?`)) {
-      this.http
-        .delete(`${this.config.webApiUrl}conceptset/${conceptSet.id}`)
-        .pipe(
-          catchError((err) => {
-            console.error('Delete failed:', err);
-            this.snackBar.open('Failed to delete concept set', 'OK', {
-              duration: 3000,
-            });
-            return of(null);
-          })
-        )
-        .subscribe((result) => {
-          if (result !== null) {
-            this.snackBar.open(`Deleted "${conceptSet.name}"`, 'OK', {
-              duration: 2000,
-            });
-            this.loadConceptSets();
-          }
-        });
-    }
+    // Remove from list
+    this.conceptSets.update(current => current.filter(cs => cs.id !== conceptSet.id));
+    this.applyFilter();
+
+    // Show undo option
+    const snackBarRef = this.snackBar.open(`Deleted "${conceptSet.name}"`, 'Undo', { duration: 5000 });
+    snackBarRef.onAction().subscribe(() => {
+      // Restore if undo clicked
+      this.conceptSets.update(current => [conceptSet, ...current]);
+      this.applyFilter();
+    });
   }
 
   exportConceptSet(conceptSet: ConceptSet): void {

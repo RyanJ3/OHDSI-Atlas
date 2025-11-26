@@ -20,6 +20,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { GenerateDialogComponent } from './generate-dialog/generate-dialog.component';
 import { ReportsDialogComponent } from './reports-dialog/reports-dialog.component';
 import { CreateCohortDialogComponent } from './create-cohort-dialog/create-cohort-dialog.component';
+import { EditCohortDialogComponent } from './edit-cohort-dialog/edit-cohort-dialog.component';
 
 // Import mock data
 import cohortDefinitionsData from '../../core/mock-data/cohort-definitions.json';
@@ -176,11 +177,38 @@ export class CohortDefinitionsComponent implements OnInit {
   }
 
   editCohort(cohort: CohortDefinition): void {
-    this.snackBar.open(`Opening cohort editor for "${cohort.name}"...`, '', { duration: 2000 });
+    const dialogRef = this.dialog.open(EditCohortDialogComponent, {
+      width: '700px',
+      data: { cohort },
+    });
+
+    dialogRef.afterClosed().subscribe((result: CohortDefinition | undefined) => {
+      if (result) {
+        this.cohorts.update(current =>
+          current.map(c => c.id === result.id ? result : c)
+        );
+        this.applyFilter();
+        this.snackBar.open(`Updated "${result.name}"`, 'OK', { duration: 3000 });
+      }
+    });
   }
 
   copyCohort(cohort: CohortDefinition): void {
-    this.snackBar.open(`Created copy of "${cohort.name}"`, 'OK', { duration: 3000 });
+    const copiedCohort: CohortDefinition = {
+      ...cohort,
+      id: Math.floor(Math.random() * 10000) + 1000,
+      name: `${cohort.name} (Copy)`,
+      createdDate: new Date(),
+      modifiedDate: new Date(),
+      createdBy: 'demo',
+      hasGeneration: false,
+    };
+    this.cohorts.update(current => [copiedCohort, ...current]);
+    this.applyFilter();
+    this.snackBar.open(`Created copy of "${cohort.name}"`, 'Edit', { duration: 3000 })
+      .onAction().subscribe(() => {
+        this.editCohort(copiedCohort);
+      });
   }
 
   exportCohort(cohort: CohortDefinition): void {
@@ -216,8 +244,17 @@ export class CohortDefinitionsComponent implements OnInit {
   }
 
   deleteCohort(cohort: CohortDefinition): void {
-    this.snackBar.open(`Deleted "${cohort.name}"`, 'Undo', { duration: 5000 });
-    // In real app, would call API and refresh list
+    // Remove from list
+    this.cohorts.update(current => current.filter(c => c.id !== cohort.id));
+    this.applyFilter();
+
+    // Show undo option
+    const snackBarRef = this.snackBar.open(`Deleted "${cohort.name}"`, 'Undo', { duration: 5000 });
+    snackBarRef.onAction().subscribe(() => {
+      // Restore if undo clicked
+      this.cohorts.update(current => [cohort, ...current]);
+      this.applyFilter();
+    });
   }
 
   generateCohort(cohort: CohortDefinition): void {
