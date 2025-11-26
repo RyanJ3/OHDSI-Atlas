@@ -70,10 +70,9 @@ export const routes: Routes = [
       {
         path: 'pathways',
         loadComponent: () =>
-          import('./shared/components/placeholder-page/placeholder-page.component').then(
-            (m) => m.PlaceholderPageComponent
+          import('./features/pathways/pathways.component').then(
+            (m) => m.PathwaysComponent
           ),
-        data: { title: 'Cohort Pathways', icon: 'fa-sitemap' },
       },
       {
         path: 'incidence-rates',

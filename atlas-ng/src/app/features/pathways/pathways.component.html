@@ -1,0 +1,256 @@
+<div class="pathways-container">
+  <mat-card class="page-header">
+    <div class="header-content">
+      <div class="title-section">
+        <h1>
+          <i class="fas fa-sitemap"></i>
+          Cohort Pathways
+        </h1>
+        <p class="subtitle">Analyze treatment sequences and patient journey patterns</p>
+      </div>
+      <div class="header-actions">
+        <button mat-flat-button color="primary" (click)="createNew()">
+          <i class="fas fa-plus"></i>
+          New Analysis
+        </button>
+      </div>
+    </div>
+  </mat-card>
+
+  <div class="stats-row">
+    <mat-card class="stat-card total">
+      <div class="stat-icon">
+        <i class="fas fa-project-diagram"></i>
+      </div>
+      <div class="stat-info">
+        <span class="stat-value">{{ getTotalCount() }}</span>
+        <span class="stat-label">Total Analyses</span>
+      </div>
+    </mat-card>
+
+    <mat-card class="stat-card generated">
+      <div class="stat-icon">
+        <i class="fas fa-check-circle"></i>
+      </div>
+      <div class="stat-info">
+        <span class="stat-value">{{ getGeneratedCount() }}</span>
+        <span class="stat-label">With Results</span>
+      </div>
+    </mat-card>
+
+    <mat-card class="stat-card pathways">
+      <div class="stat-icon">
+        <i class="fas fa-route"></i>
+      </div>
+      <div class="stat-info">
+        <span class="stat-value">{{ getTotalPathwaysFound() }}</span>
+        <span class="stat-label">Pathways Found</span>
+      </div>
+    </mat-card>
+
+    <mat-card class="stat-card running">
+      <div class="stat-icon">
+        <i class="fas fa-spinner"></i>
+      </div>
+      <div class="stat-info">
+        <span class="stat-value">{{ getRunningCount() }}</span>
+        <span class="stat-label">Running</span>
+      </div>
+    </mat-card>
+  </div>
+
+  <mat-card class="pathways-table-card">
+    <div class="filters-row">
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Search analyses</mat-label>
+        <input
+          matInput
+          [(ngModel)]="searchFilter"
+          (ngModelChange)="applyFilter()"
+          placeholder="Search by name, description, cohorts..."
+        />
+        <i matSuffix class="fas fa-search"></i>
+      </mat-form-field>
+
+      <span class="results-count">
+        {{ totalResults() }} analyses
+      </span>
+    </div>
+
+    @if (loading()) {
+      <div class="loading-container">
+        <mat-spinner diameter="40"></mat-spinner>
+        <p>Loading pathway analyses...</p>
+      </div>
+    } @else {
+      <div class="table-container">
+        <table
+          mat-table
+          [dataSource]="getPaginatedAnalyses()"
+          matSort
+          (matSortChange)="onSort($event)"
+          class="pathways-table"
+        >
+          <ng-container matColumnDef="id">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>ID</th>
+            <td mat-cell *matCellDef="let analysis">
+              <span class="analysis-id">{{ analysis.id }}</span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
+            <td mat-cell *matCellDef="let analysis">
+              <div class="name-cell">
+                <span class="analysis-name" (click)="editAnalysis(analysis)">
+                  {{ analysis.name }}
+                </span>
+                @if (analysis.description) {
+                  <span class="analysis-description">{{ analysis.description }}</span>
+                }
+              </div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="targets">
+            <th mat-header-cell *matHeaderCellDef>Target Cohorts</th>
+            <td mat-cell *matCellDef="let analysis">
+              <div class="cohort-chips">
+                @for (cohort of analysis.targetCohorts; track cohort.id) {
+                  <span class="cohort-chip target" [matTooltip]="cohort.name">
+                    <i class="fas fa-users"></i>
+                    {{ cohort.name }}
+                  </span>
+                }
+              </div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="events">
+            <th mat-header-cell *matHeaderCellDef>Event Cohorts</th>
+            <td mat-cell *matCellDef="let analysis">
+              <div class="cohort-chips events">
+                @for (cohort of analysis.eventCohorts.slice(0, 3); track cohort.id) {
+                  <span class="cohort-chip event" [matTooltip]="cohort.name">
+                    {{ cohort.name }}
+                  </span>
+                }
+                @if (analysis.eventCohorts.length > 3) {
+                  <span class="cohort-chip more" [matTooltip]="getEventCohortNames(analysis)">
+                    +{{ analysis.eventCohorts.length - 3 }} more
+                  </span>
+                }
+              </div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="settings">
+            <th mat-header-cell *matHeaderCellDef>Settings</th>
+            <td mat-cell *matCellDef="let analysis">
+              <div class="settings-info">
+                <span class="setting" matTooltip="Maximum pathway depth">
+                  <i class="fas fa-layer-group"></i> {{ analysis.maxDepth }}
+                </span>
+                <span class="setting" matTooltip="Combination window (days)">
+                  <i class="fas fa-calendar-day"></i> {{ analysis.combinationWindow }}d
+                </span>
+                @if (analysis.allowRepeats) {
+                  <span class="setting repeat" matTooltip="Repeats allowed">
+                    <i class="fas fa-redo"></i>
+                  </span>
+                }
+              </div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="executions">
+            <th mat-header-cell *matHeaderCellDef>Status</th>
+            <td mat-cell *matCellDef="let analysis">
+              <div class="execution-status" [class]="getExecutionStatusClass(analysis)">
+                <span class="status-text">{{ getExecutionSummary(analysis) }}</span>
+                @if (hasResults(analysis)) {
+                  <span class="top-pathway" matTooltip="Most common pathway">
+                    <i class="fas fa-trophy"></i>
+                    {{ getTopPathway(analysis) }}
+                  </span>
+                }
+              </div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="modifiedDate">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Modified</th>
+            <td mat-cell *matCellDef="let analysis">
+              {{ formatDate(analysis.modifiedDate) }}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let analysis">
+              <button mat-icon-button [matMenuTriggerFor]="actionMenu" matTooltip="Actions">
+                <i class="fas fa-ellipsis-v"></i>
+              </button>
+              <mat-menu #actionMenu="matMenu">
+                <button mat-menu-item (click)="editAnalysis(analysis)">
+                  <i class="fas fa-edit"></i>
+                  <span>Edit</span>
+                </button>
+                <button mat-menu-item (click)="generateAnalysis(analysis)">
+                  <i class="fas fa-play"></i>
+                  <span>Generate</span>
+                </button>
+                @if (hasResults(analysis)) {
+                  <button mat-menu-item (click)="viewResults(analysis)">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>View Results</span>
+                  </button>
+                }
+                <mat-divider></mat-divider>
+                <button mat-menu-item (click)="copyAnalysis(analysis)">
+                  <i class="fas fa-copy"></i>
+                  <span>Copy</span>
+                </button>
+                <button mat-menu-item (click)="exportAnalysis(analysis)">
+                  <i class="fas fa-download"></i>
+                  <span>Export</span>
+                </button>
+                <mat-divider></mat-divider>
+                <button mat-menu-item (click)="deleteAnalysis(analysis)" class="delete-action">
+                  <i class="fas fa-trash"></i>
+                  <span>Delete</span>
+                </button>
+              </mat-menu>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr
+            mat-row
+            *matRowDef="let row; columns: displayedColumns"
+            [class.has-results]="hasResults(row)"
+          ></tr>
+        </table>
+      </div>
+
+      @if (filteredAnalyses().length === 0) {
+        <div class="empty-state">
+          <i class="fas fa-sitemap"></i>
+          <p>No pathway analyses found</p>
+          <button mat-stroked-button color="primary" (click)="createNew()">
+            Create your first analysis
+          </button>
+        </div>
+      }
+
+      <mat-paginator
+        [length]="totalResults()"
+        [pageSize]="pageSize"
+        [pageIndex]="pageIndex"
+        [pageSizeOptions]="[10, 25, 50, 100]"
+        (page)="onPageChange($event)"
+        showFirstLastButtons
+      ></mat-paginator>
+    }
+  </mat-card>
+</div>

@@ -1,0 +1,241 @@
+[
+  {
+    "id": 1,
+    "name": "Type 2 Diabetes Treatment Pathways",
+    "description": "Analyze first-line and subsequent antidiabetic medication sequences",
+    "createdBy": "admin",
+    "createdDate": "2024-08-20T09:00:00Z",
+    "modifiedBy": "admin",
+    "modifiedDate": "2024-11-22T15:30:00Z",
+    "targetCohorts": [
+      { "id": 108, "name": "Newly Diagnosed Type 2 Diabetes" }
+    ],
+    "eventCohorts": [
+      { "id": 301, "name": "Metformin" },
+      { "id": 302, "name": "Sulfonylureas" },
+      { "id": 303, "name": "DPP-4 Inhibitors" },
+      { "id": 304, "name": "GLP-1 Agonists" },
+      { "id": 305, "name": "SGLT2 Inhibitors" },
+      { "id": 306, "name": "Insulin" }
+    ],
+    "combinationWindow": 30,
+    "minCellCount": 5,
+    "maxDepth": 4,
+    "allowRepeats": false,
+    "executions": [
+      {
+        "sourceKey": "SYNPUF",
+        "sourceName": "CMS SynPUF 1K",
+        "status": "COMPLETE",
+        "startTime": "2024-11-22T15:00:00Z",
+        "endTime": "2024-11-22T15:08:22Z",
+        "results": {
+          "totalPatients": 3245,
+          "pathwaysFound": 156,
+          "topPathways": [
+            { "path": ["Metformin"], "count": 1890, "pct": 58.2 },
+            { "path": ["Metformin", "Sulfonylureas"], "count": 445, "pct": 13.7 },
+            { "path": ["Metformin", "DPP-4 Inhibitors"], "count": 312, "pct": 9.6 },
+            { "path": ["Metformin", "SGLT2 Inhibitors"], "count": 198, "pct": 6.1 },
+            { "path": ["Sulfonylureas"], "count": 156, "pct": 4.8 }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "name": "Hypertension Treatment Sequences",
+    "description": "First-line antihypertensive drug choices and escalation patterns",
+    "createdBy": "jsmith",
+    "createdDate": "2024-07-15T11:30:00Z",
+    "modifiedBy": "jsmith",
+    "modifiedDate": "2024-11-20T10:15:00Z",
+    "targetCohorts": [
+      { "id": 101, "name": "New Hypertension Diagnosis" }
+    ],
+    "eventCohorts": [
+      { "id": 307, "name": "ACE Inhibitors" },
+      { "id": 308, "name": "ARBs" },
+      { "id": 309, "name": "Calcium Channel Blockers" },
+      { "id": 310, "name": "Thiazide Diuretics" },
+      { "id": 311, "name": "Beta Blockers" }
+    ],
+    "combinationWindow": 14,
+    "minCellCount": 5,
+    "maxDepth": 3,
+    "allowRepeats": false,
+    "executions": [
+      {
+        "sourceKey": "SYNPUF",
+        "sourceName": "CMS SynPUF 1K",
+        "status": "COMPLETE",
+        "startTime": "2024-11-20T10:00:00Z",
+        "endTime": "2024-11-20T10:05:45Z",
+        "results": {
+          "totalPatients": 5621,
+          "pathwaysFound": 89,
+          "topPathways": [
+            { "path": ["ACE Inhibitors"], "count": 2105, "pct": 37.4 },
+            { "path": ["ARBs"], "count": 1456, "pct": 25.9 },
+            { "path": ["Calcium Channel Blockers"], "count": 890, "pct": 15.8 },
+            { "path": ["ACE Inhibitors", "Thiazide Diuretics"], "count": 445, "pct": 7.9 },
+            { "path": ["ARBs", "Calcium Channel Blockers"], "count": 312, "pct": 5.5 }
+          ]
+        }
+      },
+      {
+        "sourceKey": "CCAE",
+        "sourceName": "IBM CCAE",
+        "status": "COMPLETE",
+        "startTime": "2024-11-20T10:00:00Z",
+        "endTime": "2024-11-20T10:12:33Z",
+        "results": {
+          "totalPatients": 45890,
+          "pathwaysFound": 234,
+          "topPathways": [
+            { "path": ["ACE Inhibitors"], "count": 16234, "pct": 35.4 },
+            { "path": ["ARBs"], "count": 12567, "pct": 27.4 },
+            { "path": ["Calcium Channel Blockers"], "count": 7234, "pct": 15.8 },
+            { "path": ["ACE Inhibitors", "Calcium Channel Blockers"], "count": 3456, "pct": 7.5 },
+            { "path": ["Thiazide Diuretics"], "count": 2890, "pct": 6.3 }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "name": "Depression Treatment Pathways",
+    "description": "Antidepressant medication sequences in newly diagnosed depression",
+    "createdBy": "mjohnson",
+    "createdDate": "2024-09-05T14:00:00Z",
+    "modifiedBy": "mjohnson",
+    "modifiedDate": "2024-11-18T09:45:00Z",
+    "targetCohorts": [
+      { "id": 208, "name": "New Major Depressive Disorder" }
+    ],
+    "eventCohorts": [
+      { "id": 312, "name": "SSRIs" },
+      { "id": 313, "name": "SNRIs" },
+      { "id": 314, "name": "TCAs" },
+      { "id": 315, "name": "Bupropion" },
+      { "id": 316, "name": "Mirtazapine" }
+    ],
+    "combinationWindow": 30,
+    "minCellCount": 5,
+    "maxDepth": 3,
+    "allowRepeats": true,
+    "executions": [
+      {
+        "sourceKey": "SYNPUF",
+        "sourceName": "CMS SynPUF 1K",
+        "status": "RUNNING",
+        "startTime": "2024-11-25T11:00:00Z",
+        "endTime": null,
+        "results": null
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "name": "COPD Maintenance Therapy Sequences",
+    "description": "Inhaler therapy patterns in COPD patients",
+    "createdBy": "lwhite",
+    "createdDate": "2024-06-10T10:00:00Z",
+    "modifiedBy": "admin",
+    "modifiedDate": "2024-11-15T16:20:00Z",
+    "targetCohorts": [
+      { "id": 109, "name": "COPD Patients" }
+    ],
+    "eventCohorts": [
+      { "id": 317, "name": "LABA" },
+      { "id": 318, "name": "LAMA" },
+      { "id": 319, "name": "ICS" },
+      { "id": 320, "name": "LABA/LAMA Combination" },
+      { "id": 321, "name": "Triple Therapy" }
+    ],
+    "combinationWindow": 14,
+    "minCellCount": 5,
+    "maxDepth": 4,
+    "allowRepeats": false,
+    "executions": []
+  },
+  {
+    "id": 5,
+    "name": "Rheumatoid Arthritis DMARD Sequences",
+    "description": "Disease-modifying therapy patterns in RA patients",
+    "createdBy": "admin",
+    "createdDate": "2024-05-22T08:30:00Z",
+    "modifiedBy": "jsmith",
+    "modifiedDate": "2024-11-10T14:00:00Z",
+    "targetCohorts": [
+      { "id": 110, "name": "Newly Diagnosed Rheumatoid Arthritis" }
+    ],
+    "eventCohorts": [
+      { "id": 322, "name": "Methotrexate" },
+      { "id": 323, "name": "Hydroxychloroquine" },
+      { "id": 324, "name": "Sulfasalazine" },
+      { "id": 325, "name": "TNF Inhibitors" },
+      { "id": 326, "name": "JAK Inhibitors" }
+    ],
+    "combinationWindow": 30,
+    "minCellCount": 5,
+    "maxDepth": 5,
+    "allowRepeats": true,
+    "executions": [
+      {
+        "sourceKey": "SYNPUF",
+        "sourceName": "CMS SynPUF 1K",
+        "status": "COMPLETE",
+        "startTime": "2024-11-10T13:30:00Z",
+        "endTime": "2024-11-10T13:42:15Z",
+        "results": {
+          "totalPatients": 1234,
+          "pathwaysFound": 78,
+          "topPathways": [
+            { "path": ["Methotrexate"], "count": 678, "pct": 54.9 },
+            { "path": ["Methotrexate", "TNF Inhibitors"], "count": 234, "pct": 19.0 },
+            { "path": ["Hydroxychloroquine"], "count": 156, "pct": 12.6 },
+            { "path": ["Methotrexate", "Hydroxychloroquine"], "count": 89, "pct": 7.2 },
+            { "path": ["Sulfasalazine"], "count": 45, "pct": 3.6 }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": 6,
+    "name": "Breast Cancer Treatment Pathways",
+    "description": "Systemic therapy sequences in breast cancer patients",
+    "createdBy": "mjohnson",
+    "createdDate": "2024-04-18T13:00:00Z",
+    "modifiedBy": "mjohnson",
+    "modifiedDate": "2024-10-25T11:30:00Z",
+    "targetCohorts": [
+      { "id": 111, "name": "Newly Diagnosed Breast Cancer" }
+    ],
+    "eventCohorts": [
+      { "id": 327, "name": "Tamoxifen" },
+      { "id": 328, "name": "Aromatase Inhibitors" },
+      { "id": 329, "name": "Trastuzumab" },
+      { "id": 330, "name": "CDK4/6 Inhibitors" },
+      { "id": 331, "name": "Chemotherapy" }
+    ],
+    "combinationWindow": 30,
+    "minCellCount": 5,
+    "maxDepth": 4,
+    "allowRepeats": false,
+    "executions": [
+      {
+        "sourceKey": "CCAE",
+        "sourceName": "IBM CCAE",
+        "status": "FAILED",
+        "startTime": "2024-10-25T11:00:00Z",
+        "endTime": "2024-10-25T11:02:33Z",
+        "results": null,
+        "errorMessage": "Insufficient patients meeting criteria"
+      }
+    ]
+  }
+]
