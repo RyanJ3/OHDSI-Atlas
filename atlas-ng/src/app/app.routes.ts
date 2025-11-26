@@ -83,10 +83,9 @@ export const routes: Routes = [
       {
         path: 'profiles',
         loadComponent: () =>
-          import('./shared/components/placeholder-page/placeholder-page.component').then(
-            (m) => m.PlaceholderPageComponent
+          import('./features/profiles/profiles.component').then(
+            (m) => m.ProfilesComponent
           ),
-        data: { title: 'Profiles', icon: 'fa-user' },
       },
       {
         path: 'estimation',
