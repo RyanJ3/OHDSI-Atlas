@@ -1,0 +1,255 @@
+<div class="profile-container">
+  <!-- Profile Header -->
+  <mat-card class="profile-header-card">
+    <div class="profile-header">
+      <div class="profile-avatar-section">
+        <div class="profile-avatar">
+          {{ getUserInitials() }}
+        </div>
+        <button mat-stroked-button class="change-avatar-btn">
+          <i class="fas fa-camera"></i>
+          Change Photo
+        </button>
+      </div>
+      <div class="profile-info">
+        <h1 class="profile-name">{{ user()?.name || user()?.login || 'User' }}</h1>
+        <p class="profile-login">&#64;{{ user()?.login || 'unknown' }}</p>
+        <div class="profile-meta">
+          <span class="meta-item">
+            <i class="fas fa-envelope"></i>
+            {{ user()?.email || 'No email set' }}
+          </span>
+          <span class="meta-item">
+            <i class="fas fa-shield-alt"></i>
+            {{ user()?.role || 'User' }}
+          </span>
+          <span class="meta-item">
+            <i class="fas fa-calendar"></i>
+            Member since {{ formatDate(user()?.createdDate) }}
+          </span>
+        </div>
+      </div>
+      <div class="profile-actions">
+        <button mat-raised-button color="primary" (click)="editProfile()">
+          <i class="fas fa-edit"></i>
+          Edit Profile
+        </button>
+      </div>
+    </div>
+  </mat-card>
+
+  <!-- Profile Content Tabs -->
+  <mat-card class="profile-content-card">
+    <mat-tab-group>
+      <!-- Overview Tab -->
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <i class="fas fa-user tab-icon"></i>
+          Overview
+        </ng-template>
+        <div class="tab-content">
+          <div class="overview-grid">
+            <!-- Stats Cards -->
+            <div class="stats-section">
+              <h3 class="section-title">Activity Summary</h3>
+              <div class="stats-grid">
+                <div class="stat-card">
+                  <div class="stat-icon" style="background: #1976d2;">
+                    <i class="fas fa-tasks"></i>
+                  </div>
+                  <div class="stat-info">
+                    <span class="stat-value">{{ getTotalJobs() }}</span>
+                    <span class="stat-label">Total Jobs</span>
+                  </div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-icon" style="background: #388e3c;">
+                    <i class="fas fa-check-circle"></i>
+                  </div>
+                  <div class="stat-info">
+                    <span class="stat-value">{{ getCompletedJobs() }}</span>
+                    <span class="stat-label">Completed</span>
+                  </div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-icon" style="background: #f57c00;">
+                    <i class="fas fa-spinner"></i>
+                  </div>
+                  <div class="stat-info">
+                    <span class="stat-value">{{ getRunningJobs() }}</span>
+                    <span class="stat-label">Running</span>
+                  </div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-icon" style="background: #d32f2f;">
+                    <i class="fas fa-times-circle"></i>
+                  </div>
+                  <div class="stat-info">
+                    <span class="stat-value">{{ getFailedJobs() }}</span>
+                    <span class="stat-label">Failed</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Account Info -->
+            <div class="account-section">
+              <h3 class="section-title">Account Information</h3>
+              <div class="info-list">
+                <div class="info-item">
+                  <span class="info-label">Username</span>
+                  <span class="info-value">{{ user()?.login || 'N/A' }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Display Name</span>
+                  <span class="info-value">{{ user()?.name || 'Not set' }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Email</span>
+                  <span class="info-value">{{ user()?.email || 'Not set' }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Role</span>
+                  <span class="info-value">
+                    <mat-chip class="role-chip">{{ user()?.role || 'User' }}</mat-chip>
+                  </span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Last Login</span>
+                  <span class="info-value">{{ formatDateTime(user()?.lastLogin) }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+
+      <!-- Activity Tab -->
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <i class="fas fa-history tab-icon"></i>
+          Activity
+        </ng-template>
+        <div class="tab-content">
+          <h3 class="section-title">Recent Activity</h3>
+          @if (loading()) {
+            <div class="loading-spinner">
+              <mat-spinner diameter="40"></mat-spinner>
+            </div>
+          } @else if (recentActivity().length === 0) {
+            <div class="empty-state">
+              <i class="fas fa-history"></i>
+              <p>No recent activity</p>
+            </div>
+          } @else {
+            <div class="activity-list">
+              @for (activity of recentActivity(); track activity.id) {
+                <div class="activity-item">
+                  <div class="activity-icon" [class]="'status-' + activity.status.toLowerCase()">
+                    <i class="fas {{ activity.icon }}"></i>
+                  </div>
+                  <div class="activity-content">
+                    <span class="activity-action">{{ activity.action }}</span>
+                    <span class="activity-target">{{ activity.target }}</span>
+                    <span class="activity-time">{{ formatRelativeTime(activity.date) }}</span>
+                  </div>
+                  <div class="activity-status">
+                    <mat-chip [class]="'status-chip-' + activity.status.toLowerCase()">
+                      {{ activity.status }}
+                    </mat-chip>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </mat-tab>
+
+      <!-- Permissions Tab -->
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <i class="fas fa-lock tab-icon"></i>
+          Permissions
+        </ng-template>
+        <div class="tab-content">
+          <h3 class="section-title">Your Permissions</h3>
+          <p class="section-description">
+            These permissions are assigned based on your role. Contact an administrator to request changes.
+          </p>
+          <div class="permissions-grid">
+            @for (permission of permissions(); track permission.name) {
+              <div class="permission-card" [class.granted]="permission.granted">
+                <div class="permission-status">
+                  <i class="fas {{ permission.granted ? 'fa-check-circle' : 'fa-times-circle' }}"></i>
+                </div>
+                <div class="permission-info">
+                  <span class="permission-name">{{ permission.name }}</span>
+                  <span class="permission-description">{{ permission.description }}</span>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </mat-tab>
+
+      <!-- Edit Profile Tab -->
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <i class="fas fa-edit tab-icon"></i>
+          Edit Profile
+        </ng-template>
+        <div class="tab-content">
+          <h3 class="section-title">Edit Your Profile</h3>
+          <form [formGroup]="profileForm" class="profile-form">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Display Name</mat-label>
+              <input matInput formControlName="name" placeholder="Enter your display name" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Email</mat-label>
+              <input matInput formControlName="email" placeholder="Enter your email" type="email" />
+              @if (profileForm.get('email')?.hasError('email')) {
+                <mat-error>Please enter a valid email address</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-divider></mat-divider>
+
+            <h4 class="subsection-title">Change Password</h4>
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Current Password</mat-label>
+              <input matInput formControlName="currentPassword" type="password" />
+            </mat-form-field>
+
+            <div class="form-row">
+              <mat-form-field appearance="outline">
+                <mat-label>New Password</mat-label>
+                <input matInput formControlName="newPassword" type="password" />
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Confirm Password</mat-label>
+                <input matInput formControlName="confirmPassword" type="password" />
+              </mat-form-field>
+            </div>
+
+            <div class="form-actions">
+              <button mat-button type="button" (click)="resetForm()">Reset</button>
+              <button
+                mat-raised-button
+                color="primary"
+                type="submit"
+                [disabled]="!profileForm.valid || !hasFormChanges()"
+                (click)="saveProfile()"
+              >
+                <i class="fas fa-save"></i>
+                Save Changes
+              </button>
+            </div>
+          </form>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </mat-card>
+</div>

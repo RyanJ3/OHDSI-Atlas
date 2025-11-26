@@ -135,6 +135,20 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'profile',
+        loadComponent: () =>
+          import('./features/user-profile/user-profile.component').then(
+            (m) => m.UserProfileComponent
+          ),
+      },
+      {
+        path: 'settings',
+        loadComponent: () =>
+          import('./features/user-settings/user-settings.component').then(
+            (m) => m.UserSettingsComponent
+          ),
+      },
+      {
         path: '**',
         redirectTo: 'home',
       },
