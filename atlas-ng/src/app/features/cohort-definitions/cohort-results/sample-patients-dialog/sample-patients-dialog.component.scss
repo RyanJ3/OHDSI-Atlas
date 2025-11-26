@@ -91,18 +91,61 @@ mat-dialog-content {
 }
 
 .table-container {
-  max-height: 400px;
-  overflow-y: auto;
   border: 1px solid #e0e0e0;
   border-radius: 4px;
+  overflow: hidden;
 
-  // Sticky header for Material table
   ::ng-deep {
+    // Make thead and tbody display as block for separate scrolling
     .mat-mdc-header-row {
-      position: sticky;
-      top: 0;
-      z-index: 10;
+      display: flex;
       background: #fafafa;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .mat-mdc-row {
+      display: flex;
+    }
+
+    // Scrollable body container
+    .mat-mdc-table {
+      display: flex;
+      flex-direction: column;
+    }
+
+    // The actual scrollable area - just the body rows
+    tbody.mdc-data-table__content {
+      display: block;
+      max-height: 350px;
+      overflow-y: auto;
+    }
+
+    // Fixed column widths for alignment
+    .mat-mdc-header-cell,
+    .mat-mdc-cell {
+      flex: 1;
+      min-width: 100px;
+
+      &:first-child {
+        flex: 0 0 100px;
+      }
+
+      &:nth-child(2) {
+        flex: 0 0 110px;
+      }
+
+      &:nth-child(3) {
+        flex: 0 0 60px;
+      }
+
+      &:nth-child(4) {
+        flex: 1 1 180px;
+      }
+
+      &:nth-child(5),
+      &:nth-child(6) {
+        flex: 0 0 120px;
+      }
     }
 
     .mat-mdc-header-cell {
