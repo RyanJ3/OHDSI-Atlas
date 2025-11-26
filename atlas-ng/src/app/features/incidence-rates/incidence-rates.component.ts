@@ -20,6 +20,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 // Import mock data
 import incidenceRatesData from '../../core/mock-data/incidence-rates.json';
+import { IrResultsDialogComponent } from './ir-results-dialog/ir-results-dialog.component';
 
 interface Cohort {
   id: number;
@@ -220,7 +221,16 @@ export class IncidenceRatesComponent implements OnInit {
   }
 
   viewResults(analysis: IncidenceRateAnalysis): void {
-    this.snackBar.open(`Viewing results for "${analysis.name}"...`, '', { duration: 2000 });
+    const completedExecution = analysis.executions.find(e => e.status === 'COMPLETE');
+    if (!completedExecution) {
+      this.snackBar.open('No completed results available', 'OK', { duration: 2000 });
+      return;
+    }
+    this.dialog.open(IrResultsDialogComponent, {
+      data: { analysis, execution: completedExecution },
+      width: '850px',
+      maxHeight: '90vh',
+    });
   }
 
   exportAnalysis(analysis: IncidenceRateAnalysis): void {

@@ -18,6 +18,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 import characterizationsData from '../../core/mock-data/characterizations.json';
+import { CharacterizationResultsDialogComponent } from './characterization-results-dialog/characterization-results-dialog.component';
 
 interface Cohort {
   id: number;
@@ -214,7 +215,16 @@ export class CharacterizationsComponent implements OnInit {
   }
 
   viewResults(char: Characterization): void {
-    this.snackBar.open(`Viewing results for "${char.name}"...`, '', { duration: 2000 });
+    const completedExecution = char.executions.find(e => e.status === 'COMPLETE');
+    if (!completedExecution) {
+      this.snackBar.open('No completed results available', 'OK', { duration: 2000 });
+      return;
+    }
+    this.dialog.open(CharacterizationResultsDialogComponent, {
+      data: { characterization: char, execution: completedExecution },
+      width: '800px',
+      maxHeight: '90vh',
+    });
   }
 
   exportCharacterization(char: Characterization): void {

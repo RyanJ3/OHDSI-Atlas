@@ -16,9 +16,11 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatSortModule, Sort } from '@angular/material/sort';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 
 // Import mock data
 import predictionsData from '../../core/mock-data/predictions.json';
+import { PredictionResultsDialogComponent } from './prediction-results-dialog/prediction-results-dialog.component';
 
 interface LatestExecution {
   status: 'COMPLETED' | 'RUNNING' | 'FAILED' | 'STOPPED';
@@ -66,12 +68,14 @@ interface Prediction {
     MatSortModule,
     MatSnackBarModule,
     MatDividerModule,
+    MatDialogModule,
   ],
   templateUrl: './prediction.component.html',
   styleUrl: './prediction.component.scss',
 })
 export class PredictionComponent implements OnInit {
   private snackBar = inject(MatSnackBar);
+  private dialog = inject(MatDialog);
 
   loading = signal(true);
   predictions = signal<Prediction[]>([]);
@@ -283,7 +287,11 @@ export class PredictionComponent implements OnInit {
       this.snackBar.open('No completed results available', 'OK', { duration: 2000 });
       return;
     }
-    this.snackBar.open(`Viewing results for "${prediction.name}"...`, '', { duration: 2000 });
+    this.dialog.open(PredictionResultsDialogComponent, {
+      data: { prediction },
+      width: '850px',
+      maxHeight: '90vh',
+    });
   }
 
   copyPrediction(prediction: Prediction): void {

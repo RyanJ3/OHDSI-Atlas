@@ -20,6 +20,7 @@ import { MatDividerModule } from '@angular/material/divider';
 
 // Import mock data
 import estimationsData from '../../core/mock-data/estimations.json';
+import { EstimationResultsDialogComponent } from './estimation-results-dialog/estimation-results-dialog.component';
 
 interface Comparison {
   targetCohort: string;
@@ -254,7 +255,11 @@ export class EstimationComponent implements OnInit {
       this.snackBar.open('No completed results available', 'OK', { duration: 2000 });
       return;
     }
-    this.snackBar.open(`Viewing results for "${estimation.name}"...`, '', { duration: 2000 });
+    this.dialog.open(EstimationResultsDialogComponent, {
+      data: { estimation },
+      width: '950px',
+      maxHeight: '90vh',
+    });
   }
 
   copyEstimation(estimation: Estimation): void {
