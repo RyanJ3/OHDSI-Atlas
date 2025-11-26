@@ -1,0 +1,202 @@
+[
+  {
+    "personId": 1001,
+    "gender": "Female",
+    "birthYear": 1965,
+    "age": 59,
+    "race": "White",
+    "ethnicity": "Not Hispanic",
+    "cohortStartDate": "2023-03-15",
+    "cohortEndDate": "2024-01-20"
+  },
+  {
+    "personId": 1042,
+    "gender": "Male",
+    "birthYear": 1978,
+    "age": 46,
+    "race": "Black or African American",
+    "ethnicity": "Not Hispanic",
+    "cohortStartDate": "2023-05-22",
+    "cohortEndDate": "2024-02-10"
+  },
+  {
+    "personId": 1087,
+    "gender": "Female",
+    "birthYear": 1952,
+    "age": 72,
+    "race": "White",
+    "ethnicity": "Not Hispanic",
+    "cohortStartDate": "2023-01-10",
+    "cohortEndDate": "2023-12-31"
+  },
+  {
+    "personId": 1123,
+    "gender": "Male",
+    "birthYear": 1985,
+    "age": 39,
+    "race": "Asian",
+    "ethnicity": "Not Hispanic",
+    "cohortStartDate": "2023-07-01",
+    "cohortEndDate": "2024-03-15"
+  },
+  {
+    "personId": 1156,
+    "gender": "Female",
+    "birthYear": 1970,
+    "age": 54,
+    "race": "White",
+    "ethnicity": "Hispanic or Latino",
+    "cohortStartDate": "2023-04-18",
+    "cohortEndDate": "2024-01-05"
+  },
+  {
+    "personId": 1189,
+    "gender": "Male",
+    "birthYear": 1960,
+    "age": 64,
+    "race": "White",
+    "ethnicity": "Not Hispanic",
+    "cohortStartDate": "2023-02-28",
+    "cohortEndDate": "2023-11-20"
+  },
+  {
+    "personId": 1234,
+    "gender": "Female",
+    "birthYear": 1948,
+    "age": 76,
+    "race": "Black or African American",
+    "ethnicity": "Not Hispanic",
+    "cohortStartDate": "2023-06-12",
+    "cohortEndDate": "2024-02-28"
+  },
+  {
+    "personId": 1267,
+    "gender": "Male",
+    "birthYear": 1992,
+    "age": 32,
+    "race": "White",
+    "ethnicity": "Not Hispanic",
+    "cohortStartDate": "2023-08-05",
+    "cohortEndDate": "2024-03-01"
+  },
+  {
+    "personId": 1298,
+    "gender": "Female",
+    "birthYear": 1975,
+    "age": 49,
+    "race": "Asian",
+    "ethnicity": "Not Hispanic",
+    "cohortStartDate": "2023-03-20",
+    "cohortEndDate": "2023-12-15"
+  },
+  {
+    "personId": 1345,
+    "gender": "Male",
+    "birthYear": 1958,
+    "age": 66,
+    "race": "White",
+    "ethnicity": "Hispanic or Latino",
+    "cohortStartDate": "2023-01-25",
+    "cohortEndDate": "2023-10-30"
+  },
+  {
+    "personId": 1378,
+    "gender": "Female",
+    "birthYear": 1982,
+    "age": 42,
+    "race": "Other",
+    "ethnicity": "Not Hispanic",
+    "cohortStartDate": "2023-09-10",
+    "cohortEndDate": "2024-04-05"
+  },
+  {
+    "personId": 1412,
+    "gender": "Male",
+    "birthYear": 1955,
+    "age": 69,
+    "race": "White",
+    "ethnicity": "Not Hispanic",
+    "cohortStartDate": "2023-05-01",
+    "cohortEndDate": "2024-01-15"
+  },
+  {
+    "personId": 1445,
+    "gender": "Female",
+    "birthYear": 1968,
+    "age": 56,
+    "race": "Black or African American",
+    "ethnicity": "Not Hispanic",
+    "cohortStartDate": "2023-04-05",
+    "cohortEndDate": "2023-11-28"
+  },
+  {
+    "personId": 1489,
+    "gender": "Male",
+    "birthYear": 1973,
+    "age": 51,
+    "race": "White",
+    "ethnicity": "Not Hispanic",
+    "cohortStartDate": "2023-07-20",
+    "cohortEndDate": "2024-02-20"
+  },
+  {
+    "personId": 1523,
+    "gender": "Female",
+    "birthYear": 1945,
+    "age": 79,
+    "race": "White",
+    "ethnicity": "Not Hispanic",
+    "cohortStartDate": "2023-02-14",
+    "cohortEndDate": "2023-09-30"
+  },
+  {
+    "personId": 1567,
+    "gender": "Male",
+    "birthYear": 1988,
+    "age": 36,
+    "race": "Asian",
+    "ethnicity": "Not Hispanic",
+    "cohortStartDate": "2023-10-01",
+    "cohortEndDate": "2024-04-15"
+  },
+  {
+    "personId": 1598,
+    "gender": "Female",
+    "birthYear": 1962,
+    "age": 62,
+    "race": "White",
+    "ethnicity": "Hispanic or Latino",
+    "cohortStartDate": "2023-06-25",
+    "cohortEndDate": "2024-01-10"
+  },
+  {
+    "personId": 1634,
+    "gender": "Male",
+    "birthYear": 1950,
+    "age": 74,
+    "race": "Black or African American",
+    "ethnicity": "Not Hispanic",
+    "cohortStartDate": "2023-03-08",
+    "cohortEndDate": "2023-10-22"
+  },
+  {
+    "personId": 1678,
+    "gender": "Female",
+    "birthYear": 1980,
+    "age": 44,
+    "race": "White",
+    "ethnicity": "Not Hispanic",
+    "cohortStartDate": "2023-08-15",
+    "cohortEndDate": "2024-03-20"
+  },
+  {
+    "personId": 1712,
+    "gender": "Male",
+    "birthYear": 1967,
+    "age": 57,
+    "race": "Other",
+    "ethnicity": "Hispanic or Latino",
+    "cohortStartDate": "2023-05-30",
+    "cohortEndDate": "2024-01-25"
+  }
+]

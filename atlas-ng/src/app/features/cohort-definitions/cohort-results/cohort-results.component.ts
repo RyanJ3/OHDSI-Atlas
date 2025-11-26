@@ -11,6 +11,9 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { InclusionReportDialogComponent } from './inclusion-report-dialog/inclusion-report-dialog.component';
+import { SamplePatientsDialogComponent } from './sample-patients-dialog/sample-patients-dialog.component';
 
 // Import mock data
 import cohortDefinitionsData from '../../../core/mock-data/cohort-definitions.json';
@@ -53,6 +56,7 @@ interface CohortInfo {
     MatTabsModule,
     MatMenuModule,
     MatSnackBarModule,
+    MatDialogModule,
   ],
   templateUrl: './cohort-results.component.html',
   styleUrl: './cohort-results.component.scss',
@@ -61,6 +65,7 @@ export class CohortResultsComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private snackBar = inject(MatSnackBar);
+  private dialog = inject(MatDialog);
 
   cohortId = signal<number>(0);
   cohort = signal<CohortInfo | null>(null);
@@ -149,14 +154,31 @@ export class CohortResultsComponent implements OnInit {
   }
 
   viewInclusionReport(result: GenerationResult): void {
-    this.snackBar.open(`Opening inclusion report for ${result.sourceName}...`, '', {
-      duration: 2000,
+    const cohortInfo = this.cohort();
+    this.dialog.open(InclusionReportDialogComponent, {
+      width: '700px',
+      data: {
+        cohortId: this.cohortId(),
+        cohortName: cohortInfo?.name || 'Cohort',
+        sourceKey: result.sourceKey,
+        sourceName: result.sourceName,
+        personCount: result.personCount,
+      },
     });
   }
 
   viewSamples(result: GenerationResult): void {
-    this.snackBar.open(`Loading sample patients from ${result.sourceName}...`, '', {
-      duration: 2000,
+    const cohortInfo = this.cohort();
+    this.dialog.open(SamplePatientsDialogComponent, {
+      width: '850px',
+      maxHeight: '80vh',
+      data: {
+        cohortId: this.cohortId(),
+        cohortName: cohortInfo?.name || 'Cohort',
+        sourceKey: result.sourceKey,
+        sourceName: result.sourceName,
+        personCount: result.personCount,
+      },
     });
   }
 
