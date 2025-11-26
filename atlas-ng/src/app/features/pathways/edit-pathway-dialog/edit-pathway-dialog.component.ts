@@ -1,7 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef, MatDialog } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -11,6 +11,10 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatTableModule } from '@angular/material/table';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { ConfirmDialogComponent, ConfirmDialogData } from '../../../shared/confirm-dialog/confirm-dialog.component';
+import { AddCohortDialogComponent, AddCohortDialogData, AddCohortDialogResult } from '../add-cohort-dialog/add-cohort-dialog.component';
 
 interface Cohort {
   id: number;
@@ -51,6 +55,8 @@ interface PathwayAnalysis {
     MatTableModule,
     MatCheckboxModule,
     MatSlideToggleModule,
+    MatSnackBarModule,
+    MatTooltipModule,
   ],
   template: `
     <h2 mat-dialog-title>
@@ -94,7 +100,7 @@ interface PathwayAnalysis {
           <div class="cohorts-tab">
             <p class="tab-description">Target cohorts define the population to analyze for treatment pathways.</p>
             @if (targetCohorts.length > 0) {
-              <table mat-table [dataSource]="targetCohorts" class="cohorts-table">
+              <table mat-table [dataSource]="targetCohortsDataSource" class="cohorts-table">
                 <ng-container matColumnDef="id">
                   <th mat-header-cell *matHeaderCellDef>ID</th>
                   <td mat-cell *matCellDef="let cohort">{{ cohort.id }}</td>
@@ -108,7 +114,12 @@ interface PathwayAnalysis {
                 <ng-container matColumnDef="actions">
                   <th mat-header-cell *matHeaderCellDef>Actions</th>
                   <td mat-cell *matCellDef="let cohort">
-                    <button mat-icon-button color="warn" (click)="removeTargetCohort(cohort)">
+                    <button
+                      mat-icon-button
+                      color="warn"
+                      (click)="removeTargetCohort(cohort)"
+                      matTooltip="Remove target cohort"
+                    >
                       <mat-icon>delete</mat-icon>
                     </button>
                   </td>
@@ -121,6 +132,7 @@ interface PathwayAnalysis {
               <div class="empty-state">
                 <mat-icon>groups</mat-icon>
                 <p>No target cohorts defined</p>
+                <p class="hint">Add target cohorts to define the population to analyze</p>
               </div>
             }
             <div class="add-action">
@@ -137,7 +149,7 @@ interface PathwayAnalysis {
           <div class="cohorts-tab">
             <p class="tab-description">Event cohorts represent the treatments or events that form pathways.</p>
             @if (eventCohorts.length > 0) {
-              <table mat-table [dataSource]="eventCohorts" class="cohorts-table">
+              <table mat-table [dataSource]="eventCohortsDataSource" class="cohorts-table">
                 <ng-container matColumnDef="id">
                   <th mat-header-cell *matHeaderCellDef>ID</th>
                   <td mat-cell *matCellDef="let cohort">{{ cohort.id }}</td>
@@ -151,7 +163,12 @@ interface PathwayAnalysis {
                 <ng-container matColumnDef="actions">
                   <th mat-header-cell *matHeaderCellDef>Actions</th>
                   <td mat-cell *matCellDef="let cohort">
-                    <button mat-icon-button color="warn" (click)="removeEventCohort(cohort)">
+                    <button
+                      mat-icon-button
+                      color="warn"
+                      (click)="removeEventCohort(cohort)"
+                      matTooltip="Remove event cohort"
+                    >
                       <mat-icon>delete</mat-icon>
                     </button>
                   </td>
@@ -164,6 +181,7 @@ interface PathwayAnalysis {
               <div class="empty-state">
                 <mat-icon>event</mat-icon>
                 <p>No event cohorts defined</p>
+                <p class="hint">Add event cohorts to define the treatments or events to track</p>
               </div>
             }
             <div class="add-action">
@@ -346,6 +364,11 @@ interface PathwayAnalysis {
       p {
         margin: 0;
       }
+
+      .hint {
+        font-size: 12px;
+        margin-top: 8px;
+      }
     }
 
     .add-action {
@@ -393,6 +416,8 @@ interface PathwayAnalysis {
 })
 export class EditPathwayDialogComponent implements OnInit {
   private fb = inject(FormBuilder);
+  private dialog = inject(MatDialog);
+  private snackBar = inject(MatSnackBar);
   private dialogRef = inject(MatDialogRef<EditPathwayDialogComponent>);
   data = inject<{ analysis: PathwayAnalysis }>(MAT_DIALOG_DATA);
 
@@ -400,6 +425,12 @@ export class EditPathwayDialogComponent implements OnInit {
   targetCohorts: Cohort[] = [];
   eventCohorts: Cohort[] = [];
   originalValues: any;
+  originalTargetCohorts: Cohort[] = [];
+  originalEventCohorts: Cohort[] = [];
+
+  // Data sources for MatTable refresh
+  targetCohortsDataSource: Cohort[] = [];
+  eventCohortsDataSource: Cohort[] = [];
 
   form: FormGroup = this.fb.group({
     name: ['', Validators.required],
@@ -423,55 +454,136 @@ export class EditPathwayDialogComponent implements OnInit {
     this.targetCohorts = [...this.data.analysis.targetCohorts];
     this.eventCohorts = [...this.data.analysis.eventCohorts];
 
+    // Store original cohorts for change detection
+    this.originalTargetCohorts = this.data.analysis.targetCohorts.map(c => ({ ...c }));
+    this.originalEventCohorts = this.data.analysis.eventCohorts.map(c => ({ ...c }));
+
     this.originalValues = {
       ...this.form.value,
-      targetCohortCount: this.targetCohorts.length,
-      eventCohortCount: this.eventCohorts.length,
     };
+
+    // Initialize data sources
+    this.refreshDataSources();
+  }
+
+  private refreshDataSources(): void {
+    // Create new array references to trigger MatTable refresh
+    this.targetCohortsDataSource = [...this.targetCohorts];
+    this.eventCohortsDataSource = [...this.eventCohorts];
   }
 
   removeTargetCohort(cohort: Cohort): void {
-    const index = this.targetCohorts.findIndex(c => c.id === cohort.id);
-    if (index >= 0) {
-      this.targetCohorts.splice(index, 1);
-    }
+    const dialogData: ConfirmDialogData = {
+      title: 'Remove Target Cohort',
+      message: `Are you sure you want to remove "${cohort.name}" from target cohorts?`,
+      confirmText: 'Remove',
+      cancelText: 'Cancel',
+      type: 'warning',
+    };
+
+    this.dialog.open(ConfirmDialogComponent, { data: dialogData })
+      .afterClosed()
+      .subscribe((confirmed: boolean) => {
+        if (confirmed) {
+          const index = this.targetCohorts.findIndex(c => c.id === cohort.id);
+          if (index >= 0) {
+            this.targetCohorts.splice(index, 1);
+            this.refreshDataSources();
+            this.snackBar.open(`Removed "${cohort.name}" from target cohorts`, 'OK', {
+              duration: 3000,
+            });
+          }
+        }
+      });
   }
 
   addTargetCohort(): void {
-    const newId = Math.max(...this.targetCohorts.map(c => c.id), 0) + 1;
-    this.targetCohorts.push({
-      id: newId,
-      name: `New Target Cohort ${newId}`,
-    });
+    const dialogData: AddCohortDialogData = {
+      title: 'Add Target Cohort',
+      type: 'target',
+      existingCohortIds: this.targetCohorts.map(c => c.id),
+    };
+
+    this.dialog.open(AddCohortDialogComponent, { data: dialogData })
+      .afterClosed()
+      .subscribe((result: AddCohortDialogResult | undefined) => {
+        if (result?.cohort) {
+          this.targetCohorts.push(result.cohort);
+          this.refreshDataSources();
+          this.snackBar.open(`Added "${result.cohort.name}" to target cohorts`, 'OK', {
+            duration: 3000,
+          });
+        }
+      });
   }
 
   removeEventCohort(cohort: Cohort): void {
-    const index = this.eventCohorts.findIndex(c => c.id === cohort.id);
-    if (index >= 0) {
-      this.eventCohorts.splice(index, 1);
-    }
+    const dialogData: ConfirmDialogData = {
+      title: 'Remove Event Cohort',
+      message: `Are you sure you want to remove "${cohort.name}" from event cohorts?`,
+      confirmText: 'Remove',
+      cancelText: 'Cancel',
+      type: 'warning',
+    };
+
+    this.dialog.open(ConfirmDialogComponent, { data: dialogData })
+      .afterClosed()
+      .subscribe((confirmed: boolean) => {
+        if (confirmed) {
+          const index = this.eventCohorts.findIndex(c => c.id === cohort.id);
+          if (index >= 0) {
+            this.eventCohorts.splice(index, 1);
+            this.refreshDataSources();
+            this.snackBar.open(`Removed "${cohort.name}" from event cohorts`, 'OK', {
+              duration: 3000,
+            });
+          }
+        }
+      });
   }
 
   addEventCohort(): void {
-    const newId = Math.max(...this.eventCohorts.map(c => c.id), 0) + 1;
-    this.eventCohorts.push({
-      id: newId,
-      name: `New Event Cohort ${newId}`,
-    });
+    const dialogData: AddCohortDialogData = {
+      title: 'Add Event Cohort',
+      type: 'event',
+      existingCohortIds: this.eventCohorts.map(c => c.id),
+    };
+
+    this.dialog.open(AddCohortDialogComponent, { data: dialogData })
+      .afterClosed()
+      .subscribe((result: AddCohortDialogResult | undefined) => {
+        if (result?.cohort) {
+          this.eventCohorts.push(result.cohort);
+          this.refreshDataSources();
+          this.snackBar.open(`Added "${result.cohort.name}" to event cohorts`, 'OK', {
+            duration: 3000,
+          });
+        }
+      });
   }
 
   hasChanges(): boolean {
     const formValue = this.form.value;
-    return (
+    const formChanged = (
       formValue.name !== this.originalValues.name ||
       formValue.description !== this.originalValues.description ||
       formValue.combinationWindow !== this.originalValues.combinationWindow ||
       formValue.minCellCount !== this.originalValues.minCellCount ||
       formValue.maxDepth !== this.originalValues.maxDepth ||
-      formValue.allowRepeats !== this.originalValues.allowRepeats ||
-      this.targetCohorts.length !== this.originalValues.targetCohortCount ||
-      this.eventCohorts.length !== this.originalValues.eventCohortCount
+      formValue.allowRepeats !== this.originalValues.allowRepeats
     );
+
+    const targetCohortsChanged = !this.areCohortsEqual(this.targetCohorts, this.originalTargetCohorts);
+    const eventCohortsChanged = !this.areCohortsEqual(this.eventCohorts, this.originalEventCohorts);
+
+    return formChanged || targetCohortsChanged || eventCohortsChanged;
+  }
+
+  private areCohortsEqual(a: Cohort[], b: Cohort[]): boolean {
+    if (a.length !== b.length) return false;
+    const aIds = a.map(c => c.id).sort();
+    const bIds = b.map(c => c.id).sort();
+    return aIds.every((id, i) => id === bIds[i]);
   }
 
   formatDate(dateStr: string | undefined): string {
