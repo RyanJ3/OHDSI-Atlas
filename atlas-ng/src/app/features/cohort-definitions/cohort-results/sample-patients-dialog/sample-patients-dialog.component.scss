@@ -105,6 +105,7 @@ mat-dialog-content {
 
     .mat-mdc-row {
       display: flex;
+      align-items: center;
     }
 
     // Scrollable body container
@@ -149,7 +150,8 @@ mat-dialog-content {
       // Cohort Start, Cohort End
       &:nth-child(5),
       &:nth-child(6) {
-        flex: 0 0 110px;
+        flex: 0 0 120px;
+        white-space: nowrap;
       }
     }
 
