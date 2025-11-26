@@ -4,6 +4,77 @@
   margin: 0 auto;
 }
 
+// WebAPI Connection Status Banner
+.api-status-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  transition: all 0.3s ease;
+
+  &.connected {
+    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+    border: 1px solid #a5d6a7;
+  }
+
+  &.disconnected {
+    background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+    border: 1px solid #ffcc80;
+  }
+}
+
+.api-status-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.status-icon {
+  font-size: 32px;
+
+  &.connected {
+    color: #2e7d32;
+  }
+
+  &.disconnected {
+    color: #e65100;
+  }
+}
+
+.status-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  strong {
+    font-size: 16px;
+    color: #333;
+  }
+
+  span {
+    font-size: 13px;
+    color: #666;
+  }
+}
+
+.api-status-actions {
+  display: flex;
+  gap: 12px;
+
+  button {
+    i {
+      margin-right: 8px;
+    }
+  }
+}
+
+.button-spinner {
+  display: inline-block;
+  margin-right: 8px;
+}
+
 .page-header {
   display: flex;
   justify-content: space-between;

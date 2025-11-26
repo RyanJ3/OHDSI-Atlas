@@ -1,7 +1,7 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, forkJoin, of, delay } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
+import { map, catchError, tap } from 'rxjs/operators';
 import { ConfigService } from '../config';
 
 // Mock data source constant
@@ -77,6 +77,11 @@ export class SourceService {
   private http = inject(HttpClient);
   private config = inject(ConfigService);
 
+  // Track WebAPI connection status
+  readonly webApiConnected = signal(false);
+  readonly webApiError = signal<string | null>(null);
+  readonly isConnecting = signal(false);
+
   /**
    * Check if a source key refers to the mock data source
    */
@@ -89,11 +94,49 @@ export class SourceService {
    */
   getSources(): Observable<Source[]> {
     return this.http.get<Source[]>(`${this.config.webApiUrl}source/sources`).pipe(
+      tap(() => {
+        this.webApiConnected.set(true);
+        this.webApiError.set(null);
+      }),
       map((sources) => [MOCK_SOURCE, ...sources]),
-      catchError(() => {
+      catchError((err) => {
         // If API fails, return mock source only
+        this.webApiConnected.set(false);
+        this.webApiError.set(err.message || 'Unable to connect to WebAPI');
         return of([MOCK_SOURCE]);
       })
+    );
+  }
+
+  /**
+   * Attempt to connect to WebAPI without fallback (for manual reconnection)
+   */
+  connectToWebApi(): Observable<Source[]> {
+    this.isConnecting.set(true);
+    this.webApiError.set(null);
+
+    return this.http.get<Source[]>(`${this.config.webApiUrl}source/sources`).pipe(
+      tap((sources) => {
+        this.webApiConnected.set(true);
+        this.webApiError.set(null);
+        this.isConnecting.set(false);
+      }),
+      map((sources) => [MOCK_SOURCE, ...sources]),
+      catchError((err) => {
+        this.webApiConnected.set(false);
+        this.webApiError.set(err.message || 'Unable to connect to WebAPI');
+        this.isConnecting.set(false);
+        throw err; // Re-throw so caller can handle
+      })
+    );
+  }
+
+  /**
+   * Get WebAPI info/status
+   */
+  getWebApiInfo(): Observable<any> {
+    return this.http.get(`${this.config.webApiUrl}info`).pipe(
+      catchError(() => of(null))
     );
   }
 

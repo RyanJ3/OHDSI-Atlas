@@ -12,6 +12,53 @@
     </div>
   </div>
 
+  <!-- WebAPI Connection Status Banner -->
+  <div class="api-status-banner" [class.connected]="webApiConnected()" [class.disconnected]="!webApiConnected()">
+    <div class="api-status-info">
+      @if (webApiConnected()) {
+        <i class="fas fa-cloud status-icon connected"></i>
+        <div class="status-text">
+          <strong>WebAPI Connected</strong>
+          <span>{{ realSourceCount() }} data source{{ realSourceCount() !== 1 ? 's' : '' }} available</span>
+        </div>
+      } @else {
+        <i class="fas fa-cloud-slash status-icon disconnected"></i>
+        <div class="status-text">
+          <strong>WebAPI Disconnected</strong>
+          <span>Using mock data only</span>
+        </div>
+      }
+    </div>
+    <div class="api-status-actions">
+      @if (!webApiConnected()) {
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="connectToWebApi()"
+          [disabled]="isConnecting()"
+        >
+          @if (isConnecting()) {
+            <mat-spinner diameter="18" class="button-spinner"></mat-spinner>
+            Connecting...
+          } @else {
+            <i class="fas fa-plug"></i>
+            Connect to WebAPI
+          }
+        </button>
+      } @else {
+        <button mat-stroked-button (click)="connectToWebApi()" [disabled]="isConnecting()">
+          @if (isConnecting()) {
+            <mat-spinner diameter="18" class="button-spinner"></mat-spinner>
+            Reconnecting...
+          } @else {
+            <i class="fas fa-redo"></i>
+            Reconnect
+          }
+        </button>
+      }
+    </div>
+  </div>
+
   @if (loading()) {
     <div class="loading-container">
       <mat-spinner diameter="48"></mat-spinner>

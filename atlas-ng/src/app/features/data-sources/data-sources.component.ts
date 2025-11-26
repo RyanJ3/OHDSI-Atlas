@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatTableModule } from '@angular/material/table';
@@ -10,7 +10,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { SourceService, Source } from '../../core/services/source.service';
+import { SourceService, Source, MOCK_SOURCE_KEY } from '../../core/services/source.service';
 import { catchError, of } from 'rxjs';
 
 interface SourceWithStatus extends Source {
@@ -43,6 +43,16 @@ export class DataSourcesComponent implements OnInit {
   loading = signal(true);
   sources = signal<SourceWithStatus[]>([]);
   error = signal<string | null>(null);
+
+  // WebAPI connection status from service
+  webApiConnected = this.sourceService.webApiConnected;
+  webApiError = this.sourceService.webApiError;
+  isConnecting = this.sourceService.isConnecting;
+
+  // Count of real (non-mock) sources
+  realSourceCount = computed(() =>
+    this.sources().filter((s) => s.sourceKey !== MOCK_SOURCE_KEY).length
+  );
 
   ngOnInit(): void {
     this.loadSources();
@@ -78,6 +88,42 @@ export class DataSourcesComponent implements OnInit {
 
   refreshAll(): void {
     this.loadSources();
+  }
+
+  connectToWebApi(): void {
+    this.sourceService
+      .connectToWebApi()
+      .pipe(
+        catchError((err) => {
+          this.snackBar.open(
+            `Failed to connect to WebAPI: ${err.message || 'Connection refused'}`,
+            'OK',
+            { duration: 5000 }
+          );
+          return of([]);
+        })
+      )
+      .subscribe((sources) => {
+        if (sources.length > 0) {
+          const sourcesWithStatus: SourceWithStatus[] = sources.map((s) => ({
+            ...this.sourceService['enrichSource'](s),
+            connectionStatus: 'unknown' as const,
+          }));
+          this.sources.set(sourcesWithStatus);
+
+          const realCount = sources.filter((s) => s.sourceKey !== MOCK_SOURCE_KEY).length;
+          this.snackBar.open(
+            `Connected to WebAPI! Found ${realCount} data source${realCount !== 1 ? 's' : ''}.`,
+            'OK',
+            { duration: 3000 }
+          );
+
+          // Auto-check connections
+          sourcesWithStatus.forEach((source) => {
+            this.checkConnectionSilent(source);
+          });
+        }
+      });
   }
 
   checkConnection(source: SourceWithStatus): void {
