@@ -21,6 +21,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 // Import mock data
 import predictionsData from '../../core/mock-data/predictions.json';
 import { PredictionResultsDialogComponent } from './prediction-results-dialog/prediction-results-dialog.component';
+import { CreatePredictionDialogComponent } from './create-prediction-dialog/create-prediction-dialog.component';
 
 interface LatestExecution {
   status: 'COMPLETED' | 'RUNNING' | 'FAILED' | 'STOPPED';
@@ -269,8 +270,16 @@ export class PredictionComponent implements OnInit {
   }
 
   createNew(): void {
-    this.snackBar.open('Create new prediction model (not implemented)', 'OK', {
-      duration: 2000,
+    const dialogRef = this.dialog.open(CreatePredictionDialogComponent, {
+      width: '650px',
+    });
+
+    dialogRef.afterClosed().subscribe((result: Prediction | undefined) => {
+      if (result) {
+        this.predictions.update(current => [result, ...current]);
+        this.applyFilters();
+        this.snackBar.open(`Created prediction model "${result.name}"`, 'OK', { duration: 3000 });
+      }
     });
   }
 

@@ -19,6 +19,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 import pathwaysData from '../../core/mock-data/pathways.json';
 import { PathwayResultsDialogComponent } from './pathway-results-dialog/pathway-results-dialog.component';
+import { CreatePathwayDialogComponent } from './create-pathway-dialog/create-pathway-dialog.component';
 
 interface Cohort {
   id: number;
@@ -191,7 +192,17 @@ export class PathwaysComponent implements OnInit {
   }
 
   createNew(): void {
-    this.snackBar.open('Create new pathway analysis (not implemented)', '', { duration: 2000 });
+    const dialogRef = this.dialog.open(CreatePathwayDialogComponent, {
+      width: '650px',
+    });
+
+    dialogRef.afterClosed().subscribe((result: PathwayAnalysis | undefined) => {
+      if (result) {
+        this.analyses.update(current => [result, ...current]);
+        this.applyFilter();
+        this.snackBar.open(`Created pathway "${result.name}"`, 'OK', { duration: 3000 });
+      }
+    });
   }
 
   editAnalysis(analysis: PathwayAnalysis): void {

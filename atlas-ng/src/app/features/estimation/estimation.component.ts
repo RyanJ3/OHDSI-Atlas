@@ -21,6 +21,7 @@ import { MatDividerModule } from '@angular/material/divider';
 // Import mock data
 import estimationsData from '../../core/mock-data/estimations.json';
 import { EstimationResultsDialogComponent } from './estimation-results-dialog/estimation-results-dialog.component';
+import { CreateEstimationDialogComponent } from './create-estimation-dialog/create-estimation-dialog.component';
 
 interface Comparison {
   targetCohort: string;
@@ -237,8 +238,16 @@ export class EstimationComponent implements OnInit {
   }
 
   createNew(): void {
-    this.snackBar.open('Create new estimation study (not implemented)', 'OK', {
-      duration: 2000,
+    const dialogRef = this.dialog.open(CreateEstimationDialogComponent, {
+      width: '650px',
+    });
+
+    dialogRef.afterClosed().subscribe((result: Estimation | undefined) => {
+      if (result) {
+        this.estimations.update(current => [result, ...current]);
+        this.applyFilters();
+        this.snackBar.open(`Created estimation study "${result.name}"`, 'OK', { duration: 3000 });
+      }
     });
   }
 
